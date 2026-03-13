@@ -1,0 +1,297 @@
+/* ============================================
+   GBI SALEMBA - MODERN FOOTER DESIGN
+   Clean, Minimal, Corporate Style
+   ============================================ */
+
+/* Reset for footer elements */
+.site-footer * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+/* ============================================
+   MAIN FOOTER CONTAINER
+   ============================================ */
+.site-footer {
+    background-color: #F3F9FB;
+    color: #102C57;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    margin-top: 120px;
+}
+
+/* ============================================
+   TOP FOOTER - MAIN CONTENT
+   ============================================ */
+.site-footer-top {
+    padding: 100px 0 80px;
+    border-top: 1px solid rgba(16, 44, 87, 0.08);
+}
+
+.site-footer-container {
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 0 60px;
+    display: grid;
+    grid-template-columns: 1.3fr 1fr;
+    gap: 120px;
+    align-items: start;
+}
+
+/* ============================================
+   LEFT COLUMN - CHURCH INFO
+   ============================================ */
+.site-footer-left {
+    display: flex;
+    flex-direction: column;
+    gap: 32px;
+}
+
+.site-footer-brand {
+    font-size: 36px;
+    font-weight: 900;
+    color: #102C57;
+    letter-spacing: -1px;
+    line-height: 1.1;
+    margin-bottom: 8px;
+}
+
+.site-footer-tagline {
+    font-size: 16px;
+    line-height: 1.75;
+    color: #102C57;
+    opacity: 0.65;
+    font-weight: 400;
+    max-width: 520px;
+}
+
+.site-footer-address {
+    margin-top: 12px;
+}
+
+.address-line {
+    font-size: 15px;
+    line-height: 1.85;
+    color: #102C57;
+    opacity: 0.7;
+    font-weight: 400;
+}
+
+.address-line strong {
+    font-weight: 700;
+    opacity: 1;
+    display: block;
+    margin-bottom: 6px;
+}
+
+/* ============================================
+   RIGHT COLUMN - CONTACT & SOCIAL
+   ============================================ */
+.site-footer-right {
+    display: flex;
+    flex-direction: column;
+    gap: 56px;
+}
+
+.site-footer-heading {
+    font-size: 13px;
+    font-weight: 800;
+    color: #102C57;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    margin-bottom: 24px;
+    opacity: 0.5;
+}
+
+/* Contact List */
+.contact-list {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.contact-row {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.contact-label {
+    font-size: 12px;
+    font-weight: 700;
+    color: #102C57;
+    opacity: 0.45;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+}
+
+.contact-value {
+    font-size: 16px;
+    font-weight: 600;
+    color: #146C94;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    display: inline-block;
+}
+
+.contact-value:hover {
+    color: #102C57;
+    transform: translateX(2px);
+}
+
+/* Social Media Links */
+.social-links {
+    display: flex;
+    gap: 16px;
+    flex-wrap: wrap;
+}
+
+.social-link {
+    width: 48px;
+    height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 22px;
+    background-color: rgba(16, 44, 87, 0.04);
+    border-radius: 50%;
+    transition: all 0.3s ease;
+    text-decoration: none;
+}
+
+.social-link:hover {
+    background-color: #146C94;
+    transform: translateY(-3px) scale(1.05);
+    box-shadow: 0 6px 20px rgba(20, 108, 148, 0.25);
+}
+
+/* ============================================
+   BOTTOM FOOTER - COPYRIGHT
+   ============================================ */
+.site-footer-bottom {
+    background-color: #EADBC8;
+    padding: 28px 0;
+    border-top: 1px solid rgba(16, 44, 87, 0.08);
+}
+
+.site-footer-bottom .site-footer-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 24px;
+    grid-template-columns: 1fr;
+}
+
+.site-footer-copyright {
+    font-size: 14px;
+    color: #102C57;
+    opacity: 0.55;
+    font-weight: 500;
+}
+
+.site-footer-admin {
+    font-size: 12px;
+    color: #102C57;
+    opacity: 0.3;
+    text-decoration: none;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    transition: all 0.3s ease;
+}
+
+.site-footer-admin:hover {
+    opacity: 0.8;
+    color: #146C94;
+}
+
+/* ============================================
+   RESPONSIVE - TABLET
+   ============================================ */
+@media (max-width: 1024px) {
+    .site-footer-container {
+        padding: 0 40px;
+        gap: 80px;
+    }
+
+    .site-footer-brand {
+        font-size: 32px;
+    }
+
+    .site-footer-tagline {
+        font-size: 15px;
+    }
+}
+
+/* ============================================
+   RESPONSIVE - MOBILE
+   ============================================ */
+@media (max-width: 768px) {
+    .site-footer {
+        margin-top: 80px;
+    }
+
+    .site-footer-top {
+        padding: 60px 0 50px;
+    }
+
+    .site-footer-container {
+        grid-template-columns: 1fr;
+        gap: 60px;
+        padding: 0 24px;
+    }
+
+    .site-footer-brand {
+        font-size: 28px;
+    }
+
+    .site-footer-tagline {
+        font-size: 14px;
+        line-height: 1.7;
+    }
+
+    .site-footer-right {
+        gap: 40px;
+    }
+
+    .site-footer-heading {
+        font-size: 12px;
+        margin-bottom: 20px;
+    }
+
+    .contact-list {
+        gap: 16px;
+    }
+
+    .contact-value {
+        font-size: 15px;
+    }
+
+    .social-links {
+        gap: 12px;
+    }
+
+    .social-link {
+        width: 44px;
+        height: 44px;
+        font-size: 20px;
+    }
+
+    .site-footer-bottom {
+        padding: 24px 0;
+    }
+
+    .site-footer-bottom .site-footer-container {
+        flex-direction: column;
+        gap: 12px;
+        text-align: center;
+    }
+
+    .site-footer-copyright {
+        font-size: 13px;
+    }
+
+    .site-footer-admin {
+        font-size: 11px;
+    }
+}

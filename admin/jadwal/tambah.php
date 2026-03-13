@@ -1,0 +1,194 @@
+<?php
+require_once '../includes/auth.php';
+require_once '../../config/database.php';
+
+$error = '';
+$success = '';
+
+// Handle form submission
+if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+    $judul = trim($_POST['judul'] ?? '');
+    $kategori = trim($_POST['kategori'] ?? '');
+    $hari = trim($_POST['hari'] ?? '');
+    $jam_mulai = trim($_POST['jam_mulai'] ?? '');
+    $jam_selesai = trim($_POST['jam_selesai'] ?? '');
+    $lokasi = trim($_POST['lokasi'] ?? '');
+    $catatan = trim($_POST['catatan'] ?? '');
+    $status = $_POST['status'] ?? 'aktif';
+
+    // Validation
+    if (empty($judul) || empty($kategori) || empty($hari) || empty($jam_mulai) || empty($jam_selesai)) {
+        $error = 'Semua field wajib diisi kecuali lokasi dan catatan';
+    } else {
+        // Get next urutan number
+        $stmt_urutan = $conn->prepare("SELECT COALESCE(MAX(urutan), 0) + 1 AS next_urutan FROM jadwal");
+        $stmt_urutan->execute();
+        $result_urutan = $stmt_urutan->get_result();
+        $row_urutan = $result_urutan->fetch_assoc();
+        $next_urutan = $row_urutan['next_urutan'];
+        $stmt_urutan->close();
+
+        // Insert new jadwal
+        $stmt = $conn->prepare("INSERT INTO jadwal (judul, kategori, hari, jam_mulai, jam_selesai, lokasi, catatan, urutan, status) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)");
+        $stmt->bind_param("sssssssis", $judul, $kategori, $hari, $jam_mulai, $jam_selesai, $lokasi, $catatan, $next_urutan, $status);
+        
+        if ($stmt->execute()) {
+            $stmt->close();
+            header("Location: index.php?success=Jadwal berhasil ditambahkan");
+            exit;
+        } else {
+            $error = 'Gagal menambahkan jadwal: ' . $conn->error;
+        }
+        
+        $stmt->close();
+    }
+}
+
+include '../includes/header.php';
+?>
+
+<div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="h3 mb-0 text-gray-800">Tambah Jadwal Baru</h1>
+        <a href="index.php" class="btn btn-secondary">
+            <i class="fas fa-arrow-left"></i> Kembali
+        </a>
+    </div>
+
+    <?php if (!empty($error)): ?>
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            <?php echo htmlspecialchars($error); ?>
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+    <?php endif; ?>
+
+    <div class="row">
+        <div class="col-lg-8">
+            <div class="card shadow mb-4">
+                <div class="card-body">
+                    <form method="POST" action="">
+                        <div class="form-group">
+                            <label for="judul">Judul <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" id="judul" name="judul" 
+                                   value="<?php echo htmlspecialchars($_POST['judul'] ?? ''); ?>" 
+                                   required maxlength="150">
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="kategori">Kategori <span class="text-danger">*</span></label>
+                                    <select class="form-control" id="kategori" name="kategori" required>
+                                        <option value="">-- Pilih Kategori --</option>
+                                        <option value="Ibadah Umum" <?php echo (($_POST['kategori'] ?? '') == 'Ibadah Umum') ? 'selected' : ''; ?>>Ibadah Umum</option>
+                                        <option value="Doa dan Puasa" <?php echo (($_POST['kategori'] ?? '') == 'Doa dan Puasa') ? 'selected' : ''; ?>>Doa dan Puasa</option>
+                                        <option value="Pemahaman Alkitab" <?php echo (($_POST['kategori'] ?? '') == 'Pemahaman Alkitab') ? 'selected' : ''; ?>>Pemahaman Alkitab</option>
+                                        <option value="Kelompok Usia" <?php echo (($_POST['kategori'] ?? '') == 'Kelompok Usia') ? 'selected' : ''; ?>>Kelompok Usia</option>
+                                        <option value="Persekutuan Khusus" <?php echo (($_POST['kategori'] ?? '') == 'Persekutuan Khusus') ? 'selected' : ''; ?>>Persekutuan Khusus</option>
+                                        <option value="Kegiatan Lainnya" <?php echo (($_POST['kategori'] ?? '') == 'Kegiatan Lainnya') ? 'selected' : ''; ?>>Kegiatan Lainnya</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="hari">Hari <span class="text-danger">*</span></label>
+                                    <select class="form-control" id="hari" name="hari" required>
+                                        <option value="">-- Pilih Hari --</option>
+                                        <option value="Senin" <?php echo (($_POST['hari'] ?? '') == 'Senin') ? 'selected' : ''; ?>>Senin</option>
+                                        <option value="Selasa" <?php echo (($_POST['hari'] ?? '') == 'Selasa') ? 'selected' : ''; ?>>Selasa</option>
+                                        <option value="Rabu" <?php echo (($_POST['hari'] ?? '') == 'Rabu') ? 'selected' : ''; ?>>Rabu</option>
+                                        <option value="Kamis" <?php echo (($_POST['hari'] ?? '') == 'Kamis') ? 'selected' : ''; ?>>Kamis</option>
+                                        <option value="Jumat" <?php echo (($_POST['hari'] ?? '') == 'Jumat') ? 'selected' : ''; ?>>Jumat</option>
+                                        <option value="Sabtu" <?php echo (($_POST['hari'] ?? '') == 'Sabtu') ? 'selected' : ''; ?>>Sabtu</option>
+                                        <option value="Minggu" <?php echo (($_POST['hari'] ?? '') == 'Minggu') ? 'selected' : ''; ?>>Minggu</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="jam_mulai">Jam Mulai <span class="text-danger">*</span></label>
+                                    <input type="time" class="form-control" id="jam_mulai" name="jam_mulai" 
+                                           value="<?php echo htmlspecialchars($_POST['jam_mulai'] ?? ''); ?>" 
+                                           required>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="jam_selesai">Jam Selesai <span class="text-danger">*</span></label>
+                                    <input type="time" class="form-control" id="jam_selesai" name="jam_selesai" 
+                                           value="<?php echo htmlspecialchars($_POST['jam_selesai'] ?? ''); ?>" 
+                                           required>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="lokasi">Lokasi</label>
+                            <input type="text" class="form-control" id="lokasi" name="lokasi" 
+                                   value="<?php echo htmlspecialchars($_POST['lokasi'] ?? ''); ?>" 
+                                   maxlength="150">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="catatan">Catatan</label>
+                            <textarea class="form-control" id="catatan" name="catatan" rows="3"><?php echo htmlspecialchars($_POST['catatan'] ?? ''); ?></textarea>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="status">Status <span class="text-danger">*</span></label>
+                            <select class="form-control" id="status" name="status" required>
+                                <option value="aktif" <?php echo (($_POST['status'] ?? 'aktif') == 'aktif') ? 'selected' : ''; ?>>Aktif</option>
+                                <option value="nonaktif" <?php echo (($_POST['status'] ?? '') == 'nonaktif') ? 'selected' : ''; ?>>Non-aktif</option>
+                            </select>
+                        </div>
+
+                        <hr>
+
+                        <div class="d-flex justify-content-between">
+                            <a href="index.php" class="btn btn-secondary">
+                                <i class="fas fa-times"></i> Batal
+                            </a>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save"></i> Simpan Jadwal
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-4">
+            <div class="card shadow mb-4">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">Informasi</h6>
+                </div>
+                <div class="card-body">
+                    <p class="mb-2"><i class="fas fa-info-circle text-info"></i> <strong>Field wajib diisi:</strong></p>
+                    <ul class="small">
+                        <li>Judul</li>
+                        <li>Kategori</li>
+                        <li>Hari</li>
+                        <li>Jam Mulai</li>
+                        <li>Jam Selesai</li>
+                    </ul>
+                    <hr>
+                    <p class="mb-2"><i class="fas fa-lightbulb text-warning"></i> <strong>Tips:</strong></p>
+                    <ul class="small">
+                        <li>Urutan akan otomatis ditempatkan di bawah</li>
+                        <li>Gunakan catatan untuk informasi tambahan</li>
+                        <li>Jadwal akan muncul di website jika status aktif</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<?php include '../includes/footer.php'; ?>
