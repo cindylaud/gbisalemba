@@ -79,6 +79,16 @@ $pelayanan_hero_photo = pelayanan_find_first_image([
     'uploads/slider',
     'assets/images/gembala'
 ]);
+
+$pelayanan_description_map = [
+    'pernikahan' => 'Awal yang baru membangun rumah tangga bersama Kristus',
+    'penyerahan anak' => 'Keluarga bersatu dan berkomitmen membesarkan anak dalam kasih Kristus',
+    'baptisan selam' => 'Disempurnakan menjadi seperti Kristus',
+    'kedukaan' => 'Melayani dengan kasih dan penghiburan kepada keluarga yang ditinggalkan',
+    'kematian' => 'Melayani dengan kasih dan penghiburan kepada keluarga yang ditinggalkan',
+    'pengajaran' => 'Melalui kelas KOM (Kehidupan Orientasi Melayani) kami rindu setiap jemaat Tuhan bertumbuh dalam Kristus',
+    'kom' => 'Melalui kelas KOM (Kehidupan Orientasi Melayani) kami rindu setiap jemaat Tuhan bertumbuh dalam Kristus'
+];
 ?>
 
 <main class="main-content pelayanan-page">
@@ -114,12 +124,23 @@ $pelayanan_hero_photo = pelayanan_find_first_image([
         <div class="pelayanan-grid-box">
     <?php
     if (count($pelayanan_items) > 0) {
-        echo '<div class="pelayanan-grid">';
-        foreach ($pelayanan_items as $row) {
+        echo '<div class="pelayanan-alt-list">';
+        foreach ($pelayanan_items as $index => $row) {
             $foto_path = !empty($row['foto'])
                 ? 'uploads/pelayanan/' . $row['foto']
                 : '';
             $image_meta = pelayanan_get_image_meta($foto_path);
+            $judul_text = isset($row['judul']) ? trim((string) $row['judul']) : '';
+            $judul_lower = strtolower($judul_text);
+            $deskripsi_text = isset($row['deskripsi']) ? trim((string) $row['deskripsi']) : '';
+
+            foreach ($pelayanan_description_map as $keyword => $description_override) {
+                if (strpos($judul_lower, $keyword) !== false) {
+                    $deskripsi_text = $description_override;
+                    break;
+                }
+            }
+
             $foto_posisi_y = isset($row['foto_posisi_y']) ? (int) $row['foto_posisi_y'] : 50;
             if ($foto_posisi_y < 0) {
                 $foto_posisi_y = 0;
@@ -129,19 +150,21 @@ $pelayanan_hero_photo = pelayanan_find_first_image([
             $image_inline_style = 'object-position:center ' . $foto_posisi_y . '%;';
 
             ?>
-            <article class="pelayanan-card">
-                <div class="<?php echo htmlspecialchars($image_meta['media_class']); ?>">
+            <article class="pelayanan-card pelayanan-alt-item <?php echo ($index % 2 === 0) ? 'image-right' : 'image-left'; ?>">
+                <div class="pelayanan-alt-row">
+                    <div class="<?php echo htmlspecialchars($image_meta['media_class']); ?> pelayanan-alt-media">
                     <?php if (!empty($foto_path) && file_exists($foto_path)): ?>
-                        <img src="<?php echo htmlspecialchars($foto_path); ?>" alt="<?php echo htmlspecialchars($row['judul']); ?>" class="<?php echo htmlspecialchars($image_meta['image_class']); ?>" style="<?php echo htmlspecialchars($image_inline_style); ?>">
+                        <img src="<?php echo htmlspecialchars($foto_path); ?>" alt="<?php echo htmlspecialchars($judul_text); ?>" class="<?php echo htmlspecialchars($image_meta['image_class']); ?>" style="<?php echo htmlspecialchars($image_inline_style); ?>">
                     <?php else: ?>
                         <div class="service-image service-image-placeholder">
                             <i class="fas fa-image"></i>
                             <p>Foto pelayanan akan ditampilkan di sini</p>
                         </div>
                     <?php endif; ?>
-                    <div class="pelayanan-card-overlay"></div>
-                    <div class="pelayanan-card-body">
-                        <h2 class="pelayanan-card-title"><?php echo htmlspecialchars($row['judul']); ?></h2>
+                    </div>
+                    <div class="pelayanan-card-content pelayanan-alt-content">
+                        <h2 class="pelayanan-card-title"><?php echo htmlspecialchars($judul_text); ?></h2>
+                        <p class="pelayanan-card-description"><?php echo htmlspecialchars($deskripsi_text); ?></p>
                     </div>
                 </div>
             </article>
@@ -184,7 +207,7 @@ $pelayanan_hero_photo = pelayanan_find_first_image([
 </main>
 
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Manrope:wght@600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,700;9..144,800;9..144,900&family=Manrope:wght@600;700;800&display=swap');
 
 .pelayanan-page {
     position: relative;
@@ -370,33 +393,123 @@ $pelayanan_hero_photo = pelayanan_find_first_image([
     padding: 0;
 }
 
-.pelayanan-grid {
+.pelayanan-alt-list {
     display: grid;
-    grid-template-columns: repeat(12, minmax(0, 1fr));
-    gap: clamp(14px, 1.35vw, 20px);
+    gap: clamp(10px, 1.2vw, 16px);
 }
 
-.pelayanan-card {
+.pelayanan-alt-item {
     position: relative;
-    grid-column: span 4;
+    opacity: 1;
+    transform: none;
+    animation: none;
+    border: 0;
+    box-shadow: none;
+    background: transparent;
     border-radius: 0;
-    transition: transform 0.45s ease;
-    opacity: 0;
-    transform: translateY(28px) scale(0.985);
-    animation: pelayananCardReveal 0.9s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+    padding: 10px 0;
+    border-bottom: 1px solid rgba(20, 63, 104, 0.12);
 }
 
-/* Saat total item 5, dua item bawah ditempatkan di tengah. */
-.pelayanan-card:nth-child(4):nth-last-child(2) {
-    grid-column: 3 / span 4;
+.pelayanan-alt-item::before,
+.pelayanan-alt-item::after {
+    content: "";
+    position: absolute;
+    pointer-events: none;
+    z-index: 0;
 }
 
-.pelayanan-card:nth-child(5):last-child {
-    grid-column: 7 / span 4;
+.pelayanan-alt-item::before {
+    width: 180px;
+    height: 180px;
+    right: 2%;
+    top: 18px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(126, 156, 191, 0.16) 0%, rgba(126, 156, 191, 0) 72%);
+}
+
+.pelayanan-alt-item::after {
+    width: 120px;
+    height: 120px;
+    left: 3%;
+    bottom: 8px;
+    border-radius: 44% 56% 54% 46% / 58% 42% 56% 44%;
+    background: radial-gradient(circle at 38% 42%, rgba(165, 183, 120, 0.18) 0%, rgba(165, 183, 120, 0) 70%);
+}
+
+.pelayanan-alt-item:first-child {
+    border-top: 1px solid rgba(20, 63, 104, 0.12);
+}
+
+.pelayanan-alt-row {
+    display: grid;
+    grid-template-columns: minmax(300px, 430px) minmax(250px, 340px);
+    align-items: center;
+    justify-content: center;
+    gap: clamp(10px, 1.3vw, 16px);
+    padding: 0;
+    border-radius: 0;
+    background: transparent;
+    border: 0;
+    box-shadow: none;
+    max-width: 940px;
+    margin: 0 auto;
+}
+
+.pelayanan-alt-row::before,
+.pelayanan-alt-row::after {
+    content: "";
+    position: absolute;
+    pointer-events: none;
+    z-index: 0;
+}
+
+.pelayanan-alt-row::before {
+    width: 220px;
+    height: 220px;
+    top: -74px;
+    left: -28px;
+    border-radius: 58% 42% 52% 48% / 54% 46% 54% 46%;
+    background: radial-gradient(circle at 34% 38%, rgba(102, 146, 114, 0.2) 0%, rgba(102, 146, 114, 0.06) 56%, rgba(102, 146, 114, 0) 74%);
+    filter: blur(1px);
+}
+
+.pelayanan-alt-row::after {
+    width: 140px;
+    height: 140px;
+    right: -20px;
+    bottom: -18px;
+    border-radius: 50%;
+    background:
+        radial-gradient(circle, rgba(180, 157, 106, 0.25) 0 2px, rgba(180, 157, 106, 0) 3px),
+        radial-gradient(circle, rgba(180, 157, 106, 0.2) 0 1.7px, rgba(180, 157, 106, 0) 2.7px);
+    background-size: 20px 20px, 16px 16px;
+    background-position: 0 0, 8px 8px;
+    opacity: 0.36;
+}
+
+.pelayanan-alt-item.image-left .pelayanan-alt-media {
+    order: 1;
+    justify-self: start;
+}
+
+.pelayanan-alt-item.image-left .pelayanan-alt-content {
+    order: 2;
+    justify-self: end;
+}
+
+.pelayanan-alt-item.image-right .pelayanan-alt-media {
+    order: 2;
+    justify-self: start;
+}
+
+.pelayanan-alt-item.image-right .pelayanan-alt-content {
+    order: 1;
+    justify-self: end;
 }
 
 .pelayanan-card:hover {
-    transform: translateY(-3px);
+    transform: translateY(-4px);
 }
 
 .pelayanan-card:nth-child(1) {
@@ -429,11 +542,16 @@ $pelayanan_hero_photo = pelayanan_find_first_image([
 
 .pelayanan-card-media {
     position: relative;
-    aspect-ratio: 12 / 9;
+    aspect-ratio: 1 / 1;
     overflow: hidden;
-    border-radius: 0;
+    border-radius: 14px;
     background: linear-gradient(180deg, rgba(221, 233, 245, 0.88) 0%, rgba(200, 218, 236, 0.96) 100%);
     box-shadow: none;
+}
+
+.pelayanan-alt-media {
+    width: min(100%, 340px);
+    box-shadow: 0 10px 22px rgba(16, 44, 87, 0.12);
 }
 
 .pelayanan-card-media::before {
@@ -441,9 +559,18 @@ $pelayanan_hero_photo = pelayanan_find_first_image([
     position: absolute;
     inset: 0;
     border-radius: 0;
-    border: 1px solid rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.3);
     z-index: 3;
     pointer-events: none;
+}
+
+.pelayanan-card-media::after {
+    display: none;
+}
+
+.pelayanan-alt-media::before,
+.pelayanan-alt-media::after {
+    display: none;
 }
 
 .pelayanan-card .service-image {
@@ -478,8 +605,8 @@ $pelayanan_hero_photo = pelayanan_find_first_image([
 }
 
 .pelayanan-card:hover .service-image {
-    transform: scale(1.035) translateY(-2px);
-    filter: saturate(1.04);
+    transform: scale(1.04);
+    filter: saturate(1.03);
 }
 
 .pelayanan-card:hover .service-image.rotate-90 {
@@ -492,23 +619,6 @@ $pelayanan_hero_photo = pelayanan_find_first_image([
 
 .pelayanan-card:hover .service-image.rotate-180 {
     transform: rotate(180deg) scale(1.04) translateY(-2px);
-}
-
-.pelayanan-card-overlay {
-    position: absolute;
-    inset: 0;
-    background:
-        linear-gradient(180deg, rgba(5, 20, 36, 0.02) 0%, rgba(5, 20, 36, 0.14) 44%, rgba(5, 20, 36, 0.84) 100%),
-        linear-gradient(125deg, rgba(13, 50, 90, 0.34) 0%, rgba(13, 50, 90, 0.08) 55%, rgba(255, 255, 255, 0) 100%);
-    z-index: 1;
-    transition: opacity 0.55s ease, background-position 0.75s ease;
-    background-size: 100% 100%, 130% 130%;
-    background-position: center, 52% 48%;
-}
-
-.pelayanan-card:hover .pelayanan-card-overlay {
-    background-position: center, 48% 52%;
-    opacity: 0.96;
 }
 
 .pelayanan-card .service-image-placeholder {
@@ -526,26 +636,38 @@ $pelayanan_hero_photo = pelayanan_find_first_image([
     font-size: 24px;
 }
 
-.pelayanan-card-body {
-    position: absolute;
-    inset: auto 0 0 0;
-    z-index: 2;
-    padding: 16px 16px 18px;
-    text-align: center;
+.pelayanan-card-content {
+    padding: 18px 18px 20px;
+    display: grid;
+    gap: 10px;
+}
+
+.pelayanan-alt-content {
+    padding: 0;
+    gap: 8px;
+    align-content: center;
+    max-width: 420px;
+    position: relative;
+    z-index: 1;
 }
 
 .pelayanan-card-title {
     margin: 0;
-    color: #ffffff;
-    font-size: clamp(21px, 1.85vw, 32px);
-    line-height: 1.06;
+    color: #103a66;
+    font-family: 'Fraunces', 'Playfair Display', Georgia, serif;
+    font-size: clamp(30px, 2.7vw, 40px);
+    font-weight: 800;
+    line-height: 0.98;
     letter-spacing: -0.02em;
-    text-shadow: 0 10px 24px rgba(0, 0, 0, 0.34);
-    transition: text-shadow 0.45s ease;
+    max-width: 16ch;
 }
 
-.pelayanan-card:hover .pelayanan-card-title {
-    text-shadow: 0 12px 28px rgba(0, 0, 0, 0.46), 0 0 14px rgba(255, 255, 255, 0.22);
+.pelayanan-card-description {
+    margin: 0;
+    color: #4f617a;
+    font-size: 15px;
+    line-height: 1.5;
+    max-width: 30ch;
 }
 
 .pelayanan-empty-card {
@@ -709,17 +831,36 @@ $pelayanan_hero_photo = pelayanan_find_first_image([
         height: clamp(250px, 42vh, 340px);
     }
 
-    .pelayanan-grid {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
+    .pelayanan-alt-row {
+        grid-template-columns: 1fr;
+        gap: 12px;
+        border-radius: 0;
+        padding: 0;
+        max-width: 100%;
     }
 
-    .pelayanan-card {
-        grid-column: auto;
+    .pelayanan-alt-item::before,
+    .pelayanan-alt-item::after {
+        opacity: 0.6;
+        transform: scale(0.84);
     }
 
-    .pelayanan-card:nth-child(4):nth-last-child(2),
-    .pelayanan-card:nth-child(5):last-child {
-        grid-column: auto;
+    .pelayanan-alt-row::before,
+    .pelayanan-alt-row::after {
+        opacity: 0.55;
+        transform: scale(0.8);
+    }
+
+    .pelayanan-alt-item.image-left .pelayanan-alt-media,
+    .pelayanan-alt-item.image-right .pelayanan-alt-media {
+        order: 1;
+        width: min(100%, 380px);
+    }
+
+    .pelayanan-alt-item.image-left .pelayanan-alt-content,
+    .pelayanan-alt-item.image-right .pelayanan-alt-content {
+        order: 2;
+        justify-self: center;
     }
 
     .pelayanan-grid-section {
@@ -740,25 +881,43 @@ $pelayanan_hero_photo = pelayanan_find_first_image([
         font-size: clamp(34px, 10.2vw, 50px);
     }
 
-    .pelayanan-grid {
-        grid-template-columns: 1fr;
-    }
-
     .pelayanan-grid-box {
         padding: 4px 0;
     }
 
-    .pelayanan-card-media {
-        aspect-ratio: 12 / 9;
+    .pelayanan-alt-row {
         border-radius: 0;
+        padding: 0;
+        gap: 12px;
     }
 
-    .pelayanan-card-body {
-        padding: 12px 12px 14px;
+    .pelayanan-alt-item::before,
+    .pelayanan-alt-item::after {
+        opacity: 0.42;
+        transform: scale(0.66);
+    }
+
+    .pelayanan-card-media {
+        aspect-ratio: 1 / 1;
+        border-radius: 12px;
     }
 
     .pelayanan-card-title {
-        font-size: clamp(24px, 8vw, 34px);
+        font-size: clamp(28px, 9.2vw, 36px);
+        line-height: 0.96;
+        max-width: 100%;
+    }
+
+    .pelayanan-card-description {
+        font-size: 15px;
+        line-height: 1.55;
+        max-width: none;
+    }
+
+    .pelayanan-alt-row::before,
+    .pelayanan-alt-row::after {
+        opacity: 0.42;
+        transform: scale(0.64);
     }
 
     .pelayanan-divider-section .container-large {

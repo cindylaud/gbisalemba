@@ -104,7 +104,7 @@ $cta_photo = gbi_find_first_image([
   <div class="container-large">
         <h2 class="section-title-big">WHAT'S NEW</h2>
 
-                <div class="whats-new-slider" id="whatsNewSlider">
+                <div class="whats-new-slider" id="whatsNewSlider" tabindex="0" aria-label="Slider Whats New">
             <?php
             $q_wn = "SELECT image FROM whats_new
                              WHERE is_active = 1
@@ -150,30 +150,19 @@ $cta_photo = gbi_find_first_image([
     <div class="ibadah-blob ibadah-blob-1"></div>
     <div class="ibadah-blob ibadah-blob-2"></div>
     <div class="container-large">
-        <div class="ibadah-minggu-header">
-            <span class="ibadah-eyebrow">Bergabunglah Bersama Kami</span>
-            <h2 class="ibadah-minggu-title">Ibadah Minggu</h2>
-        </div>
-        <div class="ibadah-minggu-layout">
-            <div class="ibadah-minggu-schedule reveal-on-scroll" data-reveal="left" data-delay="80">
-                <div class="ibadah-jpcc-list">
-                    <article class="ibadah-jpcc-item">
-                        <span class="ibadah-jpcc-time">08:00 WIB</span>
-                    </article>
-                    <article class="ibadah-jpcc-item">
-                        <span class="ibadah-jpcc-time">10:30 WIB</span>
-                    </article>
-                    <article class="ibadah-jpcc-item">
-                        <span class="ibadah-jpcc-time">17:00 WIB</span>
-                    </article>
-                </div>
-            </div>
-            <div class="ibadah-minggu-image reveal-on-scroll" data-reveal="right" data-delay="160">
-                <div class="ibadah-img-wrapper">
-                    <img src="<?php echo htmlspecialchars($ibadah_photo); ?>"
-                         alt="Ibadah Minggu GBI Salemba" class="ibadah-minggu-img">
-                </div>
-                <div class="ibadah-img-deco"></div>
+        <div class="ibadah-editorial-card">
+            <div class="ibadah-showcase">
+                <figure class="ibadah-showcase-photo reveal-on-scroll" data-reveal="left" data-delay="70">
+                    <img src="<?php echo htmlspecialchars($ibadah_photo); ?>" alt="Ibadah Minggu GBI Salemba" class="ibadah-showcase-img">
+                </figure>
+                <article class="ibadah-showcase-panel reveal-on-scroll" data-reveal="right" data-delay="140">
+                    <h2 class="ibadah-showcase-title">Ibadah Minggu</h2>
+                    <div class="ibadah-showcase-times">
+                        <span>08:00 WIB</span>
+                        <span>10:30 WIB</span>
+                        <span>17:00 WIB</span>
+                    </div>
+                </article>
             </div>
         </div>
     </div>

@@ -33,6 +33,47 @@ if (!function_exists('formulir_find_first_image')) {
     }
 }
 
+if (!function_exists('formulir_collect_images')) {
+    function formulir_collect_images(array $directories, $fallback = 'assets/images/default-avatar.png', $max_images = 24) {
+        $supported_extensions = ['jpg', 'jpeg', 'png', 'webp'];
+        $images = [];
+
+        foreach ($directories as $directory) {
+            if (!is_dir($directory)) {
+                continue;
+            }
+
+            $files = scandir($directory);
+            foreach ($files as $file) {
+                if ($file === '.' || $file === '..') {
+                    continue;
+                }
+
+                $extension = strtolower(pathinfo($file, PATHINFO_EXTENSION));
+                if (!in_array($extension, $supported_extensions, true)) {
+                    continue;
+                }
+
+                $candidate = rtrim($directory, '/\\') . '/' . $file;
+                if (!file_exists($candidate)) {
+                    continue;
+                }
+
+                $images[] = $candidate;
+                if (count($images) >= $max_images) {
+                    break 2;
+                }
+            }
+        }
+
+        if (empty($images)) {
+            $images[] = $fallback;
+        }
+
+        return $images;
+    }
+}
+
 // Get all active formulir, ordered by id DESC
 $query = "SELECT id, nama_formulir, deskripsi, file, status FROM formulir 
           WHERE status = 'aktif' 
@@ -51,6 +92,12 @@ $formulir_hero_photo = formulir_find_first_image([
     'uploads/slider',
     'assets/images/gembala'
 ]);
+
+$formulir_card_images = formulir_collect_images([
+    'uploads/pelayanan',
+    'uploads/slider',
+    'assets/images/gembala'
+], $formulir_hero_photo);
 
 ?>
 
@@ -89,20 +136,25 @@ $formulir_hero_photo = formulir_find_first_image([
             ?>
             <div class="formulir-grid">
                 <?php
-                foreach ($formulir_items as $row) {
+                foreach ($formulir_items as $index => $row) {
                     // Check if file exists
                     $file_exists = !empty($row['file']) && file_exists('uploads/formulir/' . $row['file']);
+                    $card_image = $formulir_card_images[$index % count($formulir_card_images)];
+                    $card_description = trim((string)($row['deskripsi'] ?? ''));
                     ?>
                     <div class="formulir-card">
                         <div class="formulir-card-media">
-                            <img src="<?php echo htmlspecialchars($formulir_hero_photo); ?>" alt="<?php echo htmlspecialchars($row['nama_formulir']); ?>" class="formulir-card-photo">
+                            <img src="<?php echo htmlspecialchars($card_image); ?>" alt="<?php echo htmlspecialchars($row['nama_formulir']); ?>" class="formulir-card-photo">
                         </div>
                         <div class="formulir-card-content">
                             <h3 class="formulir-title"><?php echo htmlspecialchars($row['nama_formulir']); ?></h3>
+                            <?php if ($card_description !== ''): ?>
+                                <p class="formulir-description"><?php echo htmlspecialchars($card_description); ?></p>
+                            <?php endif; ?>
                             <?php if ($file_exists): ?>
                                 <a href="download-formulir.php?id=<?php echo $row['id']; ?>" 
                                    class="btn-download-formulir">
-                                    <i class="fas fa-download"></i> Download
+                                    <i class="fas fa-download"></i> Download PDF
                                 </a>
                             <?php else: ?>
                                 <div class="file-not-available">
@@ -135,30 +187,23 @@ $formulir_hero_photo = formulir_find_first_image([
             <div class="formulir-step-flow">
                 <div class="formulir-step-flow-line"></div>
                 <div class="formulir-step-flow-line second-line"></div>
-                <div class="formulir-step-flow-line third-line"></div>
 
                 <div class="formulir-step-item">
                     <span class="formulir-step-icon"><i class="fas fa-file-arrow-down"></i></span>
-                    <span class="formulir-step-label">Step 1</span>
+                    <span class="formulir-step-label">Langkah 1</span>
                     <strong>Download Formulir</strong>
                 </div>
 
                 <div class="formulir-step-item">
-                    <span class="formulir-step-icon"><i class="fas fa-pen"></i></span>
-                    <span class="formulir-step-label">Step 2</span>
-                    <strong>Isi Formulir</strong>
+                    <span class="formulir-step-icon"><i class="fas fa-pen-to-square"></i></span>
+                    <span class="formulir-step-label">Langkah 2</span>
+                    <strong>Mengisi Formulir &amp; Mempersiapkan kelengkapan berkas</strong>
                 </div>
 
                 <div class="formulir-step-item">
                     <span class="formulir-step-icon"><i class="fas fa-paper-plane"></i></span>
-                    <span class="formulir-step-label">Step 3</span>
-                    <strong>Serahkan Formulir</strong>
-                </div>
-
-                <div class="formulir-step-item">
-                    <span class="formulir-step-icon"><i class="fas fa-hourglass-half"></i></span>
-                    <span class="formulir-step-label">Step 4</span>
-                    <strong>Tunggu Konfirmasi</strong>
+                    <span class="formulir-step-label">Langkah 3</span>
+                    <strong>Mengirimkan ke Sekretariat</strong>
                 </div>
             </div>
         </div>
@@ -351,37 +396,39 @@ $formulir_hero_photo = formulir_find_first_image([
 
 .formulir-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-    gap: 26px;
+    grid-template-columns: repeat(auto-fit, minmax(238px, 1fr));
+    gap: 22px;
     margin-bottom: 0;
 }
 
 .formulir-card {
-    background: rgba(255,255,255,0.92);
+    background: linear-gradient(180deg, rgba(255,255,255,0.9) 0%, rgba(249, 251, 255, 0.88) 100%);
     border: 1px solid rgba(30, 58, 95, 0.08);
-    border-radius: 34px;
-    min-height: 380px;
-    text-align: center;
+    border-radius: 20px;
+    min-height: 366px;
+    text-align: left;
     transition: all 0.3s ease;
     display: flex;
     flex-direction: column;
     align-items: stretch;
     justify-content: space-between;
-    box-shadow: 0 16px 34px rgba(16, 44, 87, 0.08);
+    box-shadow: 0 10px 24px rgba(16, 44, 87, 0.06);
     overflow: hidden;
 }
 
 .formulir-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 22px 42px rgba(30, 58, 95, 0.13);
-    border-color: rgba(63, 182, 168, 0.3);
+    transform: translateY(-4px);
+    box-shadow: 0 18px 36px rgba(30, 58, 95, 0.11);
+    border-color: rgba(63, 182, 168, 0.18);
 }
 
 .formulir-card-media {
-    width: 100%;
-    height: clamp(170px, 17vw, 220px);
+    width: calc(100% - 18px);
+    margin: 9px 9px 0;
+    height: clamp(166px, 16vw, 205px);
     overflow: hidden;
     background: #d9e5f2;
+    border-radius: 12px;
 }
 
 .formulir-card-photo {
@@ -390,56 +437,69 @@ $formulir_hero_photo = formulir_find_first_image([
     object-fit: cover;
     object-position: center;
     display: block;
-    transform: scale(1.02);
+    transform: scale(1.01);
     transition: transform 0.45s ease;
 }
 
 .formulir-card:hover .formulir-card-photo {
-    transform: scale(1.08);
+    transform: scale(1.05);
 }
 
 .formulir-card-content {
     width: 100%;
     display: flex;
     flex-direction: column;
-    align-items: center;
-    gap: 18px;
-    padding: 22px 20px 24px;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 16px 18px 18px;
 }
 
 .formulir-title {
-    font-size: clamp(19px, 1.8vw, 28px);
-    font-weight: 700;
+    font-family: 'Playfair Display', Georgia, serif;
+    font-size: clamp(22px, 1.65vw, 28px);
+    font-weight: 600;
     color: #102C57;
     margin: 0;
-    line-height: 1.35;
-    max-width: 18ch;
+    line-height: 1.2;
+    max-width: 19ch;
+}
+
+.formulir-description {
+    margin: 0;
+    color: #5f6d84;
+    font-size: 14px;
+    line-height: 1.5;
+    max-width: 34ch;
+    min-height: 64px;
 }
 
 .btn-download-formulir {
     display: inline-flex;
     align-items: center;
-    gap: 10px;
-    background: linear-gradient(135deg, #1E3A5F 0%, #0F2742 100%);
-    color: white;
-    min-width: 170px;
+    gap: 8px;
+    background: #eaedf5;
+    color: #1f3f6f;
+    min-width: 132px;
     justify-content: center;
-    padding: 10px 20px;
-    border-radius: 999px;
+    padding: 8px 14px;
+    border-radius: 8px;
+    border: 1px solid rgba(55, 84, 126, 0.12);
     font-weight: 600;
-    font-size: 13px;
+    font-size: 12px;
     transition: all 0.3s ease;
     cursor: pointer;
     text-decoration: none;
+    margin-top: auto;
 }
 
 .btn-download-formulir:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 12px rgba(30, 58, 95, 0.25);
+    transform: translateY(-1px);
+    background: #dfe6f4;
+    box-shadow: 0 5px 10px rgba(30, 58, 95, 0.12);
 }
 
 .btn-download-formulir i {
-    font-size: 16px;
+    font-size: 11px;
 }
 
 .file-not-available {
@@ -455,7 +515,7 @@ $formulir_hero_photo = formulir_find_first_image([
 }
 
 .formulir-process-section {
-    padding: 0 0 28px;
+    padding: 0 0 18px;
 }
 
 .formulir-page + .footer {
@@ -465,8 +525,8 @@ $formulir_hero_photo = formulir_find_first_image([
 .formulir-process-shell {
     max-width: 1180px;
     margin: 0 auto;
-    padding: clamp(28px, 4vw, 42px);
-    border-radius: 24px;
+    padding: clamp(22px, 3.2vw, 32px);
+    border-radius: 20px;
     background: rgba(255, 255, 255, 0.82);
     border: 1px solid rgba(30, 58, 95, 0.08);
     box-shadow: 0 18px 38px rgba(16, 44, 87, 0.08);
@@ -478,40 +538,36 @@ $formulir_hero_photo = formulir_find_first_image([
 }
 
 .formulir-process-title {
-    font-size: clamp(32px, 4vw, 44px);
+    font-size: clamp(26px, 3.2vw, 34px);
     line-height: 1.12;
     color: #102C57;
-    margin: 0 0 30px;
+    margin: 0 0 20px;
 }
 
 .formulir-step-flow {
     position: relative;
     display: grid;
-    grid-template-columns: repeat(4, minmax(0, 1fr));
-    gap: 18px;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 14px;
     align-items: start;
-    padding: 12px 10px 0;
+    padding: 8px 8px 0;
 }
 
 .formulir-step-flow-line {
     position: absolute;
-    top: 25px;
+    top: 21px;
     height: 2px;
     background: linear-gradient(90deg, rgba(21, 65, 110, 0.24) 0%, rgba(21, 65, 110, 0.38) 100%);
     z-index: 0;
 }
 
 .formulir-step-flow-line {
-    left: calc(12.5% + 26px);
-    width: calc(25% - 52px);
+    left: calc(16.666% + 26px);
+    width: calc(33.333% - 52px);
 }
 
 .formulir-step-flow-line.second-line {
-    left: calc(37.5% + 26px);
-}
-
-.formulir-step-flow-line.third-line {
-    left: calc(62.5% + 26px);
+    left: calc(50% + 26px);
 }
 
 .formulir-step-item {
@@ -524,14 +580,14 @@ $formulir_hero_photo = formulir_find_first_image([
 }
 
 .formulir-step-icon {
-    width: 38px;
-    height: 38px;
+    width: 34px;
+    height: 34px;
     border-radius: 50%;
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    font-size: 15px;
-    margin-bottom: 14px;
+    font-size: 14px;
+    margin-bottom: 10px;
     border: 2px solid rgba(21, 65, 110, 0.18);
     background: #ffffff;
     color: #1b4d7b;
@@ -540,8 +596,8 @@ $formulir_hero_photo = formulir_find_first_image([
 
 .formulir-step-label {
     display: block;
-    margin-bottom: 6px;
-    font-size: 10px;
+    margin-bottom: 4px;
+    font-size: 9px;
     font-weight: 800;
     letter-spacing: 0.16em;
     text-transform: uppercase;
@@ -550,9 +606,10 @@ $formulir_hero_photo = formulir_find_first_image([
 
 .formulir-step-item strong {
     display: block;
-    font-size: 18px;
-    line-height: 1.25;
+    font-size: 15px;
+    line-height: 1.3;
     color: #102C57;
+    max-width: 30ch;
 }
 
 /* ============================================
@@ -588,15 +645,15 @@ $formulir_hero_photo = formulir_find_first_image([
 
     .formulir-card {
         min-height: 340px;
-        border-radius: 28px;
+        border-radius: 18px;
     }
 
     .formulir-card-media {
-        height: 160px;
+        height: 170px;
     }
 
     .formulir-card-content {
-        padding: 20px 16px 20px;
+        padding: 14px 14px 16px;
     }
 
     .formulir-process-section {
@@ -604,8 +661,8 @@ $formulir_hero_photo = formulir_find_first_image([
     }
 
     .formulir-process-shell {
-        padding: 24px 18px;
-        border-radius: 20px;
+        padding: 20px 14px;
+        border-radius: 16px;
     }
 
     .formulir-step-flow {
@@ -626,7 +683,16 @@ $formulir_hero_photo = formulir_find_first_image([
     }
 
     .formulir-title {
-        font-size: clamp(20px, 7vw, 26px);
+        font-size: clamp(24px, 8vw, 30px);
+    }
+
+    .formulir-description {
+        font-size: 13px;
+        min-height: 0;
+    }
+
+    .btn-download-formulir {
+        min-width: 128px;
     }
 }
 </style>

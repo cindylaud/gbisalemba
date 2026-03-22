@@ -217,17 +217,17 @@ require_once 'includes/header.php';
     --cool-ink: #12385f;
     --cool-ink-soft: #315579;
     --cool-ink-deep: #0e2742;
-    --cool-sand: #ede5d6;
-    --cool-sand-strong: #dfd2bb;
-    --cool-olive: #a3b542;
-    --cool-olive-deep: #7f952a;
-    --cool-mint: #4e8d72;
+    --cool-sand: #dce7f4;
+    --cool-sand-strong: #c8d8eb;
+    --cool-olive: #5f95c7;
+    --cool-olive-deep: #356ba2;
+    --cool-mint: #4a7ead;
     --cool-white: #ffffff;
     --cool-shadow: 0 24px 60px rgba(18, 45, 73, 0.16);
     background:
-        radial-gradient(circle at top left, rgba(78, 141, 114, 0.16), transparent 24%),
-        radial-gradient(circle at right 12%, rgba(163, 181, 66, 0.14), transparent 22%),
-        linear-gradient(180deg, #f6f0e5 0%, #ede6d7 52%, #f6f3ec 100%);
+        radial-gradient(circle at top left, rgba(93, 143, 197, 0.2), transparent 24%),
+        radial-gradient(circle at right 12%, rgba(73, 120, 175, 0.14), transparent 22%),
+        linear-gradient(180deg, #e9f1fb 0%, #dce7f4 52%, #edf4fb 100%);
     color: var(--cool-ink);
     font-family: 'Manrope', 'Segoe UI', sans-serif;
     overflow: hidden;
@@ -243,7 +243,7 @@ require_once 'includes/header.php';
 }
 
 .cool-top-strip {
-    background: linear-gradient(90deg, #4a8b6f 0%, #58a181 100%);
+    background: linear-gradient(90deg, #1e4f84 0%, #2f6aa3 100%);
     color: rgba(255, 255, 255, 0.95);
     text-align: center;
     font-size: 12px;
@@ -264,7 +264,7 @@ require_once 'includes/header.php';
     align-items: center;
     padding: 48px;
     border-radius: 36px;
-    background: rgba(244, 239, 228, 0.9);
+    background: rgba(236, 244, 253, 0.9);
     box-shadow: var(--cool-shadow);
     position: relative;
 }
@@ -447,7 +447,7 @@ require_once 'includes/header.php';
     left: 0;
     bottom: 0;
     width: min(320px, 72%);
-    background: rgba(255, 248, 236, 0.95);
+    background: rgba(236, 244, 253, 0.95);
     border-radius: 26px;
     overflow: hidden;
     box-shadow: 0 24px 48px rgba(11, 31, 55, 0.2);
@@ -572,7 +572,7 @@ require_once 'includes/header.php';
 .cool-pillar-card {
     padding: 18px;
     border-radius: 26px;
-    background: rgba(255, 255, 255, 0.56);
+    background: rgba(235, 244, 254, 0.7);
     border: 1px solid rgba(18, 56, 95, 0.08);
     box-shadow: 0 18px 38px rgba(18, 45, 73, 0.08);
 }
@@ -650,7 +650,7 @@ require_once 'includes/header.php';
 .cool-reason-card {
     padding: 28px 24px;
     border-radius: 24px;
-    background: rgba(243, 236, 223, 0.92);
+    background: rgba(233, 242, 252, 0.94);
     border: 1px solid rgba(255, 255, 255, 0.16);
     box-shadow: 0 16px 34px rgba(11, 31, 55, 0.18);
 }
@@ -673,7 +673,7 @@ require_once 'includes/header.php';
     min-height: 34px;
     padding: 0 14px;
     margin-bottom: 14px;
-    background: rgba(163, 181, 66, 0.18);
+    background: rgba(86, 140, 198, 0.2);
     color: var(--cool-ink);
     font-size: 11px;
     letter-spacing: 0.08em;
@@ -782,7 +782,7 @@ require_once 'includes/header.php';
     display: grid;
     grid-template-columns: minmax(0, 1.05fr) minmax(320px, 0.95fr);
     gap: 24px;
-    background: linear-gradient(135deg, rgba(245, 238, 226, 0.92) 0%, rgba(224, 214, 190, 0.9) 100%);
+    background: linear-gradient(135deg, rgba(233, 242, 252, 0.94) 0%, rgba(206, 223, 242, 0.92) 100%);
 }
 
 .cool-contact-stack {
