@@ -329,7 +329,7 @@ $pelayanan_description_map = [
 
 .pelayanan-grid-section {
     position: relative;
-    padding: 0 0 26px;
+    padding: 4px 0 30px;
 }
 
 .pelayanan-divider-section {
@@ -387,6 +387,8 @@ $pelayanan_description_map = [
 .pelayanan-grid-section .container-large {
     max-width: 1540px;
     padding: 0 22px;
+    position: relative;
+    z-index: 1;
 }
 
 .pelayanan-grid-box {
@@ -408,7 +410,7 @@ $pelayanan_description_map = [
     background: transparent;
     border-radius: 0;
     padding: 10px 0;
-    border-bottom: 1px solid rgba(20, 63, 104, 0.12);
+    border-bottom: 0;
 }
 
 .pelayanan-alt-item::before,
@@ -438,7 +440,7 @@ $pelayanan_description_map = [
 }
 
 .pelayanan-alt-item:first-child {
-    border-top: 1px solid rgba(20, 63, 104, 0.12);
+    border-top: 0;
 }
 
 .pelayanan-alt-row {

@@ -105,6 +105,11 @@ $cta_photo = gbi_find_first_image([
         <h2 class="section-title-big">WHAT'S NEW</h2>
 
                 <div class="whats-new-slider" id="whatsNewSlider" tabindex="0" aria-label="Slider Whats New">
+                    <div class="whats-new-decor" aria-hidden="true">
+                        <span class="whats-new-decor-text decor-text-main">BERTUMBUH</span>
+                        <span class="whats-new-decor-text decor-text-side">KRISTUS</span>
+                    </div>
+
             <?php
             $q_wn = "SELECT image FROM whats_new
                              WHERE is_active = 1
