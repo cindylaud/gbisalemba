@@ -1,6 +1,6 @@
 <?php
-require_once '../includes/auth.php';
-require_once '../../config/database.php';
+require_once __DIR__ . '/../includes/auth.php';
+require_once __DIR__ . '/../../config/database.php';
 
 // Check if column 'urutan' exists
 $has_urutan_column = false;
@@ -115,3 +115,6 @@ try {
     header("Location: index.php?error=Gagal mengubah urutan: " . htmlspecialchars($e->getMessage()));
     exit;
 }
+
+
+

@@ -7,8 +7,8 @@
  * aplikasi (frontend dan admin).
  * 
  * Penggunaan:
- *   - Dari root: require_once 'config/database.php';
- *   - Dari admin: require_once '../config/database.php';
+ *   - Dari root: require_once __DIR__ . '/';
+ *   - Dari admin: require_once __DIR__ . '/';
  *   - Query: $conn->query(); atau prepared statement
  * =====================================================================
  */
@@ -65,3 +65,4 @@ if (!function_exists('close_connection')) {
 register_shutdown_function('close_connection');
 
 ?>
+

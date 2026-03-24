@@ -1,12 +1,12 @@
 <?php
-require_once '../config/database.php';
-require_once 'includes/auth.php';
+require_once __DIR__ . '/../config/database.php';
+require_once __DIR__ . '/includes/auth.php';
 
 $slider_id = intval($_GET['id'] ?? 0);
 
 if ($slider_id == 0) {
     $_SESSION['error'] = 'ID slider tidak valid';
-    header('Location: /gbisalemba/admin/slider.php');
+    header('Location: slider.php');
     exit;
 }
 
@@ -19,7 +19,7 @@ $slider = $result->fetch_assoc();
 
 if (!$slider) {
     $_SESSION['error'] = 'Slider tidak ditemukan';
-    header('Location: /gbisalemba/admin/slider.php');
+    header('Location: slider.php');
     exit;
 }
 
@@ -39,5 +39,8 @@ if ($stmt->execute()) {
     $_SESSION['error'] = 'Gagal menghapus slider: ' . $conn->error;
 }
 
-header('Location: /gbisalemba/admin/slider.php');
+header('Location: slider.php');
 exit;
+
+
+

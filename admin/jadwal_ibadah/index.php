@@ -1,6 +1,6 @@
 <?php
-require_once '../includes/auth.php';
-require_once '../../config/database.php';
+require_once __DIR__ . '/../includes/auth.php';
+require_once __DIR__ . '/../../config/database.php';
 
 // Check if column 'urutan' exists in jadwal_ibadah table
 $has_urutan_column = false;
@@ -31,7 +31,7 @@ $result = $stmt->get_result();
 $jadwal_list = $result->fetch_all(MYSQLI_ASSOC);
 $stmt->close();
 
-include '../includes/header.php';
+include __DIR__ . '/../includes/header.php';
 ?>
 
 <div class="container-fluid">
@@ -193,4 +193,6 @@ include '../includes/header.php';
     </div>
 </div>
 
-<?php include '../includes/footer.php'; ?>
+<?php include __DIR__ . '/../includes/footer.php'; ?>
+
+

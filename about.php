@@ -1,6 +1,6 @@
 <?php
-require_once 'config/database.php';
-include 'includes/header.php';
+require_once __DIR__ . '/config/database.php';
+include __DIR__ . '/includes/header.php';
 
 if (!function_exists('about_find_first_image')) {
     function about_find_first_image(array $directories, $fallback = 'uploads/slider/slider_1__1771686869_4ba458.jpg') {
@@ -666,4 +666,6 @@ $about_photo_3 = about_find_first_image([
 }
 </style>
 
-<?php include 'includes/footer.php'; ?>
+<?php include __DIR__ . '/includes/footer.php'; ?>
+
+

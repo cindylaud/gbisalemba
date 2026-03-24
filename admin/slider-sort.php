@@ -1,6 +1,6 @@
 <?php
-require_once '../config/database.php';
-require_once 'includes/auth.php';
+require_once __DIR__ . '/../config/database.php';
+require_once __DIR__ . '/includes/auth.php';
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['slider_id']) && isset($_POST['urutan'])) {
     $slider_id = intval($_POST['slider_id']);
@@ -19,10 +19,13 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['slider_id']) && isset(
         $_SESSION['error'] = 'Data tidak valid';
     }
     
-    header('Location: /gbisalemba/admin/slider.php');
+    header('Location: slider.php');
     exit;
 }
 
 // Jika akses langsung, redirect
-header('Location: /gbisalemba/admin/slider.php');
+header('Location: slider.php');
 exit;
+
+
+

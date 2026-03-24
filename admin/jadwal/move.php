@@ -1,6 +1,6 @@
 <?php
-require_once '../includes/auth.php';
-require_once '../../config/database.php';
+require_once __DIR__ . '/../includes/auth.php';
+require_once __DIR__ . '/../../config/database.php';
 
 // Check if ID and action are provided
 if (!isset($_GET['id']) || !is_numeric($_GET['id']) || !isset($_GET['action'])) {
@@ -97,3 +97,6 @@ try {
     header("Location: index.php?error=Gagal mengubah urutan: " . $e->getMessage());
     exit;
 }
+
+
+

@@ -1,7 +1,7 @@
 <?php
-require_once '../config/database.php';
-require_once 'includes/auth.php';
-require_once '../includes/image-helper.php';
+require_once __DIR__ . '/../config/database.php';
+require_once __DIR__ . '/includes/auth.php';
+require_once __DIR__ . '/../includes/image-helper.php';
 
 define('WN_UPLOAD_DIR', __DIR__ . '/../uploads/whatsnew/');
 define('WN_MAX_SIZE',   50 * 1024 * 1024); // 50MB
@@ -24,7 +24,7 @@ if (isset($_GET['action']) && $_GET['action'] === 'delete' && isset($_GET['id'])
 
     if ($del_id <= 0) {
         $_SESSION['error'] = 'ID tidak valid';
-        header('Location: /gbisalemba/admin/whatsnew.php');
+        header('Location: whatsnew.php');
         exit;
     }
 
@@ -37,7 +37,7 @@ if (isset($_GET['action']) && $_GET['action'] === 'delete' && isset($_GET['id'])
 
     if (!$row) {
         $_SESSION['error'] = 'Data tidak ditemukan';
-        header('Location: /gbisalemba/admin/whatsnew.php');
+        header('Location: whatsnew.php');
         exit;
     }
 
@@ -57,7 +57,7 @@ if (isset($_GET['action']) && $_GET['action'] === 'delete' && isset($_GET['id'])
     }
     $stmt->close();
 
-    header('Location: /gbisalemba/admin/whatsnew.php');
+    header('Location: whatsnew.php');
     exit;
 }
 
@@ -69,7 +69,7 @@ if (isset($_GET['action']) && $_GET['action'] === 'toggle' && isset($_GET['id'])
 
     if ($tog_id <= 0) {
         $_SESSION['error'] = 'ID tidak valid';
-        header('Location: /gbisalemba/admin/whatsnew.php');
+        header('Location: whatsnew.php');
         exit;
     }
 
@@ -82,7 +82,7 @@ if (isset($_GET['action']) && $_GET['action'] === 'toggle' && isset($_GET['id'])
     }
     $stmt->close();
 
-    header('Location: /gbisalemba/admin/whatsnew.php');
+    header('Location: whatsnew.php');
     exit;
 }
 
@@ -106,7 +106,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
         $stmt->close();
     }
 
-    header('Location: /gbisalemba/admin/whatsnew.php');
+    header('Location: whatsnew.php');
     exit;
 }
 
@@ -442,7 +442,7 @@ while ($row = $res->fetch_assoc()) {
 <body>
 <div class="container">
 
-    <a href="/gbisalemba/admin/index.php" class="back-link">← Kembali ke Dashboard</a>
+    <a href="index.php" class="back-link">← Kembali ke Dashboard</a>
     <h1>Kelola What's New Slider</h1>
 
     <?php if ($message): ?>
@@ -478,7 +478,7 @@ while ($row = $res->fetch_assoc()) {
                         <?php foreach ($items as $no => $item): ?>
                             <?php
                                 $file_exists = file_exists(WN_UPLOAD_DIR . $item['image']);
-                                $img_url     = '/gbisalemba/uploads/whatsnew/' . htmlspecialchars($item['image']);
+                                $img_url     = '../uploads/whatsnew/' . htmlspecialchars($item['image']);
                             ?>
                             <tr>
                                 <!-- No -->
@@ -575,3 +575,8 @@ while ($row = $res->fetch_assoc()) {
 </div><!-- /.container -->
 </body>
 </html>
+
+
+
+
+

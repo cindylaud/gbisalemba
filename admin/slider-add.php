@@ -1,6 +1,6 @@
 <?php
-require_once '../config/database.php';
-require_once 'includes/auth.php';
+require_once __DIR__ . '/../config/database.php';
+require_once __DIR__ . '/includes/auth.php';
 
 $error = '';
 $success = '';
@@ -58,7 +58,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                     
                     if ($stmt->execute()) {
                         $_SESSION['message'] = 'Slider berhasil ditambahkan';
-                        header('Location: /gbisalemba/admin/slider.php');
+                        header('Location: slider.php');
                         exit;
                     } else {
                         unlink($upload_path); // Hapus file jika insert gagal
@@ -72,13 +72,13 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     }
 }
 
-include 'includes/header.php';
+include __DIR__ . '/includes/header.php';
 ?>
 
 <div class="admin-container">
     <div class="admin-header">
         <h1>Tambah Slider</h1>
-        <a href="/gbisalemba/admin/slider.php" class="btn-secondary">Kembali</a>
+        <a href="slider.php" class="btn-secondary">Kembali</a>
     </div>
 
     <?php if (!empty($error)): ?>
@@ -114,8 +114,10 @@ include 'includes/header.php';
         </div>
 
         <button type="submit" class="btn-primary">Simpan</button>
-        <a href="/gbisalemba/admin/slider.php" class="btn-secondary">Batal</a>
+        <a href="slider.php" class="btn-secondary">Batal</a>
     </form>
 </div>
 
-<?php include 'includes/footer.php'; ?>
+<?php include __DIR__ . '/includes/footer.php'; ?>
+
+

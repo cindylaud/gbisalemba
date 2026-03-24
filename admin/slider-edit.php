@@ -1,11 +1,11 @@
 <?php
-require_once '../config/database.php';
-require_once 'includes/auth.php';
+require_once __DIR__ . '/../config/database.php';
+require_once __DIR__ . '/includes/auth.php';
 
 $slider_id = intval($_GET['id'] ?? 0);
 
 if ($slider_id == 0) {
-    header('Location: /gbisalemba/admin/slider.php');
+    header('Location: slider.php');
     exit;
 }
 
@@ -17,7 +17,7 @@ $result = $stmt->get_result();
 $slider = $result->fetch_assoc();
 
 if (!$slider) {
-    header('Location: /gbisalemba/admin/slider.php');
+    header('Location: slider.php');
     exit;
 }
 
@@ -85,7 +85,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 
                 if ($stmt->execute()) {
                     $_SESSION['message'] = 'Slider berhasil diperbarui';
-                    header('Location: /gbisalemba/admin/slider.php');
+                    header('Location: slider.php');
                     exit;
                 } else {
                     $error = 'Gagal menyimpan data: ' . $conn->error;
@@ -95,13 +95,13 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     }
 }
 
-include 'includes/header.php';
+include __DIR__ . '/includes/header.php';
 ?>
 
 <div class="admin-container">
     <div class="admin-header">
         <h1>Edit Slider</h1>
-        <a href="/gbisalemba/admin/slider.php" class="btn-secondary">Kembali</a>
+        <a href="slider.php" class="btn-secondary">Kembali</a>
     </div>
 
     <?php if (!empty($error)): ?>
@@ -112,7 +112,7 @@ include 'includes/header.php';
         <div class="form-group">
             <label>Gambar Sekarang</label>
             <p>
-                <img src="/gbisalemba/uploads/slider/<?php echo htmlspecialchars($slider['gambar']); ?>" 
+                <img src="../uploads/slider/<?php echo htmlspecialchars($slider['gambar']); ?>" 
                      alt="<?php echo htmlspecialchars($slider['title']); ?>" 
                      style="max-width: 200px; height: auto;">
             </p>
@@ -143,8 +143,11 @@ include 'includes/header.php';
         </div>
 
         <button type="submit" class="btn-primary">Update</button>
-        <a href="/gbisalemba/admin/slider.php" class="btn-secondary">Batal</a>
+        <a href="slider.php" class="btn-secondary">Batal</a>
     </form>
 </div>
 
-<?php include 'includes/footer.php'; ?>
+<?php include __DIR__ . '/includes/footer.php'; ?>
+
+
+

@@ -1,11 +1,11 @@
 <?php
-require_once '../config/database.php';
-require_once 'includes/auth.php';
+require_once __DIR__ . '/../config/database.php';
+require_once __DIR__ . '/includes/auth.php';
 
 // Validasi input
 if (!isset($_GET['slot'])) {
     $_SESSION['slider_error'] = 'Data tidak valid';
-    header('Location: /gbisalemba/admin/slider.php');
+    header('Location: slider.php');
     exit;
 }
 
@@ -14,7 +14,7 @@ $slot = intval($_GET['slot']);
 // Validasi slot 1-4
 if ($slot < 1 || $slot > 4) {
     $_SESSION['slider_error'] = 'Slot harus antara 1-4';
-    header('Location: /gbisalemba/admin/slider.php');
+    header('Location: slider.php');
     exit;
 }
 
@@ -27,7 +27,7 @@ $slider_data = $result->fetch_assoc();
 
 if (!$slider_data) {
     $_SESSION['slider_error'] = 'Slot tidak ditemukan';
-    header('Location: /gbisalemba/admin/slider.php');
+    header('Location: slider.php');
     exit;
 }
 
@@ -50,6 +50,9 @@ if ($update_stmt->execute()) {
 }
 
 $conn->close();
-header('Location: /gbisalemba/admin/slider.php');
+header('Location: slider.php');
 exit;
 ?>
+
+
+

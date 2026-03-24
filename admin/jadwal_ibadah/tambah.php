@@ -1,6 +1,6 @@
 <?php
-require_once '../includes/auth.php';
-require_once '../../config/database.php';
+require_once __DIR__ . '/../includes/auth.php';
+require_once __DIR__ . '/../../config/database.php';
 
 // Check if column 'urutan' and 'kategori' exist
 $has_urutan_column = false;
@@ -80,7 +80,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     }
 }
 
-include '../includes/header.php';
+include __DIR__ . '/../includes/header.php';
 ?>
 
 <div class="container-fluid">
@@ -217,4 +217,8 @@ include '../includes/header.php';
     </div>
 </div>
 
-<?php include '../includes/footer.php'; ?>
+<?php include __DIR__ . '/../includes/footer.php'; ?>
+
+
+
+

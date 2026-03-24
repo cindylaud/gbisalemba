@@ -1,5 +1,5 @@
 <?php
-include 'includes/auth.php';
+include __DIR__ . '/includes/auth.php';
 ?>
 <!DOCTYPE html>
 <html>
@@ -89,3 +89,4 @@ include 'includes/auth.php';
     </div>
 </body>
 </html>
+

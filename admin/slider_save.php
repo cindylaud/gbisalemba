@@ -1,11 +1,11 @@
 <?php
-require_once '../config/database.php';
-require_once 'includes/auth.php';
+require_once __DIR__ . '/../config/database.php';
+require_once __DIR__ . '/includes/auth.php';
 
 // Validasi input
 if (!isset($_POST['slot']) || !isset($_POST['id'])) {
     $_SESSION['slider_error'] = 'Data tidak valid';
-    header('Location: /gbisalemba/admin/slider.php');
+    header('Location: slider.php');
     exit;
 }
 
@@ -16,7 +16,7 @@ $is_active = isset($_POST['is_active']) ? 1 : 0;
 // Validasi slot 1-4
 if ($slot < 1 || $slot > 4) {
     $_SESSION['slider_error'] = 'Slot harus antara 1-4';
-    header('Location: /gbisalemba/admin/slider.php');
+    header('Location: slider.php');
     exit;
 }
 
@@ -36,14 +36,14 @@ if ($has_upload) {
     
     if (!in_array($file_ext, $allowed_extensions)) {
         $_SESSION['slider_error'] = 'Format file tidak valid. Gunakan: jpg, jpeg, png, webp';
-        header('Location: /gbisalemba/admin/slider.php');
+        header('Location: slider.php');
         exit;
     }
     
     // Validasi ukuran max 2MB
     if ($file_size > 2 * 1024 * 1024) {
         $_SESSION['slider_error'] = 'Ukuran file maksimal 2MB';
-        header('Location: /gbisalemba/admin/slider.php');
+        header('Location: slider.php');
         exit;
     }
     
@@ -100,6 +100,9 @@ if ($has_upload) {
 }
 
 $conn->close();
-header('Location: /gbisalemba/admin/slider.php');
+header('Location: slider.php');
 exit;
 ?>
+
+
+

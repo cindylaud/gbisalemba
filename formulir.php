@@ -1,6 +1,6 @@
 <?php
-require_once 'config/database.php';
-include 'includes/header.php';
+require_once __DIR__ . '/config/database.php';
+include __DIR__ . '/includes/header.php';
 
 if (!function_exists('formulir_find_first_image')) {
     function formulir_find_first_image(array $directories, $fallback = 'assets/images/default-avatar.png') {
@@ -698,5 +698,7 @@ $formulir_card_images = formulir_collect_images([
 </style>
 
 <?php
-include 'includes/footer.php';
+include __DIR__ . '/includes/footer.php';
 ?>
+
+

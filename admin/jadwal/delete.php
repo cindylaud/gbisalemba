@@ -1,6 +1,6 @@
 <?php
-require_once '../includes/auth.php';
-require_once '../../config/database.php';
+require_once __DIR__ . '/../includes/auth.php';
+require_once __DIR__ . '/../../config/database.php';
 
 // Check if ID is provided
 if (!isset($_GET['id']) || !is_numeric($_GET['id'])) {
@@ -38,3 +38,6 @@ if ($stmt_delete->execute()) {
     header("Location: index.php?error=Gagal menghapus jadwal");
     exit;
 }
+
+
+

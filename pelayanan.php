@@ -1,6 +1,6 @@
 <?php
-require_once 'config/database.php';
-include 'includes/header.php';
+require_once __DIR__ . '/config/database.php';
+include __DIR__ . '/includes/header.php';
 
 if (!function_exists('pelayanan_find_first_image')) {
     function pelayanan_find_first_image(array $directories, $fallback = 'assets/images/default-avatar.png') {
@@ -942,5 +942,7 @@ $pelayanan_description_map = [
 </style>
 
 <?php
-include 'includes/footer.php';
+include __DIR__ . '/includes/footer.php';
 ?>
+
+

@@ -1,6 +1,6 @@
 <?php
 // Setup database untuk Pelayanan
-require_once 'config/database.php';
+require_once __DIR__ . '/config/database.php';
 
 // 1. Create table pelayanan
 $sql_create = "CREATE TABLE IF NOT EXISTS pelayanan (
@@ -15,9 +15,9 @@ $sql_create = "CREATE TABLE IF NOT EXISTS pelayanan (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci";
 
 if ($conn->query($sql_create) === TRUE) {
-    echo "✓ Tabel 'pelayanan' berhasil dibuat/sudah ada.<br>";
+    echo "[OK] Tabel 'pelayanan' berhasil dibuat/sudah ada.<br>";
 } else {
-    echo "✗ Error create table: " . $conn->error . "<br>";
+    echo "[X] Error create table: " . $conn->error . "<br>";
 }
 
 // 2. Check if table already has data
@@ -34,13 +34,15 @@ if ($row['cnt'] == 0) {
     ('Pelayanan Pengajaran (KOM)', 'Kami rindu setiap jemaat Tuhan bertumbuh dalam Kristus', 'aktif', 5)";
     
     if ($conn->query($sql_insert) === TRUE) {
-        echo "✓ Data initial pelayanan berhasil diinsert.<br>";
+        echo "[OK] Data initial pelayanan berhasil diinsert.<br>";
     } else {
-        echo "✗ Error insert data: " . $conn->error . "<br>";
+        echo "[X] Error insert data: " . $conn->error . "<br>";
     }
 } else {
-    echo "ℹ Data pelayanan sudah ada (" . $row['cnt'] . " records).<br>";
+    echo "[INFO] Data pelayanan sudah ada (" . $row['cnt'] . " records).<br>";
 }
 
-echo "<br><a href='pelayanan.php'>← Kembali ke Halaman Pelayanan</a>";
+echo "<br><a href='pelayanan.php'>&larr; Kembali ke Halaman Pelayanan</a>";
 ?>
+
+

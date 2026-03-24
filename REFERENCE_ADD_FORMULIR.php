@@ -13,7 +13,7 @@
  * =====================================================================
  */
 
-require_once 'config/database.php';
+require_once __DIR__ . '/config/database.php';
 
 // Konfigurasi
 define('MAX_UPLOAD_SIZE', 10 * 1024 * 1024); // 10MB
@@ -140,3 +140,5 @@ echo "\nFile: {$file_name}";
 // exit;
 
 ?>
+
+

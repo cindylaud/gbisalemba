@@ -1,7 +1,7 @@
 <?php
-require_once '../config/database.php';
-require_once 'includes/auth.php';
-require_once '../includes/image-helper.php';
+require_once __DIR__ . '/../config/database.php';
+require_once __DIR__ . '/includes/auth.php';
+require_once __DIR__ . '/../includes/image-helper.php';
 
 // Define constants
 define('MAX_UPLOAD_SIZE', 10 * 1024 * 1024); // 10MB
@@ -765,3 +765,8 @@ updateImagePositionPreview();
 
 </body>
 </html>
+
+
+
+
+

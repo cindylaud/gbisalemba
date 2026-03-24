@@ -1,6 +1,6 @@
 <?php
-require_once 'config/database.php';
-include 'includes/header.php';
+require_once __DIR__ . '/config/database.php';
+include __DIR__ . '/includes/header.php';
 
 if (!function_exists('gbi_find_first_image')) {
     function gbi_find_first_image(array $directories, $fallback = 'assets/images/default-avatar.png') {
@@ -80,14 +80,14 @@ $cta_photo = gbi_find_first_image([
   } else {
       foreach ($images as $i => $img) { ?>
         <div class="hero-slide <?php echo $i === 0 ? 'active' : ''; ?>">
-          <div class="hero-bg" style="background-image:url('/gbisalemba/uploads/slider/<?php echo htmlspecialchars($img); ?>');"></div>
+          <div class="hero-bg" style="background-image:url('uploads/slider/<?php echo htmlspecialchars($img); ?>');" ></div>
           <div class="hero-overlay"></div>
         </div>
       <?php } ?>
 
       <?php if (count($images) > 1): ?>
-        <button class="hero-btn hero-btn-prev" onclick="sliderPrev()">‹</button>
-        <button class="hero-btn hero-btn-next" onclick="sliderNext()">›</button>
+                <button class="hero-btn hero-btn-prev" onclick="sliderPrev()">&#8249;</button>
+                <button class="hero-btn hero-btn-next" onclick="sliderNext()">&#8250;</button>
 
         <div class="hero-dots">
           <?php for ($i=0; $i<count($images); $i++): ?>
@@ -106,8 +106,6 @@ $cta_photo = gbi_find_first_image([
 
                 <div class="whats-new-slider" id="whatsNewSlider" tabindex="0" aria-label="Slider Whats New">
                     <div class="whats-new-decor" aria-hidden="true">
-                        <span class="whats-new-decor-text decor-text-main">BERTUMBUH</span>
-                        <span class="whats-new-decor-text decor-text-side">KRISTUS</span>
                     </div>
 
             <?php
@@ -128,7 +126,7 @@ $cta_photo = gbi_find_first_image([
                 <div class="whats-new-track" id="whatsNewTrack">
                     <?php foreach ($wn_images as $i => $img): ?>
                         <div class="whats-new-card">
-                            <img src="/gbisalemba/uploads/whatsnew/<?php echo htmlspecialchars($img); ?>" alt="What's New <?php echo $i + 1; ?>">
+                            <img src="uploads/whatsnew/<?php echo htmlspecialchars($img); ?>" alt="What's New <?php echo $i + 1; ?>">
                         </div>
                     <?php endforeach; ?>
                 </div>
@@ -239,8 +237,10 @@ $cta_photo = gbi_find_first_image([
 
 </main>
 
-<script src="/gbisalemba/assets/js/slider.js"></script>
-<script src="/gbisalemba/assets/js/whats-new-slider.js"></script>
-<script src="/gbisalemba/assets/js/home-reveal.js"></script>
+<script src="assets/js/slider.js"></script>
+<script src="assets/js/whats-new-slider.js"></script>
+<script src="assets/js/home-reveal.js"></script>
 
-<?php include 'includes/footer.php'; ?>
+<?php include __DIR__ . '/includes/footer.php'; ?>
+
+

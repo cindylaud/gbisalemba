@@ -1,7 +1,7 @@
 <?php
-require_once '../config/database.php';
-require_once 'includes/auth.php';
-require_once '../includes/image-helper.php';
+require_once __DIR__ . '/../config/database.php';
+require_once __DIR__ . '/includes/auth.php';
+require_once __DIR__ . '/../includes/image-helper.php';
 
 // Define constants untuk slider
 define('SLIDER_MAX_UPLOAD_SIZE', 30 * 1024 * 1024); // 30MB
@@ -395,7 +395,7 @@ while ($row = $result->fetch_assoc()) {
 <body>
     <div class="container">
         <div class="header">
-            <a href="/gbisalemba/admin/index.php" class="back-link">← Kembali ke Dashboard</a>
+            <a href="index.php" class="back-link">← Kembali ke Dashboard</a>
             <h1>Kelola Slider (4 Foto)</h1>
         </div>
         
@@ -418,7 +418,7 @@ while ($row = $result->fetch_assoc()) {
                     $has_image = file_exists($file_path);
                 }
                 
-                $image_path = $has_image ? '/gbisalemba/uploads/slider/' . $card_data['image'] : '';
+                $image_path = $has_image ? '../uploads/slider/' . $card_data['image'] : '';
                 $is_active = $card_data && $card_data['is_active'] == 1;
             ?>
                 <div class="card">
@@ -473,3 +473,8 @@ while ($row = $result->fetch_assoc()) {
     </div>
 </body>
 </html>
+
+
+
+
+

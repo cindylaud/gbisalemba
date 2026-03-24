@@ -1,6 +1,6 @@
 <?php
-require_once 'includes/header.php';
-require_once 'config/database.php';
+require_once __DIR__ . '/includes/header.php';
+require_once __DIR__ . '/config/database.php';
 
 if (!function_exists('jadwal_collect_images')) {
     function jadwal_collect_images(array $directories) {
@@ -1058,4 +1058,6 @@ document.addEventListener('DOMContentLoaded', function () {
 });
 </script>
 
-<?php require_once 'includes/footer.php'; ?>
+<?php require_once __DIR__ . '/includes/footer.php'; ?>
+
+

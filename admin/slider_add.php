@@ -1,9 +1,9 @@
 <?php
-require_once '../config/database.php';
-require_once 'includes/auth.php';
+require_once __DIR__ . '/../config/database.php';
+require_once __DIR__ . '/includes/auth.php';
 
 if ($_SERVER['REQUEST_METHOD'] != 'POST') {
-    header('Location: /gbisalemba/admin/slider.php');
+    header('Location: slider.php');
     exit;
 }
 
@@ -74,7 +74,7 @@ if (!$error) {
                     
                     if ($stmt->execute()) {
                         $_SESSION['message'] = 'Slider berhasil ditambahkan';
-                        header('Location: /gbisalemba/admin/slider.php');
+                        header('Location: slider.php');
                         exit;
                     } else {
                         $error = 'Gagal menyimpan data: ' . $conn->error;
@@ -87,7 +87,7 @@ if (!$error) {
                 
                 if ($stmt->execute()) {
                     $_SESSION['message'] = 'Slider berhasil ditambahkan';
-                    header('Location: /gbisalemba/admin/slider.php');
+                    header('Location: slider.php');
                     exit;
                 } else {
                     $error = 'Gagal menyimpan data: ' . $conn->error;
@@ -132,7 +132,7 @@ if (!$error) {
                         }
                         
                         $_SESSION['message'] = 'Slider berhasil diperbarui';
-                        header('Location: /gbisalemba/admin/slider.php');
+                        header('Location: slider.php');
                         exit;
                     } else {
                         $error = 'Gagal menyimpan data: ' . $conn->error;
@@ -147,10 +147,13 @@ if (!$error) {
 // If error, redirect back with error message
 if ($error) {
     $_SESSION['error'] = $error;
-    header('Location: /gbisalemba/admin/slider.php' . ($action == 'edit' && $slider_id > 0 ? '?edit_id=' . $slider_id : ''));
+    header('Location: slider.php' . ($action == 'edit' && $slider_id > 0 ? '?edit_id=' . $slider_id : ''));
     exit;
 }
 
 // Fallback
-header('Location: /gbisalemba/admin/slider.php');
+header('Location: slider.php');
 exit;
+
+
+
