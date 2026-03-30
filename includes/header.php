@@ -28,7 +28,12 @@
                 <img src="<?php echo $basePath; ?>/assets/images/logo/logo%20gbi.png" alt="Logo GBI Salemba" class="logo-img">
                 <span class="logo-text">GBI Salemba</span>
             </a>
-            <nav class="navbar">
+            <button class="header-menu-toggle" type="button" aria-expanded="false" aria-controls="mainNav" aria-label="Buka menu navigasi">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+            <nav class="navbar" id="mainNav">
                 <ul>
                     <li><a href="<?php echo $basePath; ?>/index.php">Home</a></li>
                     <li><a href="<?php echo $basePath; ?>/about.php">Tentang Kami</a></li>
@@ -42,3 +47,50 @@
         </div>
     </div>
 </header>
+
+<script>
+(function () {
+    var headerNav = document.querySelector('.header-nav');
+    var toggle = document.querySelector('.header-menu-toggle');
+    var nav = document.getElementById('mainNav');
+
+    if (!headerNav || !toggle || !nav) {
+        return;
+    }
+
+    var closeMenu = function () {
+        headerNav.classList.remove('nav-open');
+        toggle.setAttribute('aria-expanded', 'false');
+        document.body.classList.remove('menu-open');
+    };
+
+    toggle.addEventListener('click', function () {
+        var willOpen = !headerNav.classList.contains('nav-open');
+        headerNav.classList.toggle('nav-open', willOpen);
+        toggle.setAttribute('aria-expanded', willOpen ? 'true' : 'false');
+        document.body.classList.toggle('menu-open', willOpen && window.innerWidth <= 900);
+    });
+
+    nav.querySelectorAll('a').forEach(function (link) {
+        link.addEventListener('click', function () {
+            closeMenu();
+        });
+    });
+
+    document.addEventListener('click', function (event) {
+        if (window.innerWidth > 900) {
+            return;
+        }
+
+        if (!headerNav.contains(event.target)) {
+            closeMenu();
+        }
+    });
+
+    window.addEventListener('resize', function () {
+        if (window.innerWidth > 900) {
+            closeMenu();
+        }
+    });
+})();
+</script>

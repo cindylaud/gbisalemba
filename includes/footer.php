@@ -55,8 +55,6 @@
         <i class="fas fa-phone"></i>
         0819-1884-8181
       </a>
-
-      <p>sekretariat@gbi-salemba.org</p>
     </div>
 
     <!-- Sosial Media -->

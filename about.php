@@ -70,11 +70,14 @@ if (!function_exists('about_collect_images')) {
     }
 }
 
-$about_hero_image = about_find_first_image([
-    'uploads/whatsnew',
-    'uploads/slider',
-    'assets/images/gembala'
-]);
+$about_hero_image = 'assets/images/umum/about-hero-client.jpg';
+if (!file_exists($about_hero_image)) {
+    $about_hero_image = about_find_first_image([
+        'uploads/whatsnew',
+        'uploads/slider',
+        'assets/images/gembala'
+    ]);
+}
 
 $about_gallery_images = about_collect_images([
     'uploads/whatsnew',
@@ -122,6 +125,7 @@ $about_photo_3 = about_find_first_image([
 
         <section class="about-gbi-intro">
             <h2>Bukan sekadar perjalanan gereja, tetapi kesaksian hidup tentang panggilan Tuhan yang dikerjakan dalam kesetiaan.</h2>
+            <p class="about-gbi-identity">Gereja Bethel Indonesia (GBI) Salemba merupakan gereja Kristen di bawah naungan GBI Jl. Jend. Gatot Subroto, <span class="about-nowrap">Jakarta Rayon 1H</span> dengan gembala sidang Pdt. DR. Ir. Niko Njotorahardjo dan gembala cabang Pdt. David Natanael, M.Th.</p>
         </section>
 
         <section class="about-gbi-gallery" aria-label="Dokumentasi Kegiatan">
@@ -170,7 +174,7 @@ $about_photo_3 = about_find_first_image([
         </section>
 
         <section class="about-gbi-leaders">
-            <h3>Para Gembala</h3>
+            <h3 class="about-gbi-script-title">Penggembalaan</h3>
             <div class="about-gbi-leaders-grid">
                 <article class="about-gbi-leader-card">
                     <div class="about-gbi-leader-photo-wrap">
@@ -213,10 +217,8 @@ $about_photo_3 = about_find_first_image([
     --gbi-green-dark: #0f2847;
     --gbi-cream: #f4f8fd;
     --gbi-card: #f8fbff;
-    background:
-        radial-gradient(circle at 10% 8%, rgba(44, 110, 170, 0.12) 0%, rgba(44, 110, 170, 0) 34%),
-        radial-gradient(circle at 90% 14%, rgba(37, 133, 126, 0.08) 0%, rgba(37, 133, 126, 0) 30%),
-        linear-gradient(160deg, #f8fbff 0%, #edf3fa 52%, #f5f9fc 100%);
+    --gbi-intro-bg: #eef3fa;
+    background: var(--gbi-intro-bg);
     position: relative;
     isolation: isolate;
     overflow: hidden;
@@ -228,29 +230,7 @@ $about_photo_3 = about_find_first_image([
 
 .about-gbi-wrap::before,
 .about-gbi-wrap::after {
-    content: '';
-    position: absolute;
-    pointer-events: none;
-    z-index: 0;
-    border-radius: 50%;
-}
-
-.about-gbi-wrap::before {
-    width: 460px;
-    height: 460px;
-    top: -180px;
-    right: -120px;
-    background: radial-gradient(circle, rgba(40, 98, 156, 0.12) 0%, rgba(40, 98, 156, 0) 70%);
-    filter: blur(24px);
-}
-
-.about-gbi-wrap::after {
-    width: 380px;
-    height: 380px;
-    bottom: 10%;
-    left: -130px;
-    background: radial-gradient(circle, rgba(34, 137, 149, 0.1) 0%, rgba(34, 137, 149, 0) 72%);
-    filter: blur(26px);
+    display: none;
 }
 
 .about-gbi-shell {
@@ -378,7 +358,7 @@ $about_photo_3 = about_find_first_image([
     right: 0;
     bottom: -1px;
     height: 76px;
-    background: var(--gbi-card);
+    background: var(--gbi-intro-bg);
     border-top-left-radius: 50% 80px;
     border-top-right-radius: 50% 80px;
 }
@@ -386,7 +366,7 @@ $about_photo_3 = about_find_first_image([
 .about-gbi-intro {
     padding: 26px 52px 34px;
     text-align: center;
-    background: linear-gradient(180deg, rgba(255, 255, 255, 0.55) 0%, rgba(241, 247, 255, 0.7) 100%);
+    background: var(--gbi-intro-bg);
 }
 
 .about-gbi-intro h2 {
@@ -401,21 +381,26 @@ $about_photo_3 = about_find_first_image([
     display: inline-block;
 }
 
+.about-gbi-intro .about-gbi-identity {
+    margin: 14px auto 0;
+    max-width: 980px;
+    font-size: clamp(14px, 1.3vw, 16px);
+    line-height: 1.7;
+    color: #1b446e;
+    background: rgba(16, 44, 87, 0.08);
+    border-left: 4px solid var(--gbi-navy);
+    border-right: 4px solid var(--gbi-navy);
+    border-radius: 12px;
+    padding: 10px 14px;
+}
+
+.about-nowrap {
+    white-space: nowrap;
+}
+
 .about-gbi-gallery {
     padding: 30px 40px 26px;
     position: relative;
-}
-
-.about-gbi-gallery::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 60px;
-    width: 14px;
-    height: 14px;
-    background: var(--gbi-navy);
-    border-radius: 50%;
-    opacity: 0.4;
 }
 
 .about-gbi-gallery-grid {
@@ -470,6 +455,15 @@ $about_photo_3 = about_find_first_image([
     height: 3px;
     background: var(--gbi-navy);
     margin: 12px auto 0;
+}
+
+.about-gbi-script-title {
+    font-family: 'Great Vibes', 'Brillotus', 'Segoe Script', cursive !important;
+    font-size: clamp(46px, 5.8vw, 76px) !important;
+    font-weight: 400 !important;
+    letter-spacing: 0.01em !important;
+    line-height: 1.02 !important;
+    text-transform: none !important;
 }
 
 .about-gbi-story-card {
@@ -615,6 +609,29 @@ $about_photo_3 = about_find_first_image([
 
     .about-gbi-hero-card {
         border-radius: 0 0 18px 18px;
+        padding: 24px 22px;
+        border-left: none;
+        border-top: 5px solid var(--gbi-green);
+    }
+
+    .about-gbi-intro {
+        padding: 24px 34px 30px;
+    }
+
+    .about-gbi-intro h2 {
+        display: block;
+        max-width: 760px;
+    }
+
+    .about-gbi-intro .about-gbi-identity {
+        max-width: 900px;
+    }
+
+    .about-gbi-gallery,
+    .about-gbi-story,
+    .about-gbi-leaders {
+        padding-left: 26px;
+        padding-right: 26px;
     }
 
     .about-gbi-gallery-grid {
@@ -626,14 +643,80 @@ $about_photo_3 = about_find_first_image([
     }
 }
 
+@media (max-width: 900px) {
+    .about-gbi-hero {
+        padding: 16px 18px 68px;
+    }
+
+    .about-gbi-hero-inner {
+        max-width: 760px;
+    }
+
+    .about-gbi-hero-media {
+        min-height: 280px;
+    }
+
+    .about-gbi-hero-card h1 {
+        font-size: clamp(28px, 6vw, 42px);
+    }
+
+    .about-gbi-hero-card p {
+        font-size: 15px;
+        line-height: 1.66;
+    }
+
+    .about-gbi-wave {
+        height: 68px;
+        border-top-left-radius: 50% 72px;
+        border-top-right-radius: 50% 72px;
+    }
+
+    .about-gbi-intro {
+        padding: 22px 24px 28px;
+    }
+
+    .about-gbi-intro h2 {
+        font-size: clamp(32px, 6.1vw, 44px);
+        line-height: 1.08;
+    }
+
+    .about-gbi-intro .about-gbi-identity {
+        font-size: 15px;
+        line-height: 1.68;
+        padding: 11px 14px;
+    }
+
+    .about-gbi-story-card {
+        padding: 24px;
+    }
+
+    .about-gbi-story-card p {
+        font-size: 16px;
+        line-height: 1.8;
+    }
+
+    .about-gbi-story-card blockquote {
+        font-size: 20px;
+        line-height: 1.48;
+    }
+}
+
 @media (max-width: 700px) {
     .about-gbi-wrap {
         padding: 0 0 60px;
     }
 
     .about-gbi-shell {
-        width: min(1200px, calc(100% - 16px));
-        border-radius: 18px;
+        width: 100%;
+        margin: 0;
+        border-radius: 0;
+        overflow: hidden;
+    }
+
+    .about-gbi-wave {
+        height: 54px;
+        border-top-left-radius: 50% 56px;
+        border-top-right-radius: 50% 56px;
     }
 
     .about-gbi-hero,
@@ -645,10 +728,56 @@ $about_photo_3 = about_find_first_image([
         padding-right: 14px;
     }
 
+    .about-gbi-hero {
+        padding-top: 14px;
+        padding-bottom: 56px;
+    }
+
+    .about-gbi-hero-media {
+        min-height: 240px;
+    }
+
+    .about-gbi-hero-card {
+        padding: 18px 16px 20px;
+    }
+
+    .about-gbi-hero-card h1 {
+        font-size: clamp(26px, 9vw, 36px);
+    }
+
+    .about-gbi-hero-card p {
+        font-size: 14px;
+        line-height: 1.62;
+        padding: 0 16px;
+    }
+
+    .about-gbi-hero-card p::before,
+    .about-gbi-hero-card p::after {
+        font-size: 36px;
+    }
+
+    .about-gbi-intro {
+        padding-top: 18px;
+        padding-bottom: 22px;
+    }
+
     .about-gbi-intro h2,
     .about-gbi-story h3,
     .about-gbi-leaders h3 {
         line-height: 1.08;
+    }
+
+    .about-gbi-intro h2 {
+        font-size: clamp(30px, 9vw, 40px);
+        margin-bottom: 10px;
+    }
+
+    .about-gbi-intro .about-gbi-identity {
+        font-size: 14px;
+        line-height: 1.65;
+        border-left-width: 3px;
+        border-right-width: 3px;
+        padding: 10px 12px;
     }
 
     .about-gbi-story-card p {
@@ -662,6 +791,41 @@ $about_photo_3 = about_find_first_image([
     .about-gbi-gallery-grid,
     .about-gbi-leaders-grid {
         grid-template-columns: 1fr;
+    }
+
+    .about-gbi-leader-meta {
+        padding: 14px 12px 14px;
+    }
+}
+
+@media (max-width: 480px) {
+    .about-gbi-wave {
+        height: 46px;
+        border-top-left-radius: 50% 42px;
+        border-top-right-radius: 50% 42px;
+    }
+
+    .about-gbi-intro h2 {
+        font-size: clamp(28px, 10.6vw, 34px);
+    }
+
+    .about-gbi-intro .about-gbi-identity {
+        font-size: 13px;
+        line-height: 1.62;
+    }
+
+    .about-gbi-story-card {
+        padding: 18px;
+    }
+
+    .about-gbi-story-card p {
+        font-size: 14px;
+        line-height: 1.74;
+    }
+
+    .about-gbi-story-card blockquote {
+        font-size: 17px;
+        padding: 12px 14px;
     }
 }
 </style>

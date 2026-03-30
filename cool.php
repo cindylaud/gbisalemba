@@ -146,7 +146,7 @@ require_once __DIR__ . '/includes/header.php';
                         <div class="cool-category-icon"><i class="fas fa-child"></i></div>
                         <div>
                             <h3>Junior Church (JC)</h3>
-                            <p>13-20 Th</p>
+                            <p>12-20 Th</p>
                         </div>
                     </div>
 

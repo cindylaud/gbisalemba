@@ -34,11 +34,47 @@ if (!function_exists('jadwal_collect_images')) {
     }
 }
 
+if (!function_exists('jadwal_normalize_name')) {
+    function jadwal_normalize_name($name) {
+        $name = strtolower(trim((string) $name));
+        $name = preg_replace('/[^a-z0-9]+/', ' ', $name);
+        return trim($name);
+    }
+}
+
+if (!function_exists('jadwal_resolve_key')) {
+    function jadwal_resolve_key($name) {
+        $normalized = jadwal_normalize_name($name);
+
+        if (strpos($normalized, 'raya') !== false) {
+            return 'ibadah_raya';
+        }
+
+        if (strpos($normalized, 'starskids') !== false || strpos($normalized, 'stars kids') !== false) {
+            return 'ibadah_starskids';
+        }
+
+        if (strpos($normalized, 'starsjc') !== false || strpos($normalized, 'stars jc') !== false) {
+            return 'ibadah_starsjc';
+        }
+
+        if (strpos($normalized, 'stars community') !== false) {
+            return 'ibadah_stars_community';
+        }
+
+        if (strpos($normalized, 'rumah doa') !== false) {
+            return 'rumah_doa';
+        }
+
+        return null;
+    }
+}
+
 // Get all active jadwal ibadah
 $jadwal_list = [];
 $error_message = '';
 
-$stmt = $conn->prepare("SELECT id, nama_ibadah, hari, jam, ruangan, keterangan FROM jadwal_ibadah WHERE is_active = 1 ORDER BY id DESC");
+$stmt = $conn->prepare("SELECT id, nama_ibadah, hari, jam, ruangan, keterangan FROM jadwal_ibadah WHERE is_active = 1 ORDER BY id ASC");
 
 if ($stmt) {
     $stmt->execute();
@@ -48,6 +84,68 @@ if ($stmt) {
 } else {
     $error_message = 'Gagal mengambil data jadwal. Silakan coba lagi nanti.';
 }
+
+$jadwal_required = [
+    'ibadah_raya' => [
+        'nama_ibadah' => 'Ibadah Raya',
+        'hari' => 'Minggu',
+        'jam' => '08:00 WIB, 10:30 WIB, & 17:00 WIB',
+        'ruangan' => 'Stars Community Hall',
+        'keterangan' => 'Ibadah Minggu GBI Salemba'
+    ],
+    'ibadah_starskids' => [
+        'nama_ibadah' => 'Ibadah StarsKids',
+        'hari' => 'Minggu',
+        'jam' => '08:00 WIB, 10:30 WIB, & 17:00 WIB',
+        'ruangan' => 'Ruangan StarsKids',
+        'keterangan' => 'Ibadah Anak'
+    ],
+    'ibadah_starsjc' => [
+        'nama_ibadah' => 'Ibadah StarsJC',
+        'hari' => 'Setiap Minggu ke 1, 3, & 5',
+        'jam' => '10:30 WIB',
+        'ruangan' => 'Ruangan StarsJC',
+        'keterangan' => 'Usia 12-18 tahun'
+    ],
+    'ibadah_stars_community' => [
+        'nama_ibadah' => 'Ibadah Stars Community',
+        'hari' => 'Setiap Jumat minggu ke-4',
+        'jam' => '19:00 WIB',
+        'ruangan' => 'Stars Community Hall',
+        'keterangan' => 'Usia 18-25 tahun'
+    ],
+    'rumah_doa' => [
+        'nama_ibadah' => 'Rumah Doa',
+        'hari' => 'Selasa & Kamis',
+        'jam' => '09:00 WIB',
+        'ruangan' => 'Ruangan StarsKids',
+        'keterangan' => 'Ibadah doa bersama'
+    ]
+];
+
+$jadwal_lookup = [];
+foreach ($jadwal_list as $row) {
+    $key = jadwal_resolve_key($row['nama_ibadah'] ?? '');
+    if ($key && !isset($jadwal_lookup[$key])) {
+        $jadwal_lookup[$key] = $row;
+    }
+}
+
+$ordered_jadwal = [];
+$fallback_id = 10000;
+foreach ($jadwal_required as $key => $preset) {
+    $existing = $jadwal_lookup[$key] ?? null;
+    $ordered_jadwal[] = [
+        'id' => $existing ? (int) $existing['id'] : $fallback_id++,
+        'nama_ibadah' => $preset['nama_ibadah'],
+        'hari' => $preset['hari'],
+        'jam' => $preset['jam'],
+        'ruangan' => $preset['ruangan'],
+        'keterangan' => $preset['keterangan']
+    ];
+}
+
+$jadwal_list = $ordered_jadwal;
 
 $jadwal_gallery_images = jadwal_collect_images([
     'uploads/slider',
@@ -194,7 +292,7 @@ $jadwal_hero_photo = $jadwal_gallery_images[count($jadwal_gallery_images) - 1];
                             <i class="fab fa-instagram jadwal-social-icon"></i>
                             <span>@gbi.salemba</span>
                         </a>
-                        <a href="#" target="_blank" rel="noopener noreferrer" class="jadwal-social-btn jadwal-social-tt">
+                        <a href="https://www.tiktok.com/@gbisalemba" target="_blank" rel="noopener noreferrer" class="jadwal-social-btn jadwal-social-tt">
                             <i class="fab fa-tiktok jadwal-social-icon"></i>
                             <span>GBI Salemba</span>
                         </a>

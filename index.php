@@ -86,9 +86,6 @@ $cta_photo = gbi_find_first_image([
       <?php } ?>
 
       <?php if (count($images) > 1): ?>
-                <button class="hero-btn hero-btn-prev" onclick="sliderPrev()">&#8249;</button>
-                <button class="hero-btn hero-btn-next" onclick="sliderNext()">&#8250;</button>
-
         <div class="hero-dots">
           <?php for ($i=0; $i<count($images); $i++): ?>
             <span class="hero-dot <?php echo $i===0?'active':''; ?>" onclick="sliderGoto(<?php echo $i; ?>)"></span>
@@ -99,12 +96,12 @@ $cta_photo = gbi_find_first_image([
   <?php } ?>
 </section>
 
-<!-- 2. WHAT'S NEW SECTION -->
+<!-- 2. COMING SOON SECTION -->
 <section class="whats-new">
   <div class="container-large">
-        <h2 class="section-title-big">WHAT'S NEW</h2>
+        <h2 class="section-title-big">COMING SOON</h2>
 
-                <div class="whats-new-slider" id="whatsNewSlider" tabindex="0" aria-label="Slider Whats New">
+                <div class="whats-new-slider" id="whatsNewSlider" tabindex="0" aria-label="Slider Coming Soon">
                     <div class="whats-new-decor" aria-hidden="true">
                     </div>
 
@@ -152,19 +149,37 @@ $cta_photo = gbi_find_first_image([
 <section class="ibadah-minggu-section reveal-on-scroll" data-reveal="section" data-delay="0">
     <div class="ibadah-blob ibadah-blob-1"></div>
     <div class="ibadah-blob ibadah-blob-2"></div>
+    <div class="ibadah-section-divider" aria-hidden="true">
+        <span></span>
+        <span></span>
+        <span></span>
+    </div>
     <div class="container-large">
         <div class="ibadah-editorial-card">
             <div class="ibadah-showcase">
-                <figure class="ibadah-showcase-photo reveal-on-scroll" data-reveal="left" data-delay="70">
-                    <img src="<?php echo htmlspecialchars($ibadah_photo); ?>" alt="Ibadah Minggu GBI Salemba" class="ibadah-showcase-img">
+                <figure class="ibadah-showcase-photo reveal-on-scroll" data-reveal="right" data-delay="70">
+                    <div class="ibadah-showcase-media">
+                        <iframe
+                            class="ibadah-showcase-video"
+                            src="https://drive.google.com/file/d/1R_OgbpPHwG8nmrOxOx33nd4e-wFhlfrQ/preview"
+                            title="Video Ibadah Minggu GBI Salemba"
+                            allow="autoplay; encrypted-media; picture-in-picture"
+                            allowfullscreen>
+                        </iframe>
+                        <div class="ibadah-showcase-aesthetic-controls" aria-hidden="true">
+                            <span class="dot"></span>
+                            <span class="dot"></span>
+                        </div>
+                    </div>
                 </figure>
-                <article class="ibadah-showcase-panel reveal-on-scroll" data-reveal="right" data-delay="140">
+                <article class="ibadah-showcase-panel reveal-on-scroll" data-reveal="left" data-delay="140">
                     <h2 class="ibadah-showcase-title">Ibadah Minggu</h2>
                     <div class="ibadah-showcase-times">
                         <span>08:00 WIB</span>
                         <span>10:30 WIB</span>
                         <span>17:00 WIB</span>
                     </div>
+                    <p class="ibadah-showcase-note">Disertai ibadah Starskids dan disiarkan secara online.</p>
                 </article>
             </div>
         </div>

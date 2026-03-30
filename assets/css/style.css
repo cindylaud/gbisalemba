@@ -85,6 +85,7 @@ header{
 .header-nav{
   background-color:var(--white);
   border-bottom:1px solid rgba(30,58,95,.08);
+  position: relative;
 }
 .header-nav .container{
   max-width:1400px;
@@ -135,6 +136,40 @@ header{
   transition:width .3s ease;
 }
 .navbar a:hover::after{width:100%}
+
+.header-menu-toggle{
+  display:none;
+  width:42px;
+  height:42px;
+  border-radius:12px;
+  border:1px solid rgba(30,58,95,.2);
+  background:#fff;
+  align-items:center;
+  justify-content:center;
+  flex-direction:column;
+  gap:5px;
+  cursor:pointer;
+}
+
+.header-menu-toggle span{
+  width:18px;
+  height:2px;
+  border-radius:2px;
+  background:var(--blue-primary);
+  transition:transform .25s ease, opacity .2s ease;
+}
+
+.header-nav.nav-open .header-menu-toggle span:nth-child(1){
+  transform:translateY(7px) rotate(45deg);
+}
+
+.header-nav.nav-open .header-menu-toggle span:nth-child(2){
+  opacity:0;
+}
+
+.header-nav.nav-open .header-menu-toggle span:nth-child(3){
+  transform:translateY(-7px) rotate(-45deg);
+}
 
 /* ============================================
    HERO / SLIDER (FINAL - MATCH index.php + slider.js)
@@ -1025,7 +1060,11 @@ header{
 .whats-new .section-title-big {
   text-align: center;
   margin-bottom: 22px;
-  letter-spacing: 0.06em;
+  letter-spacing: 0.04em;
+  font-family: 'Caveat', 'Brush Script MT', cursive;
+  font-size: clamp(50px, 6vw, 78px);
+  font-weight: 700;
+  text-transform: none;
 }
 
 .whats-new .whats-new-decor {
@@ -1358,6 +1397,55 @@ header{
   filter: blur(26px);
 }
 
+.ibadah-section-divider {
+  position: relative;
+  z-index: 2;
+  width: min(230px, 64vw);
+  margin: 0 auto 14px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.ibadah-section-divider span {
+  height: 1px;
+  flex: 1;
+  background: linear-gradient(90deg, rgba(30,58,95,0), rgba(30,58,95,0.28), rgba(30,58,95,0));
+}
+
+.ibadah-section-divider span:nth-child(2) {
+  display: inline-block;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  border: 1px solid rgba(30,58,95,0.2);
+  background: rgba(255,255,255,0.9);
+  box-shadow: 0 6px 12px rgba(24,58,94,0.12);
+  position: relative;
+  flex: 0 0 20px;
+}
+
+.ibadah-section-divider span:nth-child(2)::before,
+.ibadah-section-divider span:nth-child(2)::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  background: rgba(30,79,128,0.84);
+  border-radius: 2px;
+}
+
+.ibadah-section-divider span:nth-child(2)::before {
+  width: 8px;
+  height: 1.6px;
+}
+
+.ibadah-section-divider span:nth-child(2)::after {
+  width: 1.6px;
+  height: 8px;
+}
+
 .ibadah-editorial-card {
   position: relative;
   z-index: 2;
@@ -1377,38 +1465,71 @@ header{
 .ibadah-showcase {
   position: relative;
   display: grid;
-  grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
+  grid-template-columns: minmax(0, 0.84fr) minmax(0, 1.16fr);
   align-items: center;
+  column-gap: 0;
 }
 
 .ibadah-showcase-photo {
   position: relative;
   z-index: 3;
-  width: min(100%, 420px);
-  justify-self: end;
-  transform: translateX(42px);
+  width: min(100%, 640px);
+  justify-self: start;
+  order: 2;
+  transform: translateX(-34px);
 }
 
-.ibadah-showcase-img {
+.ibadah-showcase-media {
+  position: relative;
   width: 100%;
-  aspect-ratio: 4 / 5;
+  aspect-ratio: 16 / 9;
   border-radius: 18px;
   overflow: hidden;
-  object-fit: cover;
-  object-position: center;
   box-shadow: 0 14px 28px rgba(21, 30, 31, 0.2);
   border: 1px solid rgba(255,255,255,0.55);
+}
+
+.ibadah-showcase-video {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border: 0;
+  display: block;
+  background: rgba(12, 34, 58, 0.62);
+}
+
+.ibadah-showcase-aesthetic-controls {
+  position: absolute;
+  left: 14px;
+  bottom: 14px;
+  display: inline-flex;
+  gap: 8px;
+  pointer-events: none;
+}
+
+.ibadah-showcase-aesthetic-controls .dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 999px;
+  background: rgba(233, 245, 255, 0.9);
+  box-shadow: 0 0 0 1px rgba(23, 64, 103, 0.22);
+}
+
+.ibadah-mobile-overlay {
+  display: none;
 }
 
 .ibadah-showcase-panel {
   position: relative;
   z-index: 2;
-  margin-left: -30px;
+  order: 1;
+  margin-right: -26px;
   min-height: 332px;
   border-radius: 24px;
   background: linear-gradient(145deg, #2b5d8d 0%, #214a73 100%);
   color: #f1f6fd;
-  padding: 38px 42px 34px 86px;
+  padding: 38px 70px 34px 42px;
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -1434,12 +1555,14 @@ header{
   font-weight: 400;
   font-style: normal;
   color: #f5f9ff;
+  text-align: center;
 }
 
 .ibadah-showcase-times {
   display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
   margin-top: 16px;
 }
 
@@ -1447,8 +1570,8 @@ header{
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  min-width: 116px;
-  padding: 8px 14px;
+  min-width: 126px;
+  padding: 8px 12px;
   border-radius: 999px;
   border: 1px solid rgba(237, 246, 255, 0.42);
   background: rgba(231, 242, 255, 0.2);
@@ -1457,6 +1580,14 @@ header{
   font-weight: 700;
   color: #f6fbff;
   white-space: nowrap;
+}
+
+.ibadah-showcase-note {
+  margin: 14px 0 0;
+  font-size: 15px;
+  line-height: 1.6;
+  color: rgba(246, 251, 255, 0.92);
+  text-align: center;
 }
 
 /* ============================================
@@ -1544,6 +1675,12 @@ header{
   .container-large{padding:0 40px}
 
   .hero-slider{height:60vh;min-height:420px}
+  #sliderSection.hero-slider{
+    height:auto !important;
+    min-height:0 !important;
+    aspect-ratio:16 / 7 !important;
+    max-height:none !important;
+  }
   .hero-title{font-size:52px}
   .hero-subtitle{font-size:18px}
   .hero-btn{width:42px;height:42px}
@@ -1551,22 +1688,22 @@ header{
   .hero-btn-next{right:18px}
 
   .ibadah-showcase {
-    grid-template-columns: minmax(0, 0.88fr) minmax(0, 1.12fr);
+    grid-template-columns: minmax(0, 0.92fr) minmax(0, 1.08fr);
   }
   .ibadah-showcase-photo {
-    width: min(100%, 360px);
-    transform: translateX(22px);
+    width: min(100%, 540px);
+    transform: translateX(-16px);
   }
   .ibadah-showcase-panel {
-    margin-left: -14px;
-    padding: 30px 28px 28px 62px;
+    margin-right: -10px;
+    padding: 30px 52px 28px 28px;
     min-height: 300px;
   }
   .ibadah-showcase-title {
     font-size: clamp(46px, 5vw, 62px);
   }
   .ibadah-showcase-times span {
-    min-width: 104px;
+    min-width: 118px;
     padding: 7px 12px;
     font-size: 15px;
   }
@@ -1633,18 +1770,62 @@ header{
 @media (max-width:768px){
   section{padding:70px 0}
   .header-nav .container{
-    padding:0 22px;
-    height:auto;
-    flex-wrap:wrap;
-    gap:12px;
-    justify-content:center;
+    padding:0 18px;
+    height:66px;
+    gap:10px;
+    justify-content:space-between;
   }
-  .logo{font-size:18px}
+  .logo{font-size:16px;gap:8px}
   .logo-img{width:34px;height:34px}
-  .navbar ul{gap:14px;flex-wrap:wrap;justify-content:center}
-  .navbar a{font-size:11px}
+  .header-menu-toggle{display:inline-flex}
+  .navbar{
+    position:absolute;
+    left:12px;
+    right:12px;
+    top:calc(100% + 8px);
+    background:#fff;
+    border:1px solid rgba(30,58,95,.12);
+    border-radius:14px;
+    box-shadow:0 16px 34px rgba(15,39,66,.18);
+    opacity:0;
+    transform:translateY(-8px);
+    pointer-events:none;
+    max-height:0;
+    overflow:hidden;
+    transition:opacity .26s ease, transform .26s ease, max-height .26s ease;
+    z-index:120;
+  }
+  .header-nav.nav-open .navbar{
+    opacity:1;
+    transform:translateY(0);
+    pointer-events:auto;
+    max-height:75vh;
+  }
+  .navbar ul{
+    gap:2px;
+    padding:10px;
+    flex-direction:column;
+  }
+  .navbar li{width:100%}
+  .navbar a{
+    display:block;
+    width:100%;
+    font-size:13px;
+    letter-spacing:.06em;
+    padding:10px 12px;
+    border-radius:10px;
+  }
+  .navbar a:hover{
+    color:var(--blue-primary);
+    background:rgba(30,58,95,.08);
+  }
+  .navbar a::after{display:none}
+  body.menu-open{overflow:hidden}
 
   .hero-slider{height:50vh;min-height:320px}
+  #sliderSection.hero-slider{
+    aspect-ratio:16 / 9 !important;
+  }
   .hero-content{padding:0 20px}
   .hero-title{font-size:36px}
   .hero-subtitle{font-size:16px}
@@ -1673,6 +1854,15 @@ header{
   section{padding:60px 0}
   .container-large{padding:0 24px}
 
+  .ibadah-minggu-section {
+    padding: 8px 0 30px;
+  }
+
+  .ibadah-section-divider {
+    margin-bottom: 8px;
+    width: min(190px, 56vw);
+  }
+
   .gembala-layout { gap: 36px; }
   .gembala-photo { max-width: 250px; margin: 0 auto; }
   .gembala-info { text-align: center; }
@@ -1687,39 +1877,120 @@ header{
 
   .ibadah-showcase {
     grid-template-columns: 1fr;
-    gap: 0;
+    gap: 10px;
+    max-width: 420px;
+    margin: 0 auto;
+    padding: 0;
+    border-radius: 0;
+    background: transparent;
+    border: 0;
+    box-shadow: none;
+    margin-top: -14px;
   }
   .ibadah-showcase-photo {
-    width: min(100%, 420px);
+    width: 100%;
+    max-width: none;
     justify-self: center;
+    order: 1;
     transform: none;
   }
-  .ibadah-showcase-img {
+  .ibadah-showcase-media {
     border-radius: 16px;
-    aspect-ratio: 5 / 6;
+    aspect-ratio: 16 / 10;
+    border: 1px solid rgba(255,255,255,0.68);
+    box-shadow: 0 10px 22px rgba(18, 45, 73, 0.18);
   }
   .ibadah-showcase-panel {
-    margin: -36px 0 0;
+    order: 2;
+    margin-top: 14px;
     min-height: 0;
-    border-radius: 20px;
-    padding: 54px 22px 24px;
+    border-radius: 0;
+    background: transparent;
+    box-shadow: none;
+    padding: 0;
+    max-width: none;
+    width: 100%;
+    justify-self: center;
   }
   .ibadah-showcase-kicker {
     font-size: 9px;
     letter-spacing: 0.16em;
   }
   .ibadah-showcase-title {
-    font-size: clamp(40px, 11vw, 54px);
-    max-width: 18ch;
+    display: block;
+    margin: 0;
+    font-size: clamp(38px, 10.8vw, 46px);
+    line-height: 1;
+    color: var(--blue-primary);
+    text-align: center;
+    position: relative;
+    padding: 0 8px 10px;
+    max-width: none;
+  }
+
+  .ibadah-showcase-title::after {
+    content: '';
+    position: absolute;
+    left: 50%;
+    bottom: 0;
+    width: 82px;
+    height: 1px;
+    background: linear-gradient(90deg, rgba(30,58,95,0), rgba(30,58,95,0.36), rgba(30,58,95,0));
+    transform: translateX(-50%);
   }
   .ibadah-showcase-times {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    flex-wrap: wrap;
     gap: 8px;
-    margin-top: 14px;
+    margin-top: 10px;
+    position: relative;
+    padding: 0;
+    border-radius: 0;
+    background: transparent;
+    border: 0;
   }
   .ibadah-showcase-times span {
-    min-width: 112px;
+    min-width: 88px;
+    font-size: 11px;
+    padding: 6px 8px;
+    background: linear-gradient(145deg, #2f6192 0%, #24507c 100%);
+    border: 0;
+    color: #f7fbff;
+    box-shadow: 0 6px 12px rgba(25, 70, 112, 0.16);
+  }
+  .ibadah-showcase-note {
+    color: #214a73;
+    margin: 12px auto 0;
+    max-width: 32ch;
     font-size: 14px;
-    padding: 8px 12px;
+    line-height: 1.5;
+    background: transparent;
+    border: 0;
+    border-radius: 0;
+    padding: 0 8px;
+    box-shadow: none;
+    text-align: center;
+    position: relative;
+  }
+
+  .ibadah-showcase-note::before {
+    content: '';
+    display: block;
+    width: 48px;
+    height: 2px;
+    border-radius: 2px;
+    margin: 0 auto 8px;
+    background: linear-gradient(90deg, rgba(63,182,168,0.85), rgba(30,58,95,0.45));
+  }
+
+  .ibadah-mobile-overlay {
+    display: none;
+  }
+
+  .ibadah-showcase-aesthetic-controls {
+    display: none !important;
   }
   .gembala-name { font-size: clamp(38px, 11vw, 58px); }
   .gembala-name-only { font-size: clamp(36px, 10vw, 52px); }
@@ -1747,14 +2018,21 @@ header{
 @media (max-width:480px){
   section{padding:50px 0}
   .header-nav .container{
-    padding:12px 16px 16px;
-    flex-direction:column;
-    gap:10px;
+    padding:0 14px;
+    height:62px;
   }
-  .logo{font-size:20px;gap:8px}
-  .logo-img{width:36px;height:36px}
-  .navbar ul{gap:12px}
-  .navbar a{font-size:11px}
+  .logo{font-size:14px;gap:7px}
+  .logo-img{width:30px;height:30px}
+  .navbar{
+    left:10px;
+    right:10px;
+    border-radius:12px;
+  }
+  .navbar a{font-size:12px;padding:9px 11px}
+
+  #sliderSection.hero-slider{
+    aspect-ratio:16 / 10 !important;
+  }
 
   .section-title-big{font-size:36px;margin-bottom:28px}
   .cta-title{font-size:36px}
@@ -1778,23 +2056,60 @@ header{
   .pelayanan-deskripsi{font-size:15px}
 
   .ibadah-showcase-photo {
-    width: min(100%, 360px);
+    width: 100%;
+    max-width: 360px;
+  }
+  .ibadah-showcase {
+    max-width: 360px;
+    padding: 0;
+    border-radius: 0;
+    margin-top: -16px;
+  }
+  .ibadah-section-divider {
+    margin-bottom: 4px;
+    width: min(160px, 48vw);
+  }
+  .ibadah-section-divider span:nth-child(2) {
+    width: 16px;
+    height: 16px;
+    flex-basis: 16px;
+  }
+  .ibadah-showcase-media {
+    border-radius: 14px;
   }
   .ibadah-showcase-panel {
-    margin-top: -30px;
-    border-radius: 18px;
-    padding: 46px 16px 18px;
+    margin-top: 0;
+    border-radius: 0;
+    padding: 0;
   }
   .ibadah-showcase-title {
-    font-size: clamp(34px, 11.5vw, 46px);
+    font-size: clamp(32px, 10.8vw, 40px);
+    padding-bottom: 8px;
+  }
+  .ibadah-showcase-title::after {
+    width: 70px;
   }
   .ibadah-showcase-times {
     gap: 6px;
+    margin-top: 9px;
+    padding: 0;
   }
   .ibadah-showcase-times span {
-    min-width: 96px;
+    min-width: 82px;
+    font-size: 11px;
+    padding: 5px 8px;
+  }
+  .ibadah-showcase-note {
     font-size: 13px;
-    padding: 7px 10px;
+    line-height: 1.42;
+    max-width: 26ch;
+    margin-top: 10px;
+    padding: 0 4px;
+  }
+
+  .ibadah-showcase-note::before {
+    width: 40px;
+    margin-bottom: 7px;
   }
   .gembala-name { font-size: clamp(34px, 12vw, 50px); }
   .gembala-name-only { font-size: clamp(32px, 11vw, 44px); }
