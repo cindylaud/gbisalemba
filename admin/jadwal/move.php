@@ -1,6 +1,17 @@
 <?php
 require_once __DIR__ . '/../includes/auth.php';
-require_once __DIR__ . '/../../config/database.php';
+
+$id = isset($_GET['id']) ? (int)$_GET['id'] : 0;
+$action = $_GET['action'] ?? '';
+$dir = ($action === 'down') ? 'down' : 'up';
+
+$target = '../jadwal_ibadah/move.php?dir=' . urlencode($dir);
+if ($id > 0) {
+    $target .= '&id=' . $id;
+}
+
+header('Location: ' . $target);
+exit;
 
 // Check if ID and action are provided
 if (!isset($_GET['id']) || !is_numeric($_GET['id']) || !isset($_GET['action'])) {

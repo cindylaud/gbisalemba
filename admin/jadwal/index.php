@@ -1,6 +1,8 @@
 <?php
 require_once __DIR__ . '/../includes/auth.php';
-require_once __DIR__ . '/../../config/database.php';
+
+header('Location: ../jadwal_ibadah/index.php');
+exit;
 
 // Handle toggle status
 if (isset($_GET['toggle']) && is_numeric($_GET['toggle'])) {

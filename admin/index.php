@@ -1,92 +1,86 @@
 <?php
 include __DIR__ . '/includes/auth.php';
+require_once __DIR__ . '/../config/database.php';
+
+function dashboardCount(mysqli $conn, string $table, string $where = ''): int {
+    $sql = "SELECT COUNT(*) AS total FROM {$table}" . ($where !== '' ? " WHERE {$where}" : '');
+    try {
+        $res = $conn->query($sql);
+    } catch (mysqli_sql_exception $e) {
+        return 0;
+    }
+    if (!$res) {
+        return 0;
+    }
+    $row = $res->fetch_assoc();
+    return (int) ($row['total'] ?? 0);
+}
+
+$stats = [
+    'slider_active' => dashboardCount($conn, 'slider', 'is_active = 1'),
+    'coming_soon_active' => dashboardCount($conn, 'coming_soon', 'is_active = 1'),
+    'jadwal_active' => dashboardCount($conn, 'jadwal_ibadah', 'is_active = 1'),
+    'pelayanan_active' => dashboardCount($conn, 'pelayanan', "status = 'aktif'"),
+    'renungan_total' => dashboardCount($conn, 'renungan'),
+    'formulir_active' => dashboardCount($conn, 'formulir', "status = 'aktif'"),
+];
+
+$admin_page_title = 'Dashboard Admin';
+include __DIR__ . '/includes/header.php';
 ?>
-<!DOCTYPE html>
-<html>
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard Admin - GBI Salemba</title>
-    <style>
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #F3F9FB;
-            color: #102C57;
-            margin: 0;
-            padding: 20px;
-        }
-        .container {
-            max-width: 900px;
-            margin: 0 auto;
-            background-color: #EADBC8;
-            padding: 40px;
-            border-radius: 8px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-        }
-        h1 {
-            color: #102C57;
-            margin-bottom: 10px;
-            font-size: 32px;
-        }
-        .welcome {
-            font-size: 16px;
-            margin-bottom: 30px;
-            color: #146C94;
-        }
-        .menu-list {
-            list-style: none;
-            padding: 0;
-            margin: 30px 0;
-        }
-        .menu-list li {
-            margin-bottom: 15px;
-        }
-        .menu-list a {
-            display: inline-block;
-            background-color: #146C94;
-            color: #ffffff;
-            padding: 12px 24px;
-            text-decoration: none;
-            border-radius: 6px;
-            transition: background-color 0.3s ease;
-            font-weight: 500;
-        }
-        .menu-list a:hover {
-            background-color: #0F4A6B;
-        }
-        .logout {
-            display: inline-block;
-            background-color: #d32f2f;
-            color: #ffffff;
-            padding: 12px 24px;
-            text-decoration: none;
-            border-radius: 6px;
-            transition: background-color 0.3s ease;
-            font-weight: 500;
-            margin-top: 20px;
-        }
-        .logout:hover {
-            background-color: #b71c1c;
-        }
-    </style>
-</head>
-<body>
-    <div class="container">
-        <h1>Dashboard Admin</h1>
-        <p class="welcome">Selamat datang, <strong><?php echo $_SESSION['username']; ?></strong></p>
+<section class="dashboard-stat-grid mb-4">
+    <article class="dashboard-stat-card">
+        <span class="label">Slider Aktif</span>
+        <strong><?php echo $stats['slider_active']; ?></strong>
+    </article>
+    <article class="dashboard-stat-card">
+        <span class="label">Coming Soon Aktif</span>
+        <strong><?php echo $stats['coming_soon_active']; ?></strong>
+    </article>
+    <article class="dashboard-stat-card">
+        <span class="label">Jadwal Aktif</span>
+        <strong><?php echo $stats['jadwal_active']; ?></strong>
+    </article>
+    <article class="dashboard-stat-card">
+        <span class="label">Pelayanan Aktif</span>
+        <strong><?php echo $stats['pelayanan_active']; ?></strong>
+    </article>
+    <article class="dashboard-stat-card">
+        <span class="label">Renungan</span>
+        <strong><?php echo $stats['renungan_total']; ?></strong>
+    </article>
+    <article class="dashboard-stat-card">
+        <span class="label">Formulir Aktif</span>
+        <strong><?php echo $stats['formulir_active']; ?></strong>
+    </article>
+</section>
 
-        <h3>Menu Kelola</h3>
-        <ul class="menu-list">
-            <li><a href="slider.php">Kelola Slider</a></li>
-            <li><a href="whatsnew.php">Kelola What's New</a></li>
-            <li><a href="jadwal.php">Kelola Jadwal</a></li>
-            <li><a href="pelayanan.php">Kelola Pelayanan</a></li>
-            <li><a href="renungan.php">Kelola Renungan</a></li>
-            <li><a href="formulir.php">Kelola Formulir</a></li>
-        </ul>
+<div class="dashboard-grid" id="dashboardGrid">
+    <a class="dashboard-card" data-category="konten" href="slider.php">
+        <h3><i class="fa-solid fa-images mr-2"></i>Slider</h3>
+        <p>Atur banner hero beranda.</p>
+    </a>
+    <a class="dashboard-card" data-category="konten" href="whatsnew.php">
+        <h3><i class="fa-solid fa-bullhorn mr-2"></i>Coming Soon</h3>
+        <p>Update informasi terbaru jemaat.</p>
+    </a>
+    <a class="dashboard-card" data-category="layanan" href="jadwal_ibadah/index.php">
+        <h3><i class="fa-solid fa-calendar-days mr-2"></i>Jadwal</h3>
+        <p>Kelola jadwal ibadah dan kegiatan.</p>
+    </a>
+    <a class="dashboard-card" data-category="layanan" href="pelayanan.php">
+        <h3><i class="fa-solid fa-hands-praying mr-2"></i>Pelayanan</h3>
+        <p>Atur daftar bidang pelayanan.</p>
+    </a>
+    <a class="dashboard-card" data-category="konten" href="renungan.php">
+        <h3><i class="fa-solid fa-book-open mr-2"></i>Renungan</h3>
+        <p>Publikasikan renungan harian.</p>
+    </a>
+    <a class="dashboard-card" data-category="layanan" href="formulir.php">
+        <h3><i class="fa-solid fa-file-lines mr-2"></i>Formulir</h3>
+        <p>Kelola formulir unduhan jemaat.</p>
+    </a>
+</div>
 
-        <a href="logout.php" class="logout">Logout</a>
-    </div>
-</body>
-</html>
+<?php include __DIR__ . '/includes/footer.php'; ?>
 

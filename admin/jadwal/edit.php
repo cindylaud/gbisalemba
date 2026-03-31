@@ -1,6 +1,14 @@
 <?php
 require_once __DIR__ . '/../includes/auth.php';
-require_once __DIR__ . '/../../config/database.php';
+
+$id = isset($_GET['id']) ? (int)$_GET['id'] : 0;
+$target = '../jadwal_ibadah/edit.php';
+if ($id > 0) {
+    $target .= '?id=' . $id;
+}
+
+header('Location: ' . $target);
+exit;
 
 $error = '';
 $success = '';

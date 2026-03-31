@@ -144,6 +144,17 @@ $cards = [];
 while ($row = $result->fetch_assoc()) {
     $cards[$row['urutan']] = $row;
 }
+
+$active_count = 0;
+$with_image_count = 0;
+for ($i = 1; $i <= 4; $i++) {
+    if (!empty($cards[$i]['is_active'])) {
+        $active_count++;
+    }
+    if (!empty($cards[$i]['image']) && $cards[$i]['image'] !== 'default.png') {
+        $with_image_count++;
+    }
+}
 ?>
 
 <!DOCTYPE html>
@@ -152,6 +163,7 @@ while ($row = $result->fetch_assoc()) {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Kelola Slider - Admin GBI Salemba</title>
+    <link rel="stylesheet" href="/<?php echo htmlspecialchars(basename(dirname(__DIR__))); ?>/assets/css/admin-theme.css">
     <style>
         * {
             margin: 0;
@@ -163,28 +175,65 @@ while ($row = $result->fetch_assoc()) {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background-color: #F3F9FB;
             color: #102C57;
-            padding: 20px;
             line-height: 1.6;
         }
         
         .container {
-            max-width: 1200px;
-            margin: 0 auto;
+            max-width: none;
+            margin: 0;
         }
         
-        .header {
-            margin-bottom: 30px;
+        .hero {
+            background: linear-gradient(130deg, #1e3a5f 0%, #0f2742 72%);
+            border-radius: 16px;
+            padding: 18px;
+            margin-bottom: 18px;
+            color: #fff;
+            box-shadow: 0 14px 30px rgba(15, 39, 66, 0.24);
         }
-        
-        h1 {
-            color: #102C57;
-            font-size: 32px;
-            margin-bottom: 10px;
+
+        .hero h1 {
+            color: #fff;
+            font-size: 30px;
+            margin: 6px 0 10px;
+        }
+
+        .hero p {
+            margin: 0;
+            opacity: 0.9;
+        }
+
+        .hero-stats {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 10px;
+            margin-top: 14px;
+        }
+
+        .hero-stat {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 12px;
+            padding: 10px 12px;
+        }
+
+        .hero-stat .label {
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            opacity: 0.9;
+        }
+
+        .hero-stat .value {
+            font-size: 21px;
+            font-weight: 800;
+            line-height: 1.15;
+            margin-top: 2px;
         }
         
         .back-link {
             display: inline-block;
-            margin-bottom: 20px;
+            margin-bottom: 14px;
             padding: 10px 20px;
             background-color: #146C94;
             color: white;
@@ -220,8 +269,7 @@ while ($row = $result->fetch_assoc()) {
         .cards-grid {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
-            gap: 30px;
-            margin-top: 30px;
+            gap: 16px;
         }
         
         @media (max-width: 768px) {
@@ -230,24 +278,24 @@ while ($row = $result->fetch_assoc()) {
             }
         }
         
-        .card {
-            background: #EADBC8;
+        .slider-card {
+            background: linear-gradient(160deg, #f9f2e8 0%, #efe3d3 100%);
             border-radius: 12px;
-            padding: 25px;
+            padding: 18px;
             box-shadow: 0 4px 12px rgba(16, 44, 87, 0.1);
             transition: all 0.3s ease;
         }
         
-        .card:hover {
+        .slider-card:hover {
             transform: translateY(-5px);
             box-shadow: 0 8px 20px rgba(16, 44, 87, 0.15);
         }
         
         .card-title {
-            font-size: 22px;
+            font-size: 20px;
             font-weight: bold;
             color: #102C57;
-            margin-bottom: 20px;
+            margin-bottom: 14px;
             text-align: center;
             padding-bottom: 10px;
             border-bottom: 2px solid #146C94;
@@ -255,14 +303,14 @@ while ($row = $result->fetch_assoc()) {
         
         .preview-box {
             width: 100%;
-            height: 200px;
+            aspect-ratio: 16 / 9;
             background: linear-gradient(135deg, #f5f5f5 0%, #e0e0e0 100%);
             border: 2px dashed #b0b0b0;
             border-radius: 10px;
             display: flex;
             align-items: center;
             justify-content: center;
-            margin-bottom: 20px;
+            margin-bottom: 14px;
             overflow: hidden;
             position: relative;
         }
@@ -291,7 +339,7 @@ while ($row = $result->fetch_assoc()) {
         }
         
         .form-group {
-            margin-bottom: 18px;
+            margin-bottom: 12px;
         }
         
         .form-group label {
@@ -362,6 +410,13 @@ while ($row = $result->fetch_assoc()) {
             text-transform: uppercase;
             letter-spacing: 0.5px;
         }
+
+        .btn-submit::before {
+            content: '\\f0c7';
+            font-family: 'Font Awesome 6 Free';
+            font-weight: 900;
+            margin-right: 8px;
+        }
         
         .btn-submit:hover {
             transform: scale(1.02);
@@ -390,13 +445,49 @@ while ($row = $result->fetch_assoc()) {
             background-color: #6c757d;
             color: white;
         }
+
+        @media (max-width: 768px) {
+            .hero h1 {
+                font-size: 30px;
+            }
+
+            .hero-stats {
+                grid-template-columns: 1fr;
+            }
+        }
     </style>
 </head>
-<body>
+<body class="admin-theme">
+    <div class="admin-shell">
+        <?php include __DIR__ . '/includes/sidebar.php'; ?>
+        <main class="admin-main">
+            <header class="admin-topbar">
+                <div>
+                    <h1>Kelola Slider</h1>
+                    <div class="admin-topbar-meta">Atur 4 hero visual utama di beranda gereja</div>
+                </div>
+                <div class="admin-topbar-meta">Halo, <strong><?php echo htmlspecialchars($_SESSION['username'] ?? 'Admin'); ?></strong></div>
+            </header>
+            <div class="admin-content">
     <div class="container">
-        <div class="header">
+        <div class="hero">
             <a href="index.php" class="back-link">← Kembali ke Dashboard</a>
             <h1>Kelola Slider (4 Foto)</h1>
+            <p>Atur 4 visual utama beranda gereja dengan alur upload yang cepat dan terstruktur.</p>
+            <div class="hero-stats">
+                <div class="hero-stat">
+                    <div class="label">Total Slot</div>
+                    <div class="value">4</div>
+                </div>
+                <div class="hero-stat">
+                    <div class="label">Slide Aktif</div>
+                    <div class="value"><?php echo $active_count; ?></div>
+                </div>
+                <div class="hero-stat">
+                    <div class="label">Sudah Ada Foto</div>
+                    <div class="value"><?php echo $with_image_count; ?></div>
+                </div>
+            </div>
         </div>
         
         <?php if ($message): ?>
@@ -421,7 +512,7 @@ while ($row = $result->fetch_assoc()) {
                 $image_path = $has_image ? '../uploads/slider/' . $card_data['image'] : '';
                 $is_active = $card_data && $card_data['is_active'] == 1;
             ?>
-                <div class="card">
+                <div class="slider-card">
                     <div class="card-title">
                         Foto <?php echo $i; ?>
                         <?php if ($is_active): ?>
@@ -470,6 +561,9 @@ while ($row = $result->fetch_assoc()) {
                 </div>
             <?php endfor; ?>
         </div>
+    </div>
+            </div>
+        </main>
     </div>
 </body>
 </html>

@@ -376,6 +376,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['form_action'])) {
     $stmt->close();
 }
 
+$formulir_total = count($formulir_list);
+$formulir_aktif = 0;
+foreach ($formulir_list as $form_item) {
+    if (($form_item['status'] ?? '') === 'aktif') {
+        $formulir_aktif++;
+    }
+}
+
 ?>
 <!DOCTYPE html>
 <html lang="id">
@@ -384,460 +392,431 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['form_action'])) {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Kelola Formulir - Admin GBI Salemba</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="/<?php echo htmlspecialchars(basename(dirname(__DIR__))); ?>/assets/css/admin-theme.css">
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background-color: #F3F9FB;
             color: #102C57;
+            line-height: 1.6;
         }
-        
+
         .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 30px 20px;
+            max-width: none;
+            margin: 0;
         }
-        
-        .header-section {
-            background: linear-gradient(135deg, #1E3A5F 0%, #0F2742 100%);
-            color: white;
-            padding: 30px 20px;
-            margin: -30px -20px 30px;
-            border-radius: 0 0 8px 8px;
+
+        .hero {
+            background: linear-gradient(130deg, #1e3a5f 0%, #0f2742 74%);
+            border-radius: 16px;
+            padding: 18px;
+            margin-bottom: 18px;
+            color: #fff;
+            box-shadow: 0 14px 30px rgba(15, 39, 66, 0.24);
         }
-        
-        .header-section h1 {
-            font-size: 32px;
-            margin-bottom: 5px;
+
+        .hero h1 {
+            margin: 6px 0 10px;
+            color: #fff;
+            font-size: 30px;
         }
-        
-        .breadcrumb {
-            font-size: 14px;
+
+        .hero p {
+            margin: 0;
             opacity: 0.9;
         }
-        
-        .breadcrumb a {
-            color: white;
-            text-decoration: none;
-        }
-        
-        .breadcrumb a:hover {
-            text-decoration: underline;
-        }
-        
-        .alert {
-            padding: 15px 20px;
-            margin: 20px 0;
-            border-radius: 6px;
-            font-weight: 600;
-        }
-        
-        .alert-success {
-            background-color: #D4EDDA;
-            color: #155724;
-            border: 1px solid #C3E6CB;
-        }
-        
-        .alert-error {
-            background-color: #F8D7DA;
-            color: #721C24;
-            border: 1px solid #F5C6CB;
-        }
-        
-        .tabs {
-            display: flex;
-            gap: 10px;
-            margin: 30px 0 30px;
-            border-bottom: 2px solid #E0E0E0;
-        }
-        
-        .tab-btn {
-            padding: 12px 24px;
-            background: none;
-            border: none;
-            border-bottom: 3px solid transparent;
-            color: #102C57;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-        
-        .tab-btn.active {
-            border-bottom-color: #3FB6A8;
-            color: #3FB6A8;
-        }
-        
-        .tab-content {
-            display: none;
-        }
-        
-        .tab-content.active {
-            display: block;
-        }
-        
-        .form-group {
-            margin-bottom: 20px;
-        }
-        
-        .form-group label {
-            display: block;
-            margin-bottom: 8px;
-            font-weight: 600;
-            color: #102C57;
-        }
-        
-        .form-group input,
-        .form-group textarea,
-        .form-group select {
-            width: 100%;
-            padding: 12px;
-            border: 1px solid #DDD;
-            border-radius: 6px;
-            font-family: inherit;
-            font-size: 14px;
-        }
-        
-        .form-group textarea {
-            resize: vertical;
-            min-height: 100px;
-        }
-        
-        .form-row {
+
+        .hero-stats {
             display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 20px;
-        }
-        
-        .button-group {
-            display: flex;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
             gap: 10px;
-            margin-top: 30px;
+            margin-top: 14px;
         }
-        
-        .btn {
-            padding: 12px 24px;
-            border: none;
-            border-radius: 6px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            font-size: 14px;
+
+        .hero-stat {
+            border-radius: 12px;
+            padding: 10px 12px;
+            border: 1px solid rgba(255, 255, 255, 0.22);
+            background: rgba(255, 255, 255, 0.1);
         }
-        
-        .btn-primary {
-            background-color: #1E3A5F;
-            color: white;
+
+        .hero-stat .label {
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            opacity: 0.9;
         }
-        
-        .btn-primary:hover {
-            background-color: #0F2742;
+
+        .hero-stat .value {
+            margin-top: 2px;
+            font-size: 21px;
+            font-weight: 800;
+            line-height: 1.15;
         }
-        
-        .btn-secondary {
-            background-color: #E0E0E0;
-            color: #102C57;
-        }
-        
-        .btn-secondary:hover {
-            background-color: #D0D0D0;
-        }
-        
-        .btn-danger {
-            background-color: #DC3545;
-            color: white;
-        }
-        
-        .btn-danger:hover {
-            background-color: #C82333;
-        }
-        
-        .btn-small {
-            padding: 8px 16px;
-            font-size: 12px;
-        }
-        
-        .btn-download {
-            background-color: #28a745;
+
+        .back-link {
+            display: inline-block;
+            margin-bottom: 14px;
+            padding: 10px 20px;
+            background-color: #146C94;
             color: white;
             text-decoration: none;
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-        }
-        
-        .btn-download:hover {
-            background-color: #218838;
-        }
-        
-        .table-container {
-            background: white;
             border-radius: 8px;
-            overflow: hidden;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            font-weight: 600;
+            transition: background-color 0.3s ease;
         }
-        
+
+        .back-link:hover { background-color: #0f5273; }
+
+        .alert {
+            padding: 14px 18px;
+            margin-bottom: 20px;
+            border-radius: 8px;
+            font-weight: 500;
+        }
+
+        .alert-success {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .alert-danger {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .layout {
+            display: grid;
+            grid-template-columns: 1fr 360px;
+            gap: 16px;
+            align-items: start;
+        }
+
+        .panel {
+            background: linear-gradient(165deg, #f9f2e8 0%, #efe2d1 100%);
+            border-radius: 12px;
+            padding: 18px;
+            box-shadow: 0 4px 12px rgba(16, 44, 87, 0.1);
+        }
+
+        .panel-title {
+            font-size: 17px;
+            font-weight: 700;
+            color: #102C57;
+            margin-bottom: 14px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #146C94;
+        }
+
         table {
             width: 100%;
             border-collapse: collapse;
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
         }
-        
-        table th {
-            background-color: #1E3A5F;
+
+        thead th {
+            background: #146C94;
             color: white;
-            padding: 15px;
+            padding: 10px 12px;
             text-align: left;
+            font-size: 13px;
             font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
         }
-        
-        table td {
-            padding: 15px;
-            border-bottom: 1px solid #EEE;
+
+        tbody tr {
+            border-bottom: 1px solid #f0f4f8;
+            transition: background 0.2s ease;
         }
-        
-        table tr:hover {
-            background-color: #F9F9F9;
+
+        tbody tr:last-child { border-bottom: none; }
+        tbody tr:hover { background-color: #f0f7fb; }
+
+        tbody td {
+            padding: 10px 12px;
+            vertical-align: middle;
+            font-size: 14px;
         }
-        
-        .status-badge {
+
+        .badge {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.4px;
+        }
+
+        .badge-active { background: #d4edda; color: #155724; }
+        .badge-inactive { background: #e2e3e5; color: #383d41; }
+
+        .actions { display: flex; gap: 6px; flex-wrap: wrap; }
+
+        .btn {
             display: inline-block;
             padding: 6px 12px;
-            border-radius: 20px;
+            border-radius: 6px;
             font-size: 12px;
             font-weight: 600;
-        }
-        
-        .status-aktif {
-            background-color: #D4EDDA;
-            color: #155724;
-        }
-        
-        .status-nonaktif {
-            background-color: #F8D7DA;
-            color: #721C24;
-        }
-        
-        .action-buttons {
-            display: flex;
-            gap: 8px;
-            flex-wrap: wrap;
-        }
-        
-        .form-card {
-            background: white;
-            padding: 30px;
-            border-radius: 8px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-            margin-bottom: 20px;
-        }
-        
-        .file-input-wrapper {
-            position: relative;
-            display: inline-block;
-        }
-        
-        .file-input-label {
-            display: inline-block;
-            padding: 10px 16px;
-            background-color: #3FB6A8;
-            color: white;
-            border-radius: 6px;
+            text-decoration: none;
             cursor: pointer;
-            font-weight: 600;
-            transition: all 0.3s ease;
+            border: none;
+            transition: all 0.2s ease;
+            white-space: nowrap;
         }
-        
-        .file-input-label:hover {
-            background-color: #2E9A8E;
+
+        .btn-sort {
+            background: #6c757d;
+            color: white;
+            padding: 5px 8px;
         }
-        
-        .file-input-wrapper input[type="file"] {
-            display: none;
+
+        .btn-sort:hover { background: #545b62; }
+
+        .btn-download {
+            background: #28a745;
+            color: white;
         }
-        
-        .file-info {
-            display: flex;
-            gap: 20px;
-            margin-top: 15px;
-            align-items: flex-start;
+
+        .btn-download:hover { background: #218838; }
+
+        .btn-edit {
+            background: #1e3a5f;
+            color: white;
         }
-        
-        .file-icon {
-            width: 60px;
-            height: 60px;
-            background-color: #F0F0F0;
-            border-radius: 6px;
+
+        .btn-edit:hover { background: #0f2742; }
+
+        .btn-danger {
+            background: #dc3545;
+            color: white;
+        }
+
+        .btn-danger:hover { background: #c82333; }
+
+        .sort-form {
             display: flex;
             align-items: center;
-            justify-content: center;
-            border: 2px solid #EEE;
-            font-size: 24px;
-            color: #666;
+            gap: 6px;
         }
-        
-        .file-details {
-            flex: 1;
+
+        .sort-form input[type="number"] {
+            width: 60px;
+            padding: 5px 8px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            font-size: 13px;
+            text-align: center;
         }
-        
-        .file-name {
+
+        .form-group { margin-bottom: 16px; }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 6px;
             font-weight: 600;
+            font-size: 14px;
             color: #102C57;
-            margin-bottom: 5px;
-            word-break: break-all;
         }
-        
-        .file-size {
+
+        .form-group input[type="text"],
+        .form-group input[type="file"],
+        .form-group textarea,
+        .form-group select {
+            width: 100%;
+            padding: 10px 12px;
+            border: 2px solid #146C94;
+            border-radius: 8px;
+            font-size: 14px;
+            background: white;
+            transition: border-color 0.3s ease;
+        }
+
+        .form-group textarea { min-height: 110px; resize: vertical; }
+
+        .form-group input:focus,
+        .form-group textarea:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: #0f5273;
+        }
+
+        .info-text {
             font-size: 12px;
             color: #666;
+            margin-top: 5px;
+            font-style: italic;
         }
-        
-        .preview-label {
-            font-size: 12px;
-            color: #666;
-            margin-bottom: 8px;
+
+        .btn-submit {
+            width: 100%;
+            padding: 13px 20px;
+            border: none;
+            border-radius: 8px;
+            font-size: 15px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: linear-gradient(135deg, #146C94 0%, #0f5273 100%);
+            color: white;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
         }
-        
-        .no-data {
+
+        .btn-submit:hover {
+            transform: scale(1.02);
+            box-shadow: 0 6px 15px rgba(20, 108, 148, 0.3);
+        }
+
+        .file-box {
+            background: rgba(255, 255, 255, 0.66);
+            padding: 12px;
+            border-radius: 8px;
+            margin-top: 10px;
+            border: 1px dashed #b5b5b5;
+        }
+
+        .file-line {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            margin-bottom: 6px;
+            font-size: 13px;
+            color: #243b5f;
+        }
+
+        .empty-state {
             text-align: center;
             padding: 40px 20px;
-            color: #999;
+            color: #888;
         }
-        
-        .required {
-            color: red;
-        }
-        
-        @media (max-width: 768px) {
-            .form-row {
-                grid-template-columns: 1fr;
-            }
-            
-            table {
-                font-size: 13px;
-            }
-            
-            table th, table td {
-                padding: 10px;
-            }
-            
-            .action-buttons {
-                flex-direction: column;
-            }
-            
-            .action-buttons a,
-            .action-buttons button {
-                width: 100%;
-            }
+
+        .empty-state .icon { font-size: 48px; margin-bottom: 12px; }
+        .empty-state p { font-size: 15px; }
+
+        .required { color: #d93025; }
+
+        @media (max-width: 980px) {
+            .layout { grid-template-columns: 1fr; }
+            .hero h1 { font-size: 30px; }
+            .hero-stats { grid-template-columns: 1fr; }
         }
     </style>
 </head>
-<body>
+<body class="admin-theme">
 
-<div class="header-section">
-    <div class="container">
-        <h1>Kelola Formulir</h1>
-        <p class="breadcrumb"><a href="index.php">← Dashboard Admin</a></p>
-    </div>
-</div>
+<div class="admin-shell">
+    <?php include __DIR__ . '/includes/sidebar.php'; ?>
+    <main class="admin-main">
+        <header class="admin-topbar">
+            <div>
+                <h1>Kelola Formulir</h1>
+                <div class="admin-topbar-meta">Atur file PDF formulir untuk kebutuhan jemaat</div>
+            </div>
+            <div class="admin-topbar-meta">Halo, <strong><?php echo htmlspecialchars($_SESSION['username'] ?? 'Admin'); ?></strong></div>
+        </header>
+        <div class="admin-content">
 
 <div class="container">
+<div class="hero">
+        <a href="index.php" class="back-link">← Kembali ke Dashboard</a>
+        <h1>Kelola Formulir</h1>
+        <p>Atur file formulir jemaat dengan urutan yang rapi dan status yang mudah dipantau.</p>
+        <div class="hero-stats">
+            <div class="hero-stat">
+                <div class="label">Total Formulir</div>
+                <div class="value"><?php echo $formulir_total; ?></div>
+            </div>
+            <div class="hero-stat">
+                <div class="label">Status Aktif</div>
+                <div class="value"><?php echo $formulir_aktif; ?></div>
+            </div>
+            <div class="hero-stat">
+                <div class="label">Maks Upload PDF</div>
+                <div class="value">10MB</div>
+            </div>
+        </div>
+    </div>
     
     <!-- ALERTS -->
     <?php if (isset($success)): ?>
         <div class="alert alert-success">
-            <i class="fas fa-check-circle"></i> <?php echo htmlspecialchars($success); ?>
+            ✓ <?php echo htmlspecialchars($success); ?>
         </div>
     <?php endif; ?>
     
     <?php if (isset($error)): ?>
-        <div class="alert alert-error">
-            <i class="fas fa-exclamation-circle"></i> <?php echo htmlspecialchars($error); ?>
+        <div class="alert alert-danger">
+            ✗ <?php echo htmlspecialchars($error); ?>
         </div>
     <?php endif; ?>
-    
-    <!-- TABS -->
-    <div class="tabs">
-        <button class="tab-btn active" onclick="switchTab('list')">
-            <i class="fas fa-list"></i> Daftar Formulir
-        </button>
-        <button class="tab-btn" onclick="switchTab('form')">
-            <i class="fas fa-plus"></i> <?php echo $edit_data ? 'Edit' : 'Tambah'; ?> Formulir
-        </button>
-    </div>
-    
-    <!-- TAB: LIST -->
-    <div id="list" class="tab-content active">
+
+    <div class="layout">
+    <div class="panel">
+        <div class="panel-title">📄 Daftar Formulir</div>
         <?php if (count($formulir_list) > 0): ?>
-            <div class="table-container">
                 <table>
                     <thead>
                         <tr>
+                            <th>No</th>
+                            <th>Urutan</th>
                             <th>Nama Formulir</th>
-                            <th>Deskripsi</th>
                             <th>File</th>
                             <th>Status</th>
                             <th>Aksi</th>
                         </tr>
                     </thead>
                     <tbody>
-                        <?php foreach ($formulir_list as $item): ?>
+                        <?php foreach ($formulir_list as $index => $item): ?>
                             <tr>
+                                <td><?php echo $index + 1; ?></td>
+                                <td>
+                                    <form method="POST" class="sort-form">
+                                        <input type="hidden" name="id" value="<?php echo $item['id']; ?>">
+                                        <input type="number" value="<?php echo intval($item['urutan']); ?>" min="1" readonly>
+                                        <button type="submit" name="action" value="move_up" class="btn btn-sort" title="Naik">↑</button>
+                                        <button type="submit" name="action" value="move_down" class="btn btn-sort" title="Turun">↓</button>
+                                    </form>
+                                </td>
                                 <td><?php echo htmlspecialchars($item['nama_formulir']); ?></td>
-                                <td><?php echo htmlspecialchars(substr($item['deskripsi'], 0, 50)); ?><?php echo strlen($item['deskripsi']) > 50 ? '...' : ''; ?></td>
                                 <td>
                                     <?php if (!empty($item['file']) && file_exists(UPLOAD_DIR . $item['file'])): ?>
-                                        <div style="display: flex; align-items: center; gap: 8px;">
-                                            <i class="fas fa-file-pdf" style="color: #DC3545;"></i>
+                                        <div class="actions">
                                             <a href="download-formulir.php?id=<?php echo $item['id']; ?>" 
                                                target="_blank" 
-                                               class="btn btn-download btn-small"
+                                               class="btn btn-download"
                                                title="Download PDF">
                                                 <i class="fas fa-download"></i> Download
                                             </a>
                                         </div>
                                     <?php else: ?>
-                                        <span style="color:#999; font-size:12px;">File tidak tersedia</span>
+                                        <span class="text-muted">Tidak tersedia</span>
                                     <?php endif; ?>
                                 </td>
                                 <td>
-                                    <span class="status-badge status-<?php echo $item['status']; ?>">
-                                        <?php echo ucfirst($item['status']); ?>
-                                    </span>
+                                    <?php if (($item['status'] ?? '') === 'aktif'): ?>
+                                        <span class="badge badge-active">Aktif</span>
+                                    <?php else: ?>
+                                        <span class="badge badge-inactive">Nonaktif</span>
+                                    <?php endif; ?>
                                 </td>
                                 <td>
-                                    <div class="action-buttons">
-                                        <!-- Move Up Button -->
-                                        <form method="POST" style="display:inline;">
-                                            <input type="hidden" name="action" value="move_up">
-                                            <input type="hidden" name="id" value="<?php echo $item['id']; ?>">
-                                            <button type="submit" class="btn btn-primary btn-small" title="Pindahkan ke atas">
-                                                <i class="fas fa-arrow-up"></i>
-                                            </button>
-                                        </form>
-                                        
-                                        <!-- Move Down Button -->
-                                        <form method="POST" style="display:inline;">
-                                            <input type="hidden" name="action" value="move_down">
-                                            <input type="hidden" name="id" value="<?php echo $item['id']; ?>">
-                                            <button type="submit" class="btn btn-primary btn-small" title="Pindahkan ke bawah">
-                                                <i class="fas fa-arrow-down"></i>
-                                            </button>
-                                        </form>
-                                        
-                                        <!-- Edit Button -->
-                                        <a href="?edit_id=<?php echo $item['id']; ?>" class="btn btn-primary btn-small" title="Edit">
+                                    <div class="actions">
+                                        <a href="?edit_id=<?php echo $item['id']; ?>" class="btn btn-edit" title="Edit">
                                             <i class="fas fa-edit"></i>
                                         </a>
-                                        
-                                        <!-- Delete Button -->
                                         <form method="POST" style="display:inline;" onsubmit="return confirm('Yakin ingin menghapus formulir ini?');">
                                             <input type="hidden" name="action" value="delete">
                                             <input type="hidden" name="id" value="<?php echo $item['id']; ?>">
-                                            <button type="submit" class="btn btn-danger btn-small" title="Hapus">
+                                            <button type="submit" class="btn btn-danger" title="Hapus">
                                                 <i class="fas fa-trash"></i>
                                             </button>
                                         </form>
@@ -847,18 +826,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['form_action'])) {
                         <?php endforeach; ?>
                     </tbody>
                 </table>
-            </div>
         <?php else: ?>
-            <div class="no-data">
-                <i class="fas fa-inbox" style="font-size:48px; color:#ccc; margin-bottom:20px;"></i>
-                <p>Belum ada data formulir.</p>
+            <div class="empty-state">
+                <div class="icon">📄</div>
+                <p>Belum ada data formulir. Tambahkan formulir baru di panel kanan.</p>
             </div>
         <?php endif; ?>
     </div>
-    
-    <!-- TAB: FORM -->
-    <div id="form" class="tab-content">
-        <div class="form-card">
+
+    <div class="panel">
+        <div class="panel-title"><?php echo $edit_data ? '✏ Edit Formulir' : '➕ Tambah Formulir'; ?></div>
             <form method="POST" enctype="multipart/form-data">
                 <input type="hidden" name="form_action" value="<?php echo $edit_data ? 'edit' : 'add'; ?>">
                 <?php if ($edit_data): ?>
@@ -885,13 +862,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['form_action'])) {
                 
                 <div class="form-group">
                     <label>File PDF <?php echo !$edit_data ? '<span class="required">*</span>' : ''; ?></label>
-                    <div class="file-input-wrapper">
-                        <label for="file_input" class="file-input-label">
-                            <i class="fas fa-upload"></i> Pilih File PDF<?php echo !$edit_data ? ' (Wajib)' : ' (Opsional)'; ?>
-                        </label>
-                        <input type="file" id="file_input" name="file" accept="application/pdf" onchange="previewFile(event)">
-                    </div>
-                    <p style="font-size:12px; color:#999; margin-top:10px;">
+                    <input type="file" id="file_input" name="file" accept="application/pdf" onchange="previewFile(event)">
+                    <p class="info-text">
                         <strong>Format:</strong> PDF | <strong>Max: 10MB</strong><br>
                         <?php echo !$edit_data ? '<em>File PDF wajib diupload saat menambah formulir baru.</em>' : '<em>Jika ingin mengganti file, upload file PDF baru. Jika tidak, file lama akan tetap digunakan.</em>'; ?>
                     </p>
@@ -899,73 +871,39 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['form_action'])) {
                 
                 <!-- List File Lama (jika edit) -->
                 <?php if ($edit_data && !empty($edit_data['file'])): ?>
-                    <div style="background-color: #F9F9F9; padding: 15px; border-radius: 6px; margin-bottom: 20px;">
-                        <p class="preview-label"><strong>File Saat Ini:</strong></p>
-                        <div class="file-info">
-                            <div class="file-icon">
-                                <i class="fas fa-file-pdf"></i>
-                            </div>
-                            <div class="file-details">
-                                <div class="file-name"><?php echo htmlspecialchars($edit_data['file']); ?></div>
+                    <div class="file-box">
+                        <div class="file-line"><i class="fas fa-file-pdf"></i> <strong>File Saat Ini:</strong></div>
+                        <div class="file-line"><?php echo htmlspecialchars($edit_data['file']); ?></div>
                                 <?php 
                                 $file_path = UPLOAD_DIR . $edit_data['file'];
                                 if (file_exists($file_path)) {
                                     $file_size = filesize($file_path);
                                     $file_size_kb = round($file_size / 1024, 2);
-                                    echo '<div class="file-size">Ukuran: ' . $file_size_kb . ' KB</div>';
+                                    echo '<div class="file-line">Ukuran: ' . $file_size_kb . ' KB</div>';
                                 }
                                 ?>
-                            </div>
-                        </div>
                     </div>
                 <?php endif; ?>
                 
                 <!-- Preview File Baru -->
-                <div id="preview_new" style="display:none; background-color: #E7F3F1; padding: 15px; border-radius: 6px; margin-bottom: 20px;">
-                    <p class="preview-label"><strong>File Baru:</strong></p>
-                    <div class="file-info">
-                        <div class="file-icon">
-                            <i class="fas fa-file-pdf"></i>
-                        </div>
-                        <div class="file-details">
-                            <div class="file-name" id="preview_filename"></div>
-                            <div class="file-size" id="preview_filesize"></div>
-                        </div>
-                    </div>
+                <div id="preview_new" class="file-box" style="display:none;">
+                    <div class="file-line"><i class="fas fa-file-pdf"></i> <strong>File Baru:</strong></div>
+                    <div class="file-line" id="preview_filename"></div>
+                    <div class="file-line" id="preview_filesize"></div>
                 </div>
                 
-                <div class="button-group">
-                    <button type="submit" class="btn btn-primary">
-                        <i class="fas fa-save"></i> 
+                    <button type="submit" class="btn-submit">
                         <?php echo $edit_data ? 'Perbarui Formulir' : 'Tambah Formulir'; ?>
                     </button>
                     <?php if ($edit_data): ?>
-                        <a href="?" class="btn btn-secondary">
-                            <i class="fas fa-times"></i> Batal
-                        </a>
+                        <a href="formulir.php" class="back-link" style="display:block; text-align:center; margin-top:12px; margin-bottom:0;">Batal Edit</a>
                     <?php endif; ?>
-                </div>
             </form>
-        </div>
     </div>
-    
+</div>
 </div>
 
 <script>
-function switchTab(tab) {
-    // Hide all tabs
-    document.querySelectorAll('.tab-content').forEach(el => {
-        el.classList.remove('active');
-    });
-    document.querySelectorAll('.tab-btn').forEach(el => {
-        el.classList.remove('active');
-    });
-    
-    // Show selected tab
-    document.getElementById(tab).classList.add('active');
-    event.target.closest('.tab-btn').classList.add('active');
-}
-
 function previewFile(event) {
     const file = event.target.files[0];
     if (file) {
@@ -975,6 +913,10 @@ function previewFile(event) {
     }
 }
 </script>
+
+        </div>
+    </main>
+</div>
 
 </body>
 </html>

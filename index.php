@@ -106,7 +106,7 @@ $cta_photo = gbi_find_first_image([
                     </div>
 
             <?php
-            $q_wn = "SELECT image FROM whats_new
+            $q_wn = "SELECT image FROM coming_soon
                              WHERE is_active = 1
                              ORDER BY urutan ASC
                              LIMIT 5";
@@ -123,7 +123,7 @@ $cta_photo = gbi_find_first_image([
                 <div class="whats-new-track" id="whatsNewTrack">
                     <?php foreach ($wn_images as $i => $img): ?>
                         <div class="whats-new-card">
-                            <img src="uploads/whatsnew/<?php echo htmlspecialchars($img); ?>" alt="What's New <?php echo $i + 1; ?>">
+                            <img src="uploads/whatsnew/<?php echo htmlspecialchars($img); ?>" alt="Coming Soon <?php echo $i + 1; ?>">
                         </div>
                     <?php endforeach; ?>
                 </div>

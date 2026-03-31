@@ -213,6 +213,7 @@ $stmt->close();
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Kelola Pelayanan - Admin GBI Salemba</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="/<?php echo htmlspecialchars(basename(dirname(__DIR__))); ?>/assets/css/admin-theme.css">
     <style>
         * {
             margin: 0;
@@ -227,34 +228,15 @@ $stmt->close();
         }
         
         .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 30px 20px;
+            max-width: none;
+            margin: 0;
         }
-        
-        .header-section {
-            background: linear-gradient(135deg, #1E3A5F 0%, #0F2742 100%);
-            color: white;
-            padding: 30px 20px;
-            margin: -30px -20px 30px;
-            border-radius: 0 0 8px 8px;
-        }
-        
-        .header-section h1 {
-            font-size: 32px;
-            margin-bottom: 5px;
-        }
-        
-        .breadcrumb {
-            font-size: 14px;
-            opacity: 0.9;
-        }
-        
+
         .alert {
-            padding: 15px 20px;
-            margin: 20px 0;
-            border-radius: 6px;
-            font-weight: 600;
+            padding: 14px 18px;
+            margin-bottom: 12px;
+            border-radius: 8px;
+            font-weight: 500;
         }
         
         .alert-success {
@@ -268,58 +250,52 @@ $stmt->close();
             color: #721C24;
             border: 1px solid #F5C6CB;
         }
-        
-        .tabs {
-            display: flex;
-            gap: 10px;
-            margin: 30px 0 30px;
-            border-bottom: 2px solid #E0E0E0;
+
+        .layout {
+            display: grid;
+            grid-template-columns: 1fr 360px;
+            gap: 16px;
+            align-items: start;
         }
-        
-        .tab-btn {
-            padding: 12px 24px;
-            background: none;
-            border: none;
-            border-bottom: 3px solid transparent;
+
+        .panel {
+            background: linear-gradient(165deg, #f9f2e8 0%, #efe2d1 100%);
+            border-radius: 12px;
+            padding: 14px;
+            box-shadow: 0 4px 12px rgba(16, 44, 87, 0.1);
+        }
+
+        .panel-title {
+            font-size: 16px;
+            font-weight: 700;
             color: #102C57;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-        
-        .tab-btn.active {
-            border-bottom-color: #3FB6A8;
-            color: #3FB6A8;
-        }
-        
-        .tab-content {
-            display: none;
-        }
-        
-        .tab-content.active {
-            display: block;
+            margin-bottom: 10px;
+            padding-bottom: 8px;
+            border-bottom: 2px solid #146C94;
         }
         
         .form-group {
-            margin-bottom: 20px;
+            margin-bottom: 10px;
         }
         
         .form-group label {
             display: block;
-            margin-bottom: 8px;
+            margin-bottom: 6px;
             font-weight: 600;
             color: #102C57;
+            font-size: 13px;
         }
         
         .form-group input,
         .form-group textarea,
         .form-group select {
             width: 100%;
-            padding: 12px;
-            border: 1px solid #DDD;
-            border-radius: 6px;
+            padding: 8px 10px;
+            border: 2px solid #146C94;
+            border-radius: 8px;
             font-family: inherit;
-            font-size: 14px;
+            font-size: 13px;
+            background: #fff;
         }
         
         .form-group textarea {
@@ -336,17 +312,17 @@ $stmt->close();
         .button-group {
             display: flex;
             gap: 10px;
-            margin-top: 30px;
+            margin-top: 18px;
         }
         
         .btn {
-            padding: 12px 24px;
+            padding: 8px 14px;
             border: none;
-            border-radius: 6px;
+            border-radius: 8px;
             font-weight: 600;
             cursor: pointer;
             transition: all 0.3s ease;
-            font-size: 14px;
+            font-size: 13px;
         }
         
         .btn-primary {
@@ -377,42 +353,43 @@ $stmt->close();
         }
         
         .btn-small {
-            padding: 8px 16px;
+            padding: 6px 10px;
             font-size: 12px;
-        }
-        
-        .table-container {
-            background: white;
-            border-radius: 8px;
-            overflow: hidden;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
         }
         
         table {
             width: 100%;
             border-collapse: collapse;
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
         }
         
         table th {
-            background-color: #1E3A5F;
+            background: #146C94;
             color: white;
-            padding: 15px;
+            padding: 8px 10px;
             text-align: left;
             font-weight: 600;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
         }
         
         table td {
-            padding: 15px;
-            border-bottom: 1px solid #EEE;
+            padding: 8px 10px;
+            border-bottom: 1px solid #f0f4f8;
+            vertical-align: middle;
+            font-size: 13px;
         }
         
         table tr:hover {
-            background-color: #F9F9F9;
+            background-color: #f0f7fb;
         }
         
         .thumbnail {
-            width: 60px;
-            height: 60px;
+            width: 48px;
+            height: 48px;
             object-fit: cover;
             object-position: center;
             border-radius: 4px;
@@ -421,10 +398,11 @@ $stmt->close();
         
         .status-badge {
             display: inline-block;
-            padding: 6px 12px;
+            padding: 4px 10px;
             border-radius: 20px;
-            font-size: 12px;
-            font-weight: 600;
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
         }
         
         .status-aktif {
@@ -439,39 +417,15 @@ $stmt->close();
         
         .action-buttons {
             display: flex;
-            gap: 8px;
+            gap: 6px;
+            flex-wrap: wrap;
         }
         
-        .form-card {
-            background: white;
-            padding: 30px;
-            border-radius: 8px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-            margin-bottom: 20px;
-        }
-        
-        .file-input-wrapper {
-            position: relative;
-            display: inline-block;
-        }
-        
-        .file-input-label {
-            display: inline-block;
-            padding: 10px 16px;
-            background-color: #3FB6A8;
-            color: white;
-            border-radius: 6px;
-            cursor: pointer;
-            font-weight: 600;
-            transition: all 0.3s ease;
-        }
-        
-        .file-input-label:hover {
-            background-color: #2E9A8E;
-        }
-        
-        .file-input-wrapper input[type="file"] {
-            display: none;
+        .form-group input:focus,
+        .form-group textarea:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: #0f5273;
         }
         
         .file-preview {
@@ -505,8 +459,23 @@ $stmt->close();
             padding: 40px 20px;
             color: #999;
         }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: #888;
+        }
+
+        .empty-state .icon {
+            font-size: 48px;
+            margin-bottom: 12px;
+        }
         
         @media (max-width: 768px) {
+            .layout {
+                grid-template-columns: 1fr;
+            }
+
             .form-row {
                 grid-template-columns: 1fr;
             }
@@ -521,17 +490,21 @@ $stmt->close();
         }
     </style>
 </head>
-<body>
+<body class="admin-theme">
 
-<div class="header-section">
-    <div class="container">
-        <h1>Kelola Pelayanan</h1>
-        <p class="breadcrumb"><a href="index.php" style="color:#fff; text-decoration:none;">← Dashboard Admin</a></p>
-    </div>
-</div>
+<div class="admin-shell">
+    <?php include __DIR__ . '/includes/sidebar.php'; ?>
+    <main class="admin-main">
+        <header class="admin-topbar">
+            <div>
+                <h1>Kelola Pelayanan</h1>
+                <div class="admin-topbar-meta">Manajemen data bidang pelayanan jemaat</div>
+            </div>
+            <div class="admin-topbar-meta">Halo, <strong><?php echo htmlspecialchars($_SESSION['username'] ?? 'Admin'); ?></strong></div>
+        </header>
+        <div class="admin-content">
 
 <div class="container">
-    
     <!-- ALERTS -->
     <?php if (isset($success)): ?>
         <div class="alert alert-success">
@@ -544,21 +517,11 @@ $stmt->close();
             <i class="fas fa-exclamation-circle"></i> <?php echo htmlspecialchars($error); ?>
         </div>
     <?php endif; ?>
-    
-    <!-- TABS -->
-    <div class="tabs">
-        <button class="tab-btn active" onclick="switchTab('list')">
-            <i class="fas fa-list"></i> Daftar Pelayanan
-        </button>
-        <button class="tab-btn" onclick="switchTab('form')">
-            <i class="fas fa-plus"></i> <?php echo $edit_data ? 'Edit' : 'Tambah'; ?> Pelayanan
-        </button>
-    </div>
-    
-    <!-- TAB: LIST -->
-    <div id="list" class="tab-content active">
+
+    <div class="layout">
+    <div class="panel">
+        <div class="panel-title">📋 Daftar Pelayanan</div>
         <?php if (count($pelayanan_list) > 0): ?>
-            <div class="table-container">
                 <table>
                     <thead>
                         <tr>
@@ -606,18 +569,16 @@ $stmt->close();
                         <?php endforeach; ?>
                     </tbody>
                 </table>
-            </div>
         <?php else: ?>
-            <div class="no-data">
-                <i class="fas fa-inbox" style="font-size:48px; color:#ccc; margin-bottom:20px;"></i>
+            <div class="empty-state">
+                <div class="icon">🧩</div>
                 <p>Belum ada data pelayanan.</p>
             </div>
         <?php endif; ?>
     </div>
-    
-    <!-- TAB: FORM -->
-    <div id="form" class="tab-content">
-        <div class="form-card">
+
+    <div class="panel" id="pelayanan-form-panel">
+        <div class="panel-title"><?php echo $edit_data ? '✏ Edit Pelayanan' : '➕ Tambah Pelayanan'; ?></div>
             <form method="POST" enctype="multipart/form-data">
                 <input type="hidden" name="form_action" value="<?php echo $edit_data ? 'edit' : 'add'; ?>">
                 <?php if ($edit_data): ?>
@@ -650,12 +611,7 @@ $stmt->close();
                 
                 <div class="form-group">
                     <label>Foto Pelayanan</label>
-                    <div class="file-input-wrapper">
-                        <label for="foto_input" class="file-input-label">
-                            <i class="fas fa-upload"></i> Pilih Foto (Optional)
-                        </label>
-                        <input type="file" id="foto_input" name="foto" accept="image/jpeg,image/png,image/webp" onchange="previewImage(event)">
-                    </div>
+                    <input type="file" id="foto_input" name="foto" accept="image/jpeg,image/png,image/webp" onchange="previewImage(event)">
                     <p style="font-size:12px; color:#999; margin-top:10px;">
                         <strong>Format:</strong> JPG, PNG, WebP | <strong>Max: 10MB</strong><br>
                         <em>Gambar akan otomatis di-resize dan di-compress untuk optimal loading</em>
@@ -696,32 +652,18 @@ $stmt->close();
                         <?php echo $edit_data ? 'Perbarui Data' : 'Tambah Data'; ?>
                     </button>
                     <?php if ($edit_data): ?>
-                        <a href="?" class="btn btn-secondary">
+                        <a href="pelayanan.php" class="btn btn-secondary">
                             <i class="fas fa-times"></i> Batal
                         </a>
                     <?php endif; ?>
                 </div>
             </form>
-        </div>
+    </div>
     </div>
     
 </div>
 
 <script>
-function switchTab(tab) {
-    // Hide all tabs
-    document.querySelectorAll('.tab-content').forEach(el => {
-        el.classList.remove('active');
-    });
-    document.querySelectorAll('.tab-btn').forEach(el => {
-        el.classList.remove('active');
-    });
-    
-    // Show selected tab
-    document.getElementById(tab).classList.add('active');
-    event.target.closest('.tab-btn').classList.add('active');
-}
-
 function previewImage(event) {
     const file = event.target.files[0];
     if (file) {
@@ -761,7 +703,15 @@ function updateImagePositionPreview() {
 }
 
 updateImagePositionPreview();
+
+<?php if ($edit_data): ?>
+document.getElementById('pelayanan-form-panel').scrollIntoView({ behavior: 'smooth', block: 'start' });
+<?php endif; ?>
 </script>
+
+        </div>
+    </main>
+</div>
 
 </body>
 </html>

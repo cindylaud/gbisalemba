@@ -3,11 +3,46 @@ require_once __DIR__ . '/../config/database.php';
 require_once __DIR__ . '/includes/auth.php';
 require_once __DIR__ . '/../includes/image-helper.php';
 
+define('COMING_SOON_TABLE', 'coming_soon');
 define('WN_UPLOAD_DIR', __DIR__ . '/../uploads/whatsnew/');
 define('WN_MAX_SIZE',   50 * 1024 * 1024); // 50MB
 define('WN_ALLOWED',    ['jpg', 'jpeg', 'png', 'webp']);
 define('WN_MAX_WIDTH',  1920);
 define('WN_WEBP_QUALITY', 80);
+
+function ensureComingSoonTable(mysqli $conn): void {
+    $hasComingSoon = false;
+    $hasWhatsNew = false;
+
+    $checkComingSoon = $conn->query("SHOW TABLES LIKE 'coming_soon'");
+    if ($checkComingSoon && $checkComingSoon->num_rows > 0) {
+        $hasComingSoon = true;
+    }
+
+    $checkWhatsNew = $conn->query("SHOW TABLES LIKE 'whats_new'");
+    if ($checkWhatsNew && $checkWhatsNew->num_rows > 0) {
+        $hasWhatsNew = true;
+    }
+
+    if (!$hasComingSoon && $hasWhatsNew) {
+        $conn->query("RENAME TABLE whats_new TO coming_soon");
+        $hasComingSoon = true;
+    }
+
+    if (!$hasComingSoon) {
+        $conn->query(
+            "CREATE TABLE IF NOT EXISTS coming_soon (
+                id INT AUTO_INCREMENT PRIMARY KEY,
+                image VARCHAR(255) NOT NULL,
+                urutan INT NOT NULL DEFAULT 1,
+                is_active TINYINT(1) NOT NULL DEFAULT 1,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            )"
+        );
+    }
+}
+
+ensureComingSoonTable($conn);
 
 $message = '';
 $error   = '';
@@ -29,7 +64,7 @@ if (isset($_GET['action']) && $_GET['action'] === 'delete' && isset($_GET['id'])
     }
 
     // Ambil nama file
-    $stmt = $conn->prepare("SELECT image FROM whats_new WHERE id = ?");
+    $stmt = $conn->prepare("SELECT image FROM " . COMING_SOON_TABLE . " WHERE id = ?");
     $stmt->bind_param("i", $del_id);
     $stmt->execute();
     $row = $stmt->get_result()->fetch_assoc();
@@ -48,7 +83,7 @@ if (isset($_GET['action']) && $_GET['action'] === 'delete' && isset($_GET['id'])
     }
 
     // Hapus dari database
-    $stmt = $conn->prepare("DELETE FROM whats_new WHERE id = ?");
+    $stmt = $conn->prepare("DELETE FROM " . COMING_SOON_TABLE . " WHERE id = ?");
     $stmt->bind_param("i", $del_id);
     if ($stmt->execute()) {
         $_SESSION['message'] = 'Gambar berhasil dihapus';
@@ -73,7 +108,7 @@ if (isset($_GET['action']) && $_GET['action'] === 'toggle' && isset($_GET['id'])
         exit;
     }
 
-    $stmt = $conn->prepare("UPDATE whats_new SET is_active = IF(is_active = 1, 0, 1) WHERE id = ?");
+    $stmt = $conn->prepare("UPDATE " . COMING_SOON_TABLE . " SET is_active = IF(is_active = 1, 0, 1) WHERE id = ?");
     $stmt->bind_param("i", $tog_id);
     if ($stmt->execute()) {
         $_SESSION['message'] = 'Status berhasil diubah';
@@ -96,7 +131,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
     if ($sort_id <= 0 || $sort_urutan <= 0) {
         $_SESSION['error'] = 'Data urutan tidak valid';
     } else {
-        $stmt = $conn->prepare("UPDATE whats_new SET urutan = ? WHERE id = ?");
+        $stmt = $conn->prepare("UPDATE " . COMING_SOON_TABLE . " SET urutan = ? WHERE id = ?");
         $stmt->bind_param("ii", $sort_urutan, $sort_id);
         if ($stmt->execute()) {
             $_SESSION['message'] = 'Urutan berhasil diubah';
@@ -152,7 +187,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
                 $error = $processed['error'];
             } else {
                 // Insert ke database
-                $stmt = $conn->prepare("INSERT INTO whats_new (image, urutan, is_active) VALUES (?, ?, 1)");
+                $stmt = $conn->prepare("INSERT INTO " . COMING_SOON_TABLE . " (image, urutan, is_active) VALUES (?, ?, 1)");
                 $stmt->bind_param("si", $filename, $urutan);
                 if ($stmt->execute()) {
                     $message = 'Gambar berhasil diupload dan dikonversi ke WEBP';
@@ -171,7 +206,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
 // AMBIL DATA UNTUK DITAMPILKAN
 // ============================================================
 $items = [];
-$res = $conn->query("SELECT * FROM whats_new ORDER BY urutan ASC");
+$res = $conn->query("SELECT * FROM " . COMING_SOON_TABLE . " ORDER BY urutan ASC");
 while ($row = $res->fetch_assoc()) {
     $items[] = $row;
 }
@@ -181,7 +216,8 @@ while ($row = $res->fetch_assoc()) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kelola What's New - Admin GBI Salemba</title>
+    <title>Kelola Coming Soon - Admin GBI Salemba</title>
+    <link rel="stylesheet" href="/<?php echo htmlspecialchars(basename(dirname(__DIR__))); ?>/assets/css/admin-theme.css">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
 
@@ -189,35 +225,15 @@ while ($row = $res->fetch_assoc()) {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background-color: #F3F9FB;
             color: #102C57;
-            padding: 20px;
             line-height: 1.6;
         }
 
         .container {
-            max-width: 1100px;
-            margin: 0 auto;
+            max-width: none;
+            margin: 0;
         }
 
         /* ── Header ── */
-        .back-link {
-            display: inline-block;
-            margin-bottom: 20px;
-            padding: 10px 20px;
-            background-color: #146C94;
-            color: white;
-            text-decoration: none;
-            border-radius: 8px;
-            font-weight: 600;
-            transition: background-color 0.3s ease;
-        }
-        .back-link:hover { background-color: #0f5273; }
-
-        h1 {
-            color: #102C57;
-            font-size: 28px;
-            margin-bottom: 24px;
-        }
-
         /* ── Alerts ── */
         .alert {
             padding: 14px 18px;
@@ -240,7 +256,7 @@ while ($row = $res->fetch_assoc()) {
         .layout {
             display: grid;
             grid-template-columns: 1fr 340px;
-            gap: 28px;
+            gap: 16px;
             align-items: start;
         }
         @media (max-width: 900px) {
@@ -249,17 +265,17 @@ while ($row = $res->fetch_assoc()) {
 
         /* ── Panel ── */
         .panel {
-            background: #EADBC8;
+            background: linear-gradient(165deg, #f9f2e8 0%, #efe2d1 100%);
             border-radius: 12px;
-            padding: 26px;
+            padding: 18px;
             box-shadow: 0 4px 12px rgba(16, 44, 87, 0.1);
         }
 
         .panel-title {
-            font-size: 18px;
+            font-size: 17px;
             font-weight: 700;
             color: #102C57;
-            margin-bottom: 20px;
+            margin-bottom: 14px;
             padding-bottom: 10px;
             border-bottom: 2px solid #146C94;
         }
@@ -275,7 +291,7 @@ while ($row = $res->fetch_assoc()) {
         thead th {
             background: #146C94;
             color: white;
-            padding: 12px 14px;
+            padding: 10px 12px;
             text-align: left;
             font-size: 13px;
             font-weight: 600;
@@ -289,7 +305,7 @@ while ($row = $res->fetch_assoc()) {
         tbody tr:last-child { border-bottom: none; }
         tbody tr:hover { background-color: #f0f7fb; }
         tbody td {
-            padding: 12px 14px;
+            padding: 10px 12px;
             vertical-align: middle;
             font-size: 14px;
         }
@@ -421,6 +437,13 @@ while ($row = $res->fetch_assoc()) {
             text-transform: uppercase;
             letter-spacing: 0.5px;
         }
+
+        .btn-submit::before {
+            content: '\\f093';
+            font-family: 'Font Awesome 6 Free';
+            font-weight: 900;
+            margin-right: 8px;
+        }
         .btn-submit:hover {
             transform: scale(1.02);
             box-shadow: 0 6px 15px rgba(20, 108, 148, 0.3);
@@ -437,13 +460,25 @@ while ($row = $res->fetch_assoc()) {
 
         /* ── Delete confirm ── */
         .actions { display: flex; gap: 6px; flex-wrap: wrap; }
+
+        @media (max-width: 900px) {
+            .layout { grid-template-columns: 1fr; }
+        }
     </style>
 </head>
-<body>
+<body class="admin-theme">
+<div class="admin-shell">
+    <?php include __DIR__ . '/includes/sidebar.php'; ?>
+    <main class="admin-main">
+        <header class="admin-topbar">
+            <div>
+                <h1>Kelola Coming Soon</h1>
+                <div class="admin-topbar-meta">Kontrol visual Coming Soon untuk halaman publik</div>
+            </div>
+            <div class="admin-topbar-meta">Halo, <strong><?php echo htmlspecialchars($_SESSION['username'] ?? 'Admin'); ?></strong></div>
+        </header>
+        <div class="admin-content">
 <div class="container">
-
-    <a href="index.php" class="back-link">← Kembali ke Dashboard</a>
-    <h1>Kelola What's New Slider</h1>
 
     <?php if ($message): ?>
         <div class="alert alert-success">✓ <?php echo htmlspecialchars($message); ?></div>
@@ -456,7 +491,7 @@ while ($row = $res->fetch_assoc()) {
 
         <!-- ── KIRI: DAFTAR GAMBAR ───────────────────────────────────── -->
         <div class="panel">
-            <div class="panel-title">📋 Daftar Gambar</div>
+            <div class="panel-title">📋 Daftar Coming Soon</div>
 
             <?php if (empty($items)): ?>
                 <div class="empty-state">
@@ -541,7 +576,7 @@ while ($row = $res->fetch_assoc()) {
 
         <!-- ── KANAN: FORM UPLOAD ────────────────────────────────────── -->
         <div class="panel">
-            <div class="panel-title">➕ Upload Gambar Baru</div>
+            <div class="panel-title">➕ Upload Coming Soon</div>
 
             <form method="POST" enctype="multipart/form-data">
                 <input type="hidden" name="action" value="upload">
@@ -573,6 +608,9 @@ while ($row = $res->fetch_assoc()) {
     </div><!-- /.layout -->
 
 </div><!-- /.container -->
+        </div>
+    </main>
+</div>
 </body>
 </html>
 
