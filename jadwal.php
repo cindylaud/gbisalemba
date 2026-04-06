@@ -308,7 +308,7 @@ $jadwal_hero_photo = $jadwal_gallery_images[count($jadwal_gallery_images) - 1];
 </div>
 
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Manrope:wght@600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
 
 /* ===== Color Palette ===== */
 :root {
@@ -325,7 +325,7 @@ $jadwal_hero_photo = $jadwal_gallery_images[count($jadwal_gallery_images) - 1];
     position: relative;
     isolation: isolate;
     overflow: hidden;
-    font-family: 'Manrope', 'Segoe UI', Tahoma, sans-serif;
+    font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     background:
     radial-gradient(circle at 9% 8%, rgba(42, 106, 168, 0.12) 0%, rgba(42, 106, 168, 0) 34%),
     radial-gradient(circle at 91% 15%, rgba(31, 129, 121, 0.08) 0%, rgba(31, 129, 121, 0) 30%),

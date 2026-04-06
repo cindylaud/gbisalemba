@@ -309,7 +309,8 @@ $about_photo_3 = about_find_first_image([
     line-height: 0.96;
     letter-spacing: -0.02em;
     color: var(--gbi-navy);
-    font-family: 'Playfair Display', serif;
+    font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-weight: 800;
     position: relative;
 }
 
@@ -336,7 +337,7 @@ $about_photo_3 = about_find_first_image([
     content: '"';
     position: absolute;
     font-size: 48px;
-    font-family: 'Playfair Display', serif;
+    font-family: inherit;
     color: var(--gbi-green);
     opacity: 0.6;
     line-height: 0.8;
@@ -375,7 +376,8 @@ $about_photo_3 = about_find_first_image([
     font-size: clamp(30px, 4vw, 54px);
     line-height: 1.06;
     letter-spacing: -0.025em;
-    font-family: 'Playfair Display', serif;
+    font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-weight: 800;
     color: var(--gbi-navy);
     position: relative;
     display: inline-block;
@@ -442,7 +444,7 @@ $about_photo_3 = about_find_first_image([
     font-size: clamp(30px, 4.8vw, 52px);
     line-height: 1.04;
     letter-spacing: -0.02em;
-    font-family: 'Playfair Display', serif;
+    font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     color: var(--gbi-navy);
     position: relative;
 }
@@ -458,11 +460,11 @@ $about_photo_3 = about_find_first_image([
 }
 
 .about-gbi-script-title {
-    font-family: 'Great Vibes', 'Brillotus', 'Segoe Script', cursive !important;
-    font-size: clamp(46px, 5.8vw, 76px) !important;
-    font-weight: 400 !important;
-    letter-spacing: 0.01em !important;
-    line-height: 1.02 !important;
+    font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif !important;
+    font-size: clamp(28px, 3.5vw, 40px) !important;
+    font-weight: 800 !important;
+    letter-spacing: -0.02em !important;
+    line-height: 1.05 !important;
     text-transform: none !important;
 }
 
@@ -502,10 +504,10 @@ $about_photo_3 = about_find_first_image([
     background: rgba(16, 44, 87, 0.06);
     border-radius: 0 12px 12px 0;
     color: var(--gbi-navy);
-    font-family: 'Playfair Display', serif;
-    font-size: 22px;
+    font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-size: 20px;
     line-height: 1.55;
-    font-weight: 500;
+    font-weight: 700;
 }
 
 .about-gbi-closing-quote {
@@ -588,7 +590,7 @@ $about_photo_3 = about_find_first_image([
     text-align: center;
     font-size: clamp(16px, 2vw, 20px);
     line-height: 1.3;
-    font-family: 'Playfair Display', serif;
+    font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     color: var(--gbi-navy);
     font-weight: 700;
 }

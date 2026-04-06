@@ -376,14 +376,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['form_action'])) {
     $stmt->close();
 }
 
-$formulir_total = count($formulir_list);
-$formulir_aktif = 0;
-foreach ($formulir_list as $form_item) {
-    if (($form_item['status'] ?? '') === 'aktif') {
-        $formulir_aktif++;
-    }
-}
-
 ?>
 <!DOCTYPE html>
 <html lang="id">
@@ -392,12 +384,13 @@ foreach ($formulir_list as $form_item) {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Kelola Formulir - Admin GBI Salemba</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="/<?php echo htmlspecialchars(basename(dirname(__DIR__))); ?>/assets/css/admin-theme.css">
+    <?php $admin_theme_path = dirname(__DIR__) . '/assets/css/admin-theme.css'; ?>
+    <link rel="stylesheet" href="/<?php echo htmlspecialchars(basename(dirname(__DIR__))); ?>/assets/css/admin-theme.css?v=<?php echo urlencode((string) (is_file($admin_theme_path) ? filemtime($admin_theme_path) : time())); ?>">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
 
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background-color: #F3F9FB;
             color: #102C57;
             line-height: 1.6;
@@ -406,54 +399,6 @@ foreach ($formulir_list as $form_item) {
         .container {
             max-width: none;
             margin: 0;
-        }
-
-        .hero {
-            background: linear-gradient(130deg, #1e3a5f 0%, #0f2742 74%);
-            border-radius: 16px;
-            padding: 18px;
-            margin-bottom: 18px;
-            color: #fff;
-            box-shadow: 0 14px 30px rgba(15, 39, 66, 0.24);
-        }
-
-        .hero h1 {
-            margin: 6px 0 10px;
-            color: #fff;
-            font-size: 30px;
-        }
-
-        .hero p {
-            margin: 0;
-            opacity: 0.9;
-        }
-
-        .hero-stats {
-            display: grid;
-            grid-template-columns: repeat(3, minmax(0, 1fr));
-            gap: 10px;
-            margin-top: 14px;
-        }
-
-        .hero-stat {
-            border-radius: 12px;
-            padding: 10px 12px;
-            border: 1px solid rgba(255, 255, 255, 0.22);
-            background: rgba(255, 255, 255, 0.1);
-        }
-
-        .hero-stat .label {
-            font-size: 11px;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            opacity: 0.9;
-        }
-
-        .hero-stat .value {
-            margin-top: 2px;
-            font-size: 21px;
-            font-weight: 800;
-            line-height: 1.15;
         }
 
         .back-link {
@@ -503,6 +448,11 @@ foreach ($formulir_list as $form_item) {
             box-shadow: 0 4px 12px rgba(16, 44, 87, 0.1);
         }
 
+        .panel-upload {
+            position: sticky;
+            top: 104px;
+        }
+
         .panel-title {
             font-size: 17px;
             font-weight: 700;
@@ -510,6 +460,25 @@ foreach ($formulir_list as $form_item) {
             margin-bottom: 14px;
             padding-bottom: 10px;
             border-bottom: 2px solid #146C94;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .panel-title::before {
+            font-family: 'Font Awesome 6 Free';
+            font-weight: 900;
+            font-size: 16px;
+        }
+
+        .list-title::before {
+            content: '\f15c';
+            color: #8b74c7;
+        }
+
+        .upload-title::before {
+            content: '\2b';
+            color: #7d5ad8;
         }
 
         table {
@@ -628,7 +597,6 @@ foreach ($formulir_list as $form_item) {
         }
 
         .form-group input[type="text"],
-        .form-group input[type="file"],
         .form-group textarea,
         .form-group select {
             width: 100%;
@@ -647,6 +615,124 @@ foreach ($formulir_list as $form_item) {
         .form-group select:focus {
             outline: none;
             border-color: #0f5273;
+        }
+
+        .status-select-native {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            padding: 0;
+            margin: -1px;
+            overflow: hidden;
+            clip: rect(0, 0, 0, 0);
+            white-space: nowrap;
+            border: 0;
+        }
+
+        .status-toggle {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 6px;
+            padding: 5px;
+            border-radius: 12px;
+            border: 1px solid rgba(16, 44, 87, 0.18);
+            background: linear-gradient(180deg, #f8fbff 0%, #edf4fb 100%);
+        }
+
+        .status-option {
+            border: none;
+            border-radius: 9px;
+            padding: 9px 10px;
+            font-size: 13px;
+            font-weight: 700;
+            color: #3f5b78;
+            background: transparent;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .status-option:hover {
+            background: rgba(20, 108, 148, 0.12);
+            color: #1e3a5f;
+        }
+
+        .status-option.active {
+            background: linear-gradient(135deg, #1e3a5f 0%, #146C94 100%);
+            color: #fff;
+            box-shadow: 0 8px 14px rgba(20, 108, 148, 0.24);
+        }
+
+        .file-upload-wrap {
+            border: 1px dashed rgba(20, 108, 148, 0.35);
+            border-radius: 12px;
+            background: linear-gradient(180deg, rgba(255, 255, 255, 0.92) 0%, rgba(240, 247, 252, 0.9) 100%);
+            padding: 12px;
+            transition: border-color 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .file-upload-wrap.is-highlight {
+            border-color: rgba(20, 108, 148, 0.62);
+            box-shadow: 0 0 0 0.2rem rgba(63, 182, 168, 0.14);
+        }
+
+        .file-input-native {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            padding: 0;
+            margin: -1px;
+            overflow: hidden;
+            clip: rect(0, 0, 0, 0);
+            white-space: nowrap;
+            border: 0;
+        }
+
+        .file-upload-button {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            border: none;
+            border-radius: 10px;
+            padding: 10px 14px;
+            background: linear-gradient(135deg, #1e3a5f 0%, #146C94 100%);
+            color: #fff;
+            font-size: 12px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .file-upload-button:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 8px 14px rgba(20, 108, 148, 0.22);
+        }
+
+        .file-upload-name {
+            margin-top: 10px;
+            padding: 9px 10px;
+            border-radius: 9px;
+            border: 1px solid rgba(16, 44, 87, 0.15);
+            background: rgba(255, 255, 255, 0.86);
+            font-size: 12px;
+            color: #405f7b;
+            font-weight: 600;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .file-upload-meta {
+            margin-top: 10px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 12px;
+            color: #59708a;
+            font-weight: 600;
+        }
+
+        .file-upload-meta i {
+            color: #146C94;
         }
 
         .info-text {
@@ -706,8 +792,10 @@ foreach ($formulir_list as $form_item) {
 
         @media (max-width: 980px) {
             .layout { grid-template-columns: 1fr; }
-            .hero h1 { font-size: 30px; }
-            .hero-stats { grid-template-columns: 1fr; }
+            .panel-upload {
+                position: static;
+                top: auto;
+            }
         }
     </style>
 </head>
@@ -726,26 +814,6 @@ foreach ($formulir_list as $form_item) {
         <div class="admin-content">
 
 <div class="container">
-<div class="hero">
-        <a href="index.php" class="back-link">← Kembali ke Dashboard</a>
-        <h1>Kelola Formulir</h1>
-        <p>Atur file formulir jemaat dengan urutan yang rapi dan status yang mudah dipantau.</p>
-        <div class="hero-stats">
-            <div class="hero-stat">
-                <div class="label">Total Formulir</div>
-                <div class="value"><?php echo $formulir_total; ?></div>
-            </div>
-            <div class="hero-stat">
-                <div class="label">Status Aktif</div>
-                <div class="value"><?php echo $formulir_aktif; ?></div>
-            </div>
-            <div class="hero-stat">
-                <div class="label">Maks Upload PDF</div>
-                <div class="value">10MB</div>
-            </div>
-        </div>
-    </div>
-    
     <!-- ALERTS -->
     <?php if (isset($success)): ?>
         <div class="alert alert-success">
@@ -760,8 +828,8 @@ foreach ($formulir_list as $form_item) {
     <?php endif; ?>
 
     <div class="layout">
-    <div class="panel">
-        <div class="panel-title">📄 Daftar Formulir</div>
+    <div class="panel panel-list">
+        <div class="panel-title list-title">Daftar Formulir</div>
         <?php if (count($formulir_list) > 0): ?>
                 <table>
                     <thead>
@@ -790,7 +858,7 @@ foreach ($formulir_list as $form_item) {
                                 <td>
                                     <?php if (!empty($item['file']) && file_exists(UPLOAD_DIR . $item['file'])): ?>
                                         <div class="actions">
-                                            <a href="download-formulir.php?id=<?php echo $item['id']; ?>" 
+                                                          <a href="../download-formulir.php?id=<?php echo $item['id']; ?>" 
                                                target="_blank" 
                                                class="btn btn-download"
                                                title="Download PDF">
@@ -834,8 +902,8 @@ foreach ($formulir_list as $form_item) {
         <?php endif; ?>
     </div>
 
-    <div class="panel">
-        <div class="panel-title"><?php echo $edit_data ? '✏ Edit Formulir' : '➕ Tambah Formulir'; ?></div>
+    <div class="panel panel-upload">
+        <div class="panel-title upload-title"><?php echo $edit_data ? 'Edit Formulir' : 'Tambah Formulir'; ?></div>
             <form method="POST" enctype="multipart/form-data">
                 <input type="hidden" name="form_action" value="<?php echo $edit_data ? 'edit' : 'add'; ?>">
                 <?php if ($edit_data): ?>
@@ -844,10 +912,14 @@ foreach ($formulir_list as $form_item) {
                 
                 <div class="form-group">
                     <label>Status <span class="required">*</span></label>
-                    <select name="status" required>
+                    <select id="status_select" name="status" required class="status-select-native">
                         <option value="aktif" <?php echo (($edit_data['status'] ?? $_POST['status'] ?? 'aktif') === 'aktif') ? 'selected' : ''; ?>>Aktif</option>
                         <option value="nonaktif" <?php echo (($edit_data['status'] ?? $_POST['status'] ?? '') === 'nonaktif') ? 'selected' : ''; ?>>Nonaktif</option>
                     </select>
+                    <div class="status-toggle" id="status_toggle" role="radiogroup" aria-label="Status Formulir">
+                        <button type="button" class="status-option" data-value="aktif">Aktif</button>
+                        <button type="button" class="status-option" data-value="nonaktif">Nonaktif</button>
+                    </div>
                 </div>
                 
                 <div class="form-group">
@@ -862,7 +934,17 @@ foreach ($formulir_list as $form_item) {
                 
                 <div class="form-group">
                     <label>File PDF <?php echo !$edit_data ? '<span class="required">*</span>' : ''; ?></label>
-                    <input type="file" id="file_input" name="file" accept="application/pdf" onchange="previewFile(event)">
+                    <div class="file-upload-wrap">
+                        <input type="file" id="file_input" class="file-input-native" name="file" accept="application/pdf" onchange="previewFile(event)">
+                        <button type="button" id="file_upload_button" class="file-upload-button">
+                            <i class="fas fa-file-arrow-up"></i> Pilih File PDF
+                        </button>
+                        <div class="file-upload-name" id="file_name_text">Belum ada file dipilih</div>
+                        <div class="file-upload-meta">
+                            <i class="fas fa-file-pdf"></i>
+                            <span>Upload PDF formulir yang siap dibagikan ke jemaat</span>
+                        </div>
+                    </div>
                     <p class="info-text">
                         <strong>Format:</strong> PDF | <strong>Max: 10MB</strong><br>
                         <?php echo !$edit_data ? '<em>File PDF wajib diupload saat menambah formulir baru.</em>' : '<em>Jika ingin mengganti file, upload file PDF baru. Jika tidak, file lama akan tetap digunakan.</em>'; ?>
@@ -906,12 +988,70 @@ foreach ($formulir_list as $form_item) {
 <script>
 function previewFile(event) {
     const file = event.target.files[0];
+    const fileNameText = document.getElementById('file_name_text');
+
+    if (fileNameText) {
+        fileNameText.textContent = file ? file.name : 'Belum ada file dipilih';
+    }
+
     if (file) {
         document.getElementById('preview_filename').textContent = file.name;
         document.getElementById('preview_filesize').textContent = 'Ukuran: ' + (file.size / 1024).toFixed(2) + ' KB';
         document.getElementById('preview_new').style.display = 'block';
     }
 }
+
+function initStatusToggle() {
+    const select = document.getElementById('status_select');
+    const toggle = document.getElementById('status_toggle');
+
+    if (!select || !toggle) {
+        return;
+    }
+
+    const options = toggle.querySelectorAll('.status-option');
+
+    function syncStatusUI(value) {
+        options.forEach(function(option) {
+            option.classList.toggle('active', option.dataset.value === value);
+            option.setAttribute('aria-checked', option.dataset.value === value ? 'true' : 'false');
+        });
+        select.value = value;
+    }
+
+    options.forEach(function(option) {
+        option.addEventListener('click', function() {
+            syncStatusUI(option.dataset.value);
+        });
+    });
+
+    syncStatusUI(select.value || 'aktif');
+}
+
+function initFileUploadButton() {
+    const input = document.getElementById('file_input');
+    const button = document.getElementById('file_upload_button');
+    const wrap = document.querySelector('.file-upload-wrap');
+
+    if (!input || !button || !wrap) {
+        return;
+    }
+
+    button.addEventListener('click', function() {
+        input.click();
+    });
+
+    wrap.addEventListener('dragenter', function() {
+        wrap.classList.add('is-highlight');
+    });
+
+    wrap.addEventListener('dragleave', function() {
+        wrap.classList.remove('is-highlight');
+    });
+}
+
+initStatusToggle();
+initFileUploadButton();
 </script>
 
         </div>

@@ -1,20 +1,11 @@
 <?php
 require_once __DIR__ . '/../includes/auth.php';
 require_once __DIR__ . '/../../config/database.php';
+require_once __DIR__ . '/_table_bootstrap.php';
 
-// Check if column 'urutan' and 'kategori' exist
-$has_urutan_column = false;
-$has_kategori_column = false;
-
-$check_columns = $conn->query("SHOW COLUMNS FROM jadwal_ibadah");
-while ($col = $check_columns->fetch_assoc()) {
-    if ($col['Field'] == 'urutan') {
-        $has_urutan_column = true;
-    }
-    if ($col['Field'] == 'kategori') {
-        $has_kategori_column = true;
-    }
-}
+$table_state = ensureJadwalIbadahTable($conn);
+$has_urutan_column = (bool) ($table_state['has_urutan_column'] ?? false);
+$has_kategori_column = (bool) ($table_state['has_kategori_column'] ?? false);
 
 $error = '';
 $success = '';

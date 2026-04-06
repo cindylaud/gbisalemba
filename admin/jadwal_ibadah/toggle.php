@@ -1,6 +1,9 @@
 <?php
 require_once __DIR__ . '/../includes/auth.php';
 require_once __DIR__ . '/../../config/database.php';
+require_once __DIR__ . '/_table_bootstrap.php';
+
+ensureJadwalIbadahTable($conn);
 
 // Check if ID is provided and valid
 if (!isset($_GET['id']) || !is_numeric($_GET['id'])) {

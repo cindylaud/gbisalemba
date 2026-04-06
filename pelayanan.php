@@ -207,7 +207,7 @@ $pelayanan_description_map = [
 </main>
 
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,700;9..144,800;9..144,900&family=Manrope:wght@600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
 
 .pelayanan-page {
     position: relative;
@@ -318,7 +318,7 @@ $pelayanan_description_map = [
 
 .pelayanan-hero-title {
     margin: 0;
-    font-family: 'Manrope', 'Segoe UI', Tahoma, sans-serif;
+    font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     font-size: clamp(40px, 6vw, 72px);
     line-height: 0.96;
     color: #ffffff;
@@ -656,7 +656,7 @@ $pelayanan_description_map = [
 .pelayanan-card-title {
     margin: 0;
     color: #103a66;
-    font-family: 'Fraunces', 'Playfair Display', Georgia, serif;
+    font-family: inherit;
     font-size: clamp(30px, 2.7vw, 40px);
     font-weight: 800;
     line-height: 0.98;

@@ -161,11 +161,12 @@ $cta_photo = gbi_find_first_image([
                     <div class="ibadah-showcase-media">
                         <iframe
                             class="ibadah-showcase-video"
-                            src="https://drive.google.com/file/d/1R_OgbpPHwG8nmrOxOx33nd4e-wFhlfrQ/preview"
+                            data-src="https://drive.google.com/file/d/1R_OgbpPHwG8nmrOxOx33nd4e-wFhlfrQ/preview"
                             title="Video Ibadah Minggu GBI Salemba"
                             allow="autoplay; encrypted-media; picture-in-picture"
                             allowfullscreen>
                         </iframe>
+                        <div class="ibadah-showcase-privacy-mask" aria-hidden="true"></div>
                         <div class="ibadah-showcase-aesthetic-controls" aria-hidden="true">
                             <span class="dot"></span>
                             <span class="dot"></span>
@@ -255,6 +256,31 @@ $cta_photo = gbi_find_first_image([
 <script src="assets/js/slider.js"></script>
 <script src="assets/js/whats-new-slider.js"></script>
 <script src="assets/js/home-reveal.js"></script>
+
+<script>
+// Auto-load video iframe when scrolling into view
+(function() {
+  const videoIframe = document.querySelector('.ibadah-showcase-video');
+  if (!videoIframe || videoIframe.getAttribute('src')) return;
+  
+  const observer = new IntersectionObserver(function(entries) {
+    entries.forEach(function(entry) {
+      if (entry.isIntersecting) {
+        const src = entry.target.getAttribute('data-src');
+        if (src && !entry.target.getAttribute('src')) {
+          entry.target.setAttribute('src', src);
+          observer.unobserve(entry.target);
+        }
+      }
+    });
+  }, { 
+    threshold: 0.1,
+    rootMargin: '50px'
+  });
+  
+  observer.observe(videoIframe);
+})();
+</script>
 
 <?php include __DIR__ . '/includes/footer.php'; ?>
 

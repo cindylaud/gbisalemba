@@ -213,279 +213,484 @@ $stmt->close();
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Kelola Pelayanan - Admin GBI Salemba</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="/<?php echo htmlspecialchars(basename(dirname(__DIR__))); ?>/assets/css/admin-theme.css">
+    <?php $admin_theme_path = dirname(__DIR__) . '/assets/css/admin-theme.css'; ?>
+    <link rel="stylesheet" href="/<?php echo htmlspecialchars(basename(dirname(__DIR__))); ?>/assets/css/admin-theme.css?v=<?php echo urlencode((string) (is_file($admin_theme_path) ? filemtime($admin_theme_path) : time())); ?>">
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background-color: #F3F9FB;
             color: #102C57;
+            line-height: 1.6;
         }
-        
+
         .container {
             max-width: none;
             margin: 0;
         }
 
+        .admin-topbar {
+            border-radius: 14px;
+        }
+
         .alert {
-            padding: 14px 18px;
-            margin-bottom: 12px;
-            border-radius: 8px;
-            font-weight: 500;
+            padding: 13px 16px;
+            margin-bottom: 16px;
+            border-radius: 12px;
+            font-weight: 600;
         }
-        
+
         .alert-success {
-            background-color: #D4EDDA;
+            background-color: #d4edda;
             color: #155724;
-            border: 1px solid #C3E6CB;
+            border: 1px solid #c3e6cb;
         }
-        
-        .alert-error {
-            background-color: #F8D7DA;
-            color: #721C24;
-            border: 1px solid #F5C6CB;
+
+        .alert-danger {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
         }
 
         .layout {
             display: grid;
-            grid-template-columns: 1fr 360px;
-            gap: 16px;
+            grid-template-columns: minmax(0, 1.2fr) minmax(360px, 0.8fr);
+            gap: 18px;
             align-items: start;
         }
 
         .panel {
-            background: linear-gradient(165deg, #f9f2e8 0%, #efe2d1 100%);
-            border-radius: 12px;
-            padding: 14px;
-            box-shadow: 0 4px 12px rgba(16, 44, 87, 0.1);
+            background: linear-gradient(180deg, #ffffff 0%, #f8fbfe 100%);
+            border: 1px solid rgba(16, 44, 87, 0.1);
+            border-radius: 22px;
+            padding: 20px;
+            box-shadow: 0 12px 26px rgba(15, 39, 66, 0.08);
+        }
+
+        .panel-upload {
+            position: sticky;
+            top: 104px;
         }
 
         .panel-title {
-            font-size: 16px;
-            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 19px;
+            font-weight: 800;
             color: #102C57;
-            margin-bottom: 10px;
-            padding-bottom: 8px;
-            border-bottom: 2px solid #146C94;
+            margin-bottom: 14px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid rgba(16, 44, 87, 0.1);
         }
-        
+
+        .panel-title::before {
+            font-family: 'Font Awesome 6 Free';
+            font-weight: 900;
+            color: #146C94;
+            font-size: 17px;
+        }
+
+        .list-title::before {
+            content: '\f03a';
+        }
+
+        .upload-title::before {
+            content: '\2b';
+        }
+
+        .panel-upload .panel-title {
+            font-size: 16px;
+        }
+
+        .panel-upload .panel-title::before {
+            font-size: 15px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+            background: white;
+            border-radius: 14px;
+            overflow: hidden;
+            border: 1px solid rgba(16, 44, 87, 0.08);
+        }
+
+        thead th {
+            background: linear-gradient(180deg, #eff7fb 0%, #e4f0f5 100%);
+            color: #1e3a5f;
+            padding: 11px 12px;
+            text-align: left;
+            font-size: 12px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.45px;
+            border-bottom: 1px solid #d9e9ef;
+        }
+
+        tbody tr {
+            border-bottom: 1px solid #edf3f8;
+            transition: background 0.2s ease;
+        }
+
+        tbody tr:last-child {
+            border-bottom: none;
+        }
+
+        tbody tr:hover {
+            background-color: rgba(63, 182, 168, 0.06);
+        }
+
+        tbody td {
+            padding: 12px;
+            vertical-align: middle;
+            font-size: 13px;
+        }
+
+        tbody td:nth-child(1),
+        tbody td:nth-child(3),
+        tbody td:nth-child(4),
+        tbody td:nth-child(5),
+        tbody td:nth-child(6) {
+            text-align: center;
+        }
+
+        .thumbnail {
+            width: 66px;
+            height: 66px;
+            object-fit: cover;
+            object-position: center;
+            border-radius: 12px;
+            display: inline-block;
+            background-color: #eef4f8;
+            border: 1px solid rgba(16, 44, 87, 0.1);
+        }
+
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 5px 11px;
+            border-radius: 999px;
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.4px;
+        }
+
+        .badge-active {
+            background: rgba(47, 158, 68, 0.14);
+            color: #1f6a31;
+        }
+
+        .badge-inactive {
+            background: rgba(108, 117, 125, 0.14);
+            color: #4f5963;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            padding: 8px 12px;
+            border-radius: 10px;
+            font-size: 12px;
+            font-weight: 700;
+            text-decoration: none;
+            cursor: pointer;
+            border: none;
+            transition: all 0.2s ease;
+            white-space: nowrap;
+        }
+
+        .btn i {
+            font-size: 11px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #1e3a5f 0%, #146C94 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 8px 14px rgba(20, 108, 148, 0.24);
+        }
+
+        .btn-secondary {
+            background: #e8edf3;
+            color: #1e3a5f;
+            border: 1px solid rgba(16, 44, 87, 0.14);
+        }
+
+        .btn-secondary:hover {
+            background: #dbe4ee;
+        }
+
+        .btn-danger {
+            background: linear-gradient(135deg, #e45f5a 0%, #cb3f3a 100%);
+            color: white;
+        }
+
+        .btn-danger:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 8px 14px rgba(203, 63, 58, 0.24);
+        }
+
+        .btn-small {
+            width: 150px;
+            min-width: 150px;
+            padding: 8px 12px;
+            border-radius: 11px;
+            font-size: 12px;
+            font-weight: 800;
+            letter-spacing: 0.1px;
+        }
+
+        .actions {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            align-items: center;
+        }
+
         .form-group {
-            margin-bottom: 10px;
+            margin-bottom: 16px;
         }
-        
+
         .form-group label {
             display: block;
             margin-bottom: 6px;
-            font-weight: 600;
-            color: #102C57;
+            font-weight: 700;
             font-size: 13px;
+            color: #102C57;
         }
-        
+
         .form-group input,
         .form-group textarea,
         .form-group select {
             width: 100%;
-            padding: 8px 10px;
-            border: 2px solid #146C94;
-            border-radius: 8px;
-            font-family: inherit;
+            padding: 10px 12px;
+            border: 1px solid rgba(16, 44, 87, 0.2);
+            border-radius: 12px;
             font-size: 13px;
-            background: #fff;
-        }
-        
-        .form-group textarea {
-            resize: vertical;
-            min-height: 100px;
-        }
-        
-        .form-row {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 20px;
-        }
-        
-        .button-group {
-            display: flex;
-            gap: 10px;
-            margin-top: 18px;
-        }
-        
-        .btn {
-            padding: 8px 14px;
-            border: none;
-            border-radius: 8px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            font-size: 13px;
-        }
-        
-        .btn-primary {
-            background-color: #1E3A5F;
-            color: white;
-        }
-        
-        .btn-primary:hover {
-            background-color: #0F2742;
-        }
-        
-        .btn-secondary {
-            background-color: #E0E0E0;
-            color: #102C57;
-        }
-        
-        .btn-secondary:hover {
-            background-color: #D0D0D0;
-        }
-        
-        .btn-danger {
-            background-color: #DC3545;
-            color: white;
-        }
-        
-        .btn-danger:hover {
-            background-color: #C82333;
-        }
-        
-        .btn-small {
-            padding: 6px 10px;
-            font-size: 12px;
-        }
-        
-        table {
-            width: 100%;
-            border-collapse: collapse;
             background: white;
-            border-radius: 10px;
+            transition: border-color 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .status-select-native {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            padding: 0;
+            margin: -1px;
             overflow: hidden;
+            clip: rect(0, 0, 0, 0);
+            white-space: nowrap;
+            border: 0;
         }
-        
-        table th {
-            background: #146C94;
-            color: white;
-            padding: 8px 10px;
-            text-align: left;
-            font-weight: 600;
-            font-size: 12px;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-        
-        table td {
-            padding: 8px 10px;
-            border-bottom: 1px solid #f0f4f8;
-            vertical-align: middle;
-            font-size: 13px;
-        }
-        
-        table tr:hover {
-            background-color: #f0f7fb;
-        }
-        
-        .thumbnail {
-            width: 48px;
-            height: 48px;
-            object-fit: cover;
-            object-position: center;
-            border-radius: 4px;
-            background-color: #EEE;
-        }
-        
-        .status-badge {
-            display: inline-block;
-            padding: 4px 10px;
-            border-radius: 20px;
-            font-size: 11px;
-            font-weight: 700;
-            text-transform: uppercase;
-        }
-        
-        .status-aktif {
-            background-color: #D4EDDA;
-            color: #155724;
-        }
-        
-        .status-nonaktif {
-            background-color: #F8D7DA;
-            color: #721C24;
-        }
-        
-        .action-buttons {
-            display: flex;
+
+        .status-toggle {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
             gap: 6px;
-            flex-wrap: wrap;
+            padding: 5px;
+            border-radius: 12px;
+            border: 1px solid rgba(16, 44, 87, 0.18);
+            background: linear-gradient(180deg, #f8fbff 0%, #edf4fb 100%);
         }
-        
+
+        .status-option {
+            border: none;
+            border-radius: 9px;
+            padding: 9px 10px;
+            font-size: 13px;
+            font-weight: 700;
+            color: #3f5b78;
+            background: transparent;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .status-option:hover {
+            background: rgba(20, 108, 148, 0.12);
+            color: #1e3a5f;
+        }
+
+        .status-option.active {
+            background: linear-gradient(135deg, #1e3a5f 0%, #146C94 100%);
+            color: #fff;
+            box-shadow: 0 8px 14px rgba(20, 108, 148, 0.24);
+        }
+
+        .file-upload-wrap {
+            border: 1px dashed rgba(20, 108, 148, 0.35);
+            border-radius: 12px;
+            background: linear-gradient(180deg, rgba(255, 255, 255, 0.92) 0%, rgba(240, 247, 252, 0.9) 100%);
+            padding: 12px;
+            transition: border-color 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .file-upload-wrap.is-highlight {
+            border-color: rgba(20, 108, 148, 0.62);
+            box-shadow: 0 0 0 0.2rem rgba(63, 182, 168, 0.14);
+        }
+
+        .file-input-native {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            padding: 0;
+            margin: -1px;
+            overflow: hidden;
+            clip: rect(0, 0, 0, 0);
+            white-space: nowrap;
+            border: 0;
+        }
+
+        .file-upload-button {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            border: none;
+            border-radius: 10px;
+            padding: 10px 14px;
+            background: linear-gradient(135deg, #1e3a5f 0%, #146C94 100%);
+            color: #fff;
+            font-size: 12px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .file-upload-button:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 8px 14px rgba(20, 108, 148, 0.22);
+        }
+
+        .file-upload-name {
+            margin-top: 10px;
+            padding: 9px 10px;
+            border-radius: 9px;
+            border: 1px solid rgba(16, 44, 87, 0.15);
+            background: rgba(255, 255, 255, 0.86);
+            font-size: 12px;
+            color: #405f7b;
+            font-weight: 600;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .file-upload-meta {
+            margin-top: 10px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 12px;
+            color: #59708a;
+            font-weight: 600;
+        }
+
+        .file-upload-meta i {
+            color: #146C94;
+        }
+
         .form-group input:focus,
         .form-group textarea:focus,
         .form-group select:focus {
             outline: none;
-            border-color: #0f5273;
+            border-color: rgba(63, 182, 168, 0.56);
+            box-shadow: 0 0 0 0.2rem rgba(63, 182, 168, 0.14);
         }
-        
+
+        .form-group textarea {
+            resize: vertical;
+            min-height: 130px;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 18px;
+            flex-wrap: wrap;
+        }
+
+        .help-text {
+            font-size: 12px;
+            color: #6b7c93;
+            margin-top: 6px;
+            font-style: italic;
+            line-height: 1.45;
+        }
+
         .file-preview {
             display: flex;
-            gap: 20px;
-            margin-top: 15px;
+            gap: 14px;
+            margin-top: 14px;
             align-items: flex-start;
         }
-        
+
         .preview-image {
             width: 150px;
             height: 150px;
             object-fit: cover;
             object-position: center;
-            border-radius: 6px;
-            border: 2px solid #EEE;
+            border-radius: 10px;
+            border: 1px solid rgba(16, 44, 87, 0.16);
+            background: #eef4f8;
         }
-        
-        .preview-info {
-            flex: 1;
-        }
-        
+
         .preview-label {
             font-size: 12px;
-            color: #666;
+            color: #6b7c93;
             margin-bottom: 8px;
-        }
-        
-        .no-data {
-            text-align: center;
-            padding: 40px 20px;
-            color: #999;
         }
 
         .empty-state {
             text-align: center;
             padding: 40px 20px;
-            color: #888;
+            color: #6b7c93;
         }
 
         .empty-state .icon {
-            font-size: 48px;
-            margin-bottom: 12px;
+            font-size: 40px;
+            margin-bottom: 10px;
         }
-        
-        @media (max-width: 768px) {
+
+        @media (max-width: 980px) {
             .layout {
                 grid-template-columns: 1fr;
             }
 
+            .panel-upload {
+                position: static;
+                top: auto;
+            }
+        }
+
+        @media (max-width: 768px) {
             .form-row {
                 grid-template-columns: 1fr;
             }
-            
-            table {
-                font-size: 13px;
-            }
-            
-            table th, table td {
+
+            table th,
+            table td {
                 padding: 10px;
+            }
+
+            .btn-small {
+                width: 100%;
+                min-width: 0;
             }
         }
     </style>
@@ -513,14 +718,14 @@ $stmt->close();
     <?php endif; ?>
     
     <?php if (isset($error)): ?>
-        <div class="alert alert-error">
+        <div class="alert alert-danger">
             <i class="fas fa-exclamation-circle"></i> <?php echo htmlspecialchars($error); ?>
         </div>
     <?php endif; ?>
 
     <div class="layout">
-    <div class="panel">
-        <div class="panel-title">📋 Daftar Pelayanan</div>
+    <div class="panel panel-list">
+        <div class="panel-title list-title">Daftar Pelayanan</div>
         <?php if (count($pelayanan_list) > 0): ?>
                 <table>
                     <thead>
@@ -547,12 +752,12 @@ $stmt->close();
                                 </td>
                                 <td><?php echo isset($item['foto_posisi_y']) ? intval($item['foto_posisi_y']) : 50; ?>%</td>
                                 <td>
-                                    <span class="status-badge status-<?php echo $item['status']; ?>">
-                                        <?php echo ucfirst($item['status']); ?>
+                                    <span class="badge <?php echo $item['status'] === 'aktif' ? 'badge-active' : 'badge-inactive'; ?>">
+                                        <?php echo $item['status'] === 'aktif' ? 'Aktif' : 'Nonaktif'; ?>
                                     </span>
                                 </td>
                                 <td>
-                                    <div class="action-buttons">
+                                    <div class="actions">
                                         <a href="?edit_id=<?php echo $item['id']; ?>" class="btn btn-primary btn-small">
                                             <i class="fas fa-edit"></i> Edit
                                         </a>
@@ -571,14 +776,14 @@ $stmt->close();
                 </table>
         <?php else: ?>
             <div class="empty-state">
-                <div class="icon">🧩</div>
+                <div class="icon"><i class="fas fa-layer-group"></i></div>
                 <p>Belum ada data pelayanan.</p>
             </div>
         <?php endif; ?>
     </div>
 
-    <div class="panel" id="pelayanan-form-panel">
-        <div class="panel-title"><?php echo $edit_data ? '✏ Edit Pelayanan' : '➕ Tambah Pelayanan'; ?></div>
+    <div class="panel panel-upload" id="pelayanan-form-panel">
+        <div class="panel-title upload-title"><?php echo $edit_data ? 'Edit Pelayanan' : 'Tambah Pelayanan'; ?></div>
             <form method="POST" enctype="multipart/form-data">
                 <input type="hidden" name="form_action" value="<?php echo $edit_data ? 'edit' : 'add'; ?>">
                 <?php if ($edit_data): ?>
@@ -592,10 +797,14 @@ $stmt->close();
                     </div>
                     <div class="form-group">
                         <label>Status <span style="color:red;">*</span></label>
-                        <select name="status" required>
-                            <option value="aktif" <?php echo (($edit_data['status'] ?? $_POST['status'] ?? 'aktif') === 'aktif') ? 'selected' : ''; ?>>Aktif</option>
-                            <option value="nonaktif" <?php echo (($edit_data['status'] ?? $_POST['status'] ?? '') === 'nonaktif') ? 'selected' : ''; ?>>Nonaktif</option>
+                        <select id="status_select" name="status" required class="status-select-native">
+                                <option value="aktif" <?php echo (($edit_data['status'] ?? $_POST['status'] ?? 'aktif') === 'aktif') ? 'selected' : ''; ?>>Aktif</option>
+                                <option value="nonaktif" <?php echo (($edit_data['status'] ?? $_POST['status'] ?? '') === 'nonaktif') ? 'selected' : ''; ?>>Nonaktif</option>
                         </select>
+                        <div class="status-toggle" id="status_toggle" role="radiogroup" aria-label="Status Pelayanan">
+                            <button type="button" class="status-option" data-value="aktif">Aktif</button>
+                            <button type="button" class="status-option" data-value="nonaktif">Nonaktif</button>
+                        </div>
                     </div>
                 </div>
                 
@@ -611,8 +820,18 @@ $stmt->close();
                 
                 <div class="form-group">
                     <label>Foto Pelayanan</label>
-                    <input type="file" id="foto_input" name="foto" accept="image/jpeg,image/png,image/webp" onchange="previewImage(event)">
-                    <p style="font-size:12px; color:#999; margin-top:10px;">
+                    <div class="file-upload-wrap">
+                        <input type="file" id="foto_input" class="file-input-native" name="foto" accept="image/jpeg,image/png,image/webp" onchange="previewImage(event)">
+                        <button type="button" id="file_upload_button" class="file-upload-button">
+                            <i class="fas fa-cloud-upload-alt"></i> Pilih Foto
+                        </button>
+                        <div class="file-upload-name" id="file_name_text">Belum ada file dipilih</div>
+                        <div class="file-upload-meta">
+                            <i class="fas fa-file-image"></i>
+                            <span>Upload gambar terbaik untuk thumbnail pelayanan</span>
+                        </div>
+                    </div>
+                    <p class="help-text">
                         <strong>Format:</strong> JPG, PNG, WebP | <strong>Max: 10MB</strong><br>
                         <em>Gambar akan otomatis di-resize dan di-compress untuk optimal loading</em>
                     </p>
@@ -621,7 +840,7 @@ $stmt->close();
                 <div class="form-group">
                     <label>Posisi Vertikal Foto (<span id="foto_posisi_value"><?php echo intval($edit_data['foto_posisi_y'] ?? $_POST['foto_posisi_y'] ?? 50); ?></span>%)</label>
                     <input type="range" id="foto_posisi_y" name="foto_posisi_y" min="0" max="100" value="<?php echo intval($edit_data['foto_posisi_y'] ?? $_POST['foto_posisi_y'] ?? 50); ?>" oninput="updateImagePositionPreview()">
-                    <p style="font-size:12px; color:#999; margin-top:8px;">
+                    <p class="help-text" style="margin-top:8px;">
                         Geser ke kiri untuk naik (atas), geser ke kanan untuk turun (bawah). Nilai 50% = center.
                     </p>
                 </div>
@@ -666,6 +885,12 @@ $stmt->close();
 <script>
 function previewImage(event) {
     const file = event.target.files[0];
+    const fileNameText = document.getElementById('file_name_text');
+
+    if (fileNameText) {
+        fileNameText.textContent = file ? file.name : 'Belum ada file dipilih';
+    }
+
     if (file) {
         const reader = new FileReader();
         reader.onload = function(e) {
@@ -703,6 +928,58 @@ function updateImagePositionPreview() {
 }
 
 updateImagePositionPreview();
+
+function initStatusToggle() {
+    const select = document.getElementById('status_select');
+    const toggle = document.getElementById('status_toggle');
+
+    if (!select || !toggle) {
+        return;
+    }
+
+    const options = toggle.querySelectorAll('.status-option');
+
+    function syncStatusUI(value) {
+        options.forEach(function(option) {
+            option.classList.toggle('active', option.dataset.value === value);
+            option.setAttribute('aria-checked', option.dataset.value === value ? 'true' : 'false');
+        });
+        select.value = value;
+    }
+
+    options.forEach(function(option) {
+        option.addEventListener('click', function() {
+            syncStatusUI(option.dataset.value);
+        });
+    });
+
+    syncStatusUI(select.value || 'aktif');
+}
+
+function initFileUploadButton() {
+    const input = document.getElementById('foto_input');
+    const button = document.getElementById('file_upload_button');
+    const wrap = document.querySelector('.file-upload-wrap');
+
+    if (!input || !button || !wrap) {
+        return;
+    }
+
+    button.addEventListener('click', function() {
+        input.click();
+    });
+
+    wrap.addEventListener('dragenter', function() {
+        wrap.classList.add('is-highlight');
+    });
+
+    wrap.addEventListener('dragleave', function() {
+        wrap.classList.remove('is-highlight');
+    });
+}
+
+initStatusToggle();
+initFileUploadButton();
 
 <?php if ($edit_data): ?>
 document.getElementById('pelayanan-form-panel').scrollIntoView({ behavior: 'smooth', block: 'start' });

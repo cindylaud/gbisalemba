@@ -163,7 +163,8 @@ for ($i = 1; $i <= 4; $i++) {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Kelola Slider - Admin GBI Salemba</title>
-    <link rel="stylesheet" href="/<?php echo htmlspecialchars(basename(dirname(__DIR__))); ?>/assets/css/admin-theme.css">
+    <?php $admin_theme_path = dirname(__DIR__) . '/assets/css/admin-theme.css'; ?>
+    <link rel="stylesheet" href="/<?php echo htmlspecialchars(basename(dirname(__DIR__))); ?>/assets/css/admin-theme.css?v=<?php echo urlencode((string) (is_file($admin_theme_path) ? filemtime($admin_theme_path) : time())); ?>">
     <style>
         * {
             margin: 0;
@@ -172,7 +173,7 @@ for ($i = 1; $i <= 4; $i++) {
         }
         
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background-color: #F3F9FB;
             color: #102C57;
             line-height: 1.6;
@@ -183,68 +184,40 @@ for ($i = 1; $i <= 4; $i++) {
             margin: 0;
         }
         
-        .hero {
-            background: linear-gradient(130deg, #1e3a5f 0%, #0f2742 72%);
-            border-radius: 16px;
-            padding: 18px;
-            margin-bottom: 18px;
-            color: #fff;
-            box-shadow: 0 14px 30px rgba(15, 39, 66, 0.24);
-        }
-
-        .hero h1 {
-            color: #fff;
-            font-size: 30px;
-            margin: 6px 0 10px;
-        }
-
-        .hero p {
-            margin: 0;
-            opacity: 0.9;
-        }
-
-        .hero-stats {
-            display: grid;
-            grid-template-columns: repeat(3, minmax(0, 1fr));
-            gap: 10px;
-            margin-top: 14px;
-        }
-
-        .hero-stat {
-            background: rgba(255, 255, 255, 0.1);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            border-radius: 12px;
-            padding: 10px 12px;
-        }
-
-        .hero-stat .label {
-            font-size: 11px;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            opacity: 0.9;
-        }
-
-        .hero-stat .value {
-            font-size: 21px;
-            font-weight: 800;
-            line-height: 1.15;
-            margin-top: 2px;
+        .slider-page-toolbar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            margin-bottom: 16px;
+            flex-wrap: wrap;
         }
         
         .back-link {
-            display: inline-block;
-            margin-bottom: 14px;
-            padding: 10px 20px;
-            background-color: #146C94;
-            color: white;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 16px;
+            background: #1e3a5f;
+            color: #fff;
             text-decoration: none;
-            border-radius: 8px;
+            border-radius: 999px;
             font-weight: 600;
-            transition: background-color 0.3s ease;
+            box-shadow: 0 8px 16px rgba(15, 39, 66, 0.1);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
         }
         
         .back-link:hover {
-            background-color: #0f5273;
+            color: #fff;
+            transform: translateY(-1px);
+            box-shadow: 0 16px 26px rgba(15, 39, 66, 0.18);
+        }
+
+        .slider-page-note {
+            margin: 0;
+            color: #6b7c93;
+            font-size: 12px;
+            font-weight: 500;
         }
         
         .alert {
@@ -268,7 +241,7 @@ for ($i = 1; $i <= 4; $i++) {
         
         .cards-grid {
             display: grid;
-            grid-template-columns: repeat(2, 1fr);
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
             gap: 16px;
         }
         
@@ -279,34 +252,40 @@ for ($i = 1; $i <= 4; $i++) {
         }
         
         .slider-card {
-            background: linear-gradient(160deg, #f9f2e8 0%, #efe3d3 100%);
-            border-radius: 12px;
-            padding: 18px;
-            box-shadow: 0 4px 12px rgba(16, 44, 87, 0.1);
-            transition: all 0.3s ease;
+            background: #ffffff;
+            border: 1px solid rgba(16, 44, 87, 0.08);
+            border-radius: 18px;
+            padding: 14px;
+            box-shadow: 0 8px 18px rgba(15, 39, 66, 0.06);
+            transition: transform 0.18s ease, box-shadow 0.18s ease;
+            overflow: hidden;
         }
         
         .slider-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 8px 20px rgba(16, 44, 87, 0.15);
+            transform: translateY(-2px);
+            box-shadow: 0 12px 24px rgba(15, 39, 66, 0.1);
         }
         
         .card-title {
-            font-size: 20px;
-            font-weight: bold;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            font-size: 16px;
+            font-weight: 700;
             color: #102C57;
-            margin-bottom: 14px;
-            text-align: center;
+            margin-bottom: 12px;
+            text-align: left;
             padding-bottom: 10px;
-            border-bottom: 2px solid #146C94;
+            border-bottom: 1px solid rgba(16, 44, 87, 0.08);
         }
         
         .preview-box {
             width: 100%;
             aspect-ratio: 16 / 9;
-            background: linear-gradient(135deg, #f5f5f5 0%, #e0e0e0 100%);
-            border: 2px dashed #b0b0b0;
-            border-radius: 10px;
+            background: #f4f7fb;
+            border: 1px solid rgba(16, 44, 87, 0.08);
+            border-radius: 16px;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -319,27 +298,27 @@ for ($i = 1; $i <= 4; $i++) {
             width: 100%;
             height: 100%;
             object-fit: cover;
-            border-radius: 10px;
+            display: block;
         }
         
         .preview-box .placeholder {
             text-align: center;
-            color: #999;
+            color: #6b7c93;
         }
         
         .preview-box .placeholder .icon {
-            font-size: 60px;
-            margin-bottom: 10px;
+            font-size: 34px;
+            margin-bottom: 6px;
             opacity: 0.5;
         }
         
         .preview-box .placeholder .text {
-            font-size: 14px;
-            font-weight: 500;
+            font-size: 12px;
+            font-weight: 600;
         }
         
         .form-group {
-            margin-bottom: 12px;
+            margin-bottom: 9px;
         }
         
         .form-group label {
@@ -347,44 +326,51 @@ for ($i = 1; $i <= 4; $i++) {
             margin-bottom: 8px;
             font-weight: 600;
             color: #102C57;
-            font-size: 14px;
+            font-size: 12px;
         }
         
         .form-group input[type="file"] {
             width: 100%;
-            padding: 12px;
-            border: 2px solid #146C94;
-            border-radius: 8px;
-            font-size: 14px;
+            padding: 10px;
+            border: 1px solid rgba(20, 108, 148, 0.2);
+            border-radius: 10px;
+            font-size: 12px;
             background: white;
             cursor: pointer;
-            transition: border-color 0.3s ease;
+            transition: border-color 0.2s ease, box-shadow 0.2s ease;
         }
         
         .form-group input[type="file"]:hover {
-            border-color: #0f5273;
+            border-color: rgba(20, 108, 148, 0.5);
+        }
+
+        .form-group input[type="file"]:focus {
+            outline: none;
+            box-shadow: 0 0 0 0.2rem rgba(63, 182, 168, 0.14);
         }
         
         .info-text {
-            font-size: 12px;
-            color: #666;
+            font-size: 11px;
+            color: #6b7c93;
             margin-top: 5px;
             font-style: italic;
+            line-height: 1.5;
         }
         
         .checkbox-group {
             display: flex;
             align-items: center;
-            margin-bottom: 18px;
-            padding: 10px;
-            background: white;
-            border-radius: 8px;
+            gap: 10px;
+            margin-bottom: 12px;
+            padding: 11px 12px;
+            background: #f8fbfd;
+            border: 1px solid rgba(16, 44, 87, 0.08);
+            border-radius: 12px;
         }
         
         .checkbox-group input[type="checkbox"] {
-            width: 22px;
-            height: 22px;
-            margin-right: 12px;
+            width: 20px;
+            height: 20px;
             cursor: pointer;
             accent-color: #146C94;
         }
@@ -394,21 +380,23 @@ for ($i = 1; $i <= 4; $i++) {
             color: #102C57;
             cursor: pointer;
             user-select: none;
+            margin: 0;
+            font-size: 12px;
         }
         
         .btn-submit {
             width: 100%;
-            padding: 14px 20px;
+            padding: 12px 18px;
             border: none;
-            border-radius: 8px;
-            font-size: 16px;
+            border-radius: 10px;
+            font-size: 13px;
             font-weight: 700;
             cursor: pointer;
-            transition: all 0.3s ease;
-            background: linear-gradient(135deg, #146C94 0%, #0f5273 100%);
+            transition: all 0.2s ease;
+            background: #146C94;
             color: white;
             text-transform: uppercase;
-            letter-spacing: 0.5px;
+            letter-spacing: 0.35px;
         }
 
         .btn-submit::before {
@@ -419,40 +407,57 @@ for ($i = 1; $i <= 4; $i++) {
         }
         
         .btn-submit:hover {
-            transform: scale(1.02);
-            box-shadow: 0 6px 15px rgba(20, 108, 148, 0.3);
+            transform: translateY(-1px);
+            box-shadow: 0 8px 16px rgba(20, 108, 148, 0.18);
         }
         
         .btn-submit:active {
-            transform: scale(0.98);
+            transform: translateY(0);
         }
         
         .status-badge {
-            display: inline-block;
-            padding: 5px 12px;
-            border-radius: 20px;
-            font-size: 11px;
-            font-weight: 600;
-            margin-top: 5px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 5px 9px;
+            border-radius: 999px;
+            font-size: 9px;
+            font-weight: 700;
+            margin-top: 0;
+            letter-spacing: 0.35px;
+            text-transform: uppercase;
         }
         
         .status-active {
-            background-color: #28a745;
-            color: white;
+            background-color: rgba(40, 167, 69, 0.12);
+            color: #1f6a31;
         }
         
         .status-inactive {
-            background-color: #6c757d;
-            color: white;
+            background-color: rgba(108, 117, 125, 0.12);
+            color: #4f5963;
         }
 
         @media (max-width: 768px) {
-            .hero h1 {
-                font-size: 30px;
+            .slider-page-toolbar {
+                align-items: stretch;
             }
 
-            .hero-stats {
+            .back-link {
+                width: 100%;
+                justify-content: center;
+            }
+
+            .cards-grid {
                 grid-template-columns: 1fr;
+            }
+
+            .card-title {
+                font-size: 15px;
+            }
+
+            .preview-box {
+                aspect-ratio: 16 / 10;
             }
         }
     </style>
@@ -470,24 +475,9 @@ for ($i = 1; $i <= 4; $i++) {
             </header>
             <div class="admin-content">
     <div class="container">
-        <div class="hero">
+        <div class="slider-page-toolbar">
             <a href="index.php" class="back-link">← Kembali ke Dashboard</a>
-            <h1>Kelola Slider (4 Foto)</h1>
-            <p>Atur 4 visual utama beranda gereja dengan alur upload yang cepat dan terstruktur.</p>
-            <div class="hero-stats">
-                <div class="hero-stat">
-                    <div class="label">Total Slot</div>
-                    <div class="value">4</div>
-                </div>
-                <div class="hero-stat">
-                    <div class="label">Slide Aktif</div>
-                    <div class="value"><?php echo $active_count; ?></div>
-                </div>
-                <div class="hero-stat">
-                    <div class="label">Sudah Ada Foto</div>
-                    <div class="value"><?php echo $with_image_count; ?></div>
-                </div>
-            </div>
+            <p class="slider-page-note">Tersedia 4 slot foto utama. Upload, aktifkan, lalu simpan perubahan per kartu.</p>
         </div>
         
         <?php if ($message): ?>
@@ -514,12 +504,8 @@ for ($i = 1; $i <= 4; $i++) {
             ?>
                 <div class="slider-card">
                     <div class="card-title">
-                        Foto <?php echo $i; ?>
-                        <?php if ($is_active): ?>
-                            <span class="status-badge status-active">AKTIF</span>
-                        <?php else: ?>
-                            <span class="status-badge status-inactive">NONAKTIF</span>
-                        <?php endif; ?>
+                        <span>Foto <?php echo $i; ?></span>
+                        <span class="status-badge <?php echo $is_active ? 'status-active' : 'status-inactive'; ?>"><?php echo $is_active ? 'AKTIF' : 'NONAKTIF'; ?></span>
                     </div>
                     
                     <div class="preview-box">

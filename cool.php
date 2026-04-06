@@ -211,7 +211,7 @@ require_once __DIR__ . '/includes/header.php';
 </div>
 
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
 
 .cool-page {
     --cool-ink: #12385f;
@@ -229,7 +229,7 @@ require_once __DIR__ . '/includes/header.php';
         radial-gradient(circle at right 12%, rgba(73, 120, 175, 0.14), transparent 22%),
         linear-gradient(180deg, #e9f1fb 0%, #dce7f4 52%, #edf4fb 100%);
     color: var(--cool-ink);
-    font-family: 'Manrope', 'Segoe UI', sans-serif;
+    font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     overflow: hidden;
 }
 
@@ -318,7 +318,7 @@ require_once __DIR__ . '/includes/header.php';
 .cool-history-panel h2,
 .cool-categories-panel h2,
 .cool-join-copy h2 {
-    font-family: 'Cormorant Garamond', Georgia, serif;
+    font-family: inherit;
 }
 
 .cool-hero-title {
@@ -480,7 +480,7 @@ require_once __DIR__ . '/includes/header.php';
     margin: 10px 0 8px;
     font-size: 32px;
     line-height: 0.96;
-    font-family: 'Cormorant Garamond', Georgia, serif;
+    font-family: inherit;
     color: var(--cool-ink-deep);
 }
 
@@ -537,7 +537,11 @@ require_once __DIR__ . '/includes/header.php';
 .cool-manifesto,
 .cool-history-categories,
 .cool-join-section {
-    padding: 42px 0 72px;
+    padding: 34px 0 60px;
+}
+
+.cool-join-section {
+    padding-top: 16px;
 }
 
 .cool-section-note {
@@ -590,7 +594,7 @@ require_once __DIR__ . '/includes/header.php';
     margin: 0 0 8px;
     font-size: 28px;
     line-height: 1;
-    font-family: 'Cormorant Garamond', Georgia, serif;
+    font-family: inherit;
     color: var(--cool-ink-deep);
 }
 
@@ -682,16 +686,16 @@ require_once __DIR__ . '/includes/header.php';
 
 .cool-history-layout {
     display: grid;
-    grid-template-columns: minmax(0, 1fr) minmax(0, 0.92fr);
-    gap: 24px;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 20px;
     align-items: start;
 }
 
 .cool-history-panel,
 .cool-categories-panel,
 .cool-join-card {
-    padding: 34px;
-    border-radius: 32px;
+    padding: 28px;
+    border-radius: 28px;
     box-shadow: var(--cool-shadow);
 }
 
@@ -707,30 +711,30 @@ require_once __DIR__ . '/includes/header.php';
 .cool-history-panel h2,
 .cool-categories-panel h2,
 .cool-join-copy h2 {
-    margin: 10px 0 22px;
-    font-size: clamp(38px, 4vw, 54px);
-    line-height: 0.98;
+    margin: 8px 0 16px;
+    font-size: clamp(30px, 3.2vw, 42px);
+    line-height: 1.02;
 }
 
 .cool-timeline {
     display: grid;
-    gap: 18px;
+    gap: 14px;
 }
 
 .cool-timeline-item {
-    padding: 22px 24px;
-    border-radius: 22px;
+    padding: 16px 18px;
+    border-radius: 18px;
     background: rgba(18, 56, 95, 0.04);
     border: 1px solid rgba(18, 56, 95, 0.08);
 }
 
 .cool-timeline-mark {
-    min-height: 38px;
-    padding: 0 16px;
-    margin-bottom: 12px;
+    min-height: 30px;
+    padding: 0 12px;
+    margin-bottom: 10px;
     background: rgba(18, 56, 95, 0.1);
     color: var(--cool-ink);
-    font-size: 12px;
+    font-size: 11px;
     letter-spacing: 0.08em;
     text-transform: uppercase;
 }
@@ -745,18 +749,29 @@ require_once __DIR__ . '/includes/header.php';
 
 .cool-category-list {
     display: grid;
-    gap: 16px;
+    gap: 12px;
 }
 
 .cool-category-card {
     display: grid;
     grid-template-columns: auto 1fr;
-    gap: 18px;
+    gap: 12px;
     align-items: center;
-    padding: 20px 22px;
-    border-radius: 24px;
+    padding: 12px 14px;
+    border-radius: 16px;
     background: rgba(255, 255, 255, 0.12);
     border: 1px solid rgba(255, 255, 255, 0.16);
+}
+
+.cool-category-card h3 {
+    margin: 0 0 4px;
+    font-size: 24px;
+    line-height: 1.05;
+}
+
+.cool-category-card p {
+    font-size: 14px;
+    line-height: 1.6;
 }
 
 .cool-category-card h3 {
@@ -773,30 +788,30 @@ require_once __DIR__ . '/includes/header.php';
 }
 
 .cool-category-photo {
-    margin-top: 22px;
-    height: 260px;
+    margin-top: 14px;
+    height: 200px;
     box-shadow: 0 18px 36px rgba(8, 24, 43, 0.2);
 }
 
 .cool-join-card {
     display: grid;
     grid-template-columns: minmax(0, 1.05fr) minmax(320px, 0.95fr);
-    gap: 24px;
+    gap: 18px;
     background: linear-gradient(135deg, rgba(233, 242, 252, 0.94) 0%, rgba(206, 223, 242, 0.92) 100%);
 }
 
 .cool-contact-stack {
     display: grid;
-    gap: 14px;
+    gap: 10px;
 }
 
 .cool-contact-item {
     display: grid;
     grid-template-columns: 56px 1fr;
-    gap: 16px;
+    gap: 12px;
     align-items: center;
-    padding: 18px 20px;
-    border-radius: 22px;
+    padding: 14px 16px;
+    border-radius: 18px;
     background: linear-gradient(135deg, #173a60 0%, #214f7c 100%);
     box-shadow: 0 14px 28px rgba(18, 45, 73, 0.14);
 }
@@ -856,8 +871,8 @@ require_once __DIR__ . '/includes/header.php';
     .cool-history-panel,
     .cool-categories-panel,
     .cool-join-card {
-        padding: 24px;
-        border-radius: 24px;
+        padding: 20px;
+        border-radius: 22px;
     }
 
     .cool-hero-title,
@@ -915,7 +930,11 @@ require_once __DIR__ . '/includes/header.php';
     .cool-manifesto,
     .cool-history-categories,
     .cool-join-section {
-        padding: 18px 0 44px;
+        padding: 18px 0 40px;
+    }
+
+    .cool-join-section {
+        padding-top: 10px;
     }
 
     .cool-manifesto-title {
@@ -944,12 +963,12 @@ require_once __DIR__ . '/includes/header.php';
     .cool-pillar-card h3,
     .cool-reason-card h3,
     .cool-category-card h3 {
-        font-size: 28px;
+        font-size: 24px;
     }
 
     .cool-category-photo {
-        min-height: 220px;
-        height: 220px;
+        min-height: 180px;
+        height: 180px;
     }
 
     .cool-reasons-frame {

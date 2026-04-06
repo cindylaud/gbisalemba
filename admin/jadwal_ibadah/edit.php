@@ -1,20 +1,11 @@
 <?php
 require_once __DIR__ . '/../includes/auth.php';
 require_once __DIR__ . '/../../config/database.php';
+require_once __DIR__ . '/_table_bootstrap.php';
 
-// Check if column 'urutan' and 'kategori' exist
-$has_urutan_column = false;
-$has_kategori_column = false;
-
-$check_columns = $conn->query("SHOW COLUMNS FROM jadwal_ibadah");
-while ($col = $check_columns->fetch_assoc()) {
-    if ($col['Field'] == 'urutan') {
-        $has_urutan_column = true;
-    }
-    if ($col['Field'] == 'kategori') {
-        $has_kategori_column = true;
-    }
-}
+$table_state = ensureJadwalIbadahTable($conn);
+$has_urutan_column = (bool) ($table_state['has_urutan_column'] ?? false);
+$has_kategori_column = (bool) ($table_state['has_kategori_column'] ?? false);
 
 $error = '';
 $success = '';
@@ -90,155 +81,481 @@ if ($result->num_rows == 0) {
 $jadwal = $result->fetch_assoc();
 $stmt->close();
 
+$jam_value_for_form = $_POST['jam'] ?? ($jadwal['jam'] ?? '');
+$jam_items_for_form = [];
+foreach (explode(',', (string) $jam_value_for_form) as $jam_item) {
+    $jam_item = trim($jam_item);
+    if ($jam_item !== '') {
+        $jam_items_for_form[] = $jam_item;
+    }
+}
+if (empty($jam_items_for_form)) {
+    $jam_items_for_form[] = '';
+}
+
+$admin_page_title = 'Edit Jadwal Ibadah';
 include __DIR__ . '/../includes/header.php';
 ?>
 
-<div class="container-fluid">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <h1 class="h3 mb-0 text-gray-800">Edit Jadwal Ibadah</h1>
-        <a href="index.php" class="btn btn-secondary">
-            <i class="fas fa-arrow-left"></i> Kembali
-        </a>
-    </div>
+<style>
+    .jadwal-edit-page {
+        display: grid;
+        gap: 12px;
+        margin-top: -4px;
+    }
 
+    .btn-back {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 9px 14px;
+        border-radius: 12px;
+        border: 1px solid rgba(16, 44, 87, 0.14);
+        background: #f3f8fc;
+        color: #1f3f6f;
+        font-size: 13px;
+        font-weight: 700;
+        text-decoration: none;
+        transition: transform 0.18s ease, box-shadow 0.18s ease;
+    }
+
+    .btn-back:hover {
+        text-decoration: none;
+        color: #1f3f6f;
+        transform: translateY(-1px);
+        box-shadow: 0 8px 16px rgba(16, 44, 87, 0.14);
+    }
+
+    .admin-alert {
+        border-radius: 12px;
+        padding: 12px 14px;
+        font-size: 13px;
+        font-weight: 600;
+        border: 1px solid transparent;
+    }
+
+    .admin-alert.error {
+        background: #fde8e8;
+        color: #8d2d2d;
+        border-color: #f8c7c7;
+    }
+
+    .edit-layout {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr);
+        gap: 12px;
+        align-items: start;
+    }
+
+    .panel {
+        background: linear-gradient(180deg, #ffffff 0%, #f8fbfe 100%);
+        border: 1px solid rgba(16, 44, 87, 0.1);
+        border-radius: 22px;
+        box-shadow: 0 12px 26px rgba(15, 39, 66, 0.08);
+    }
+
+    .panel-form {
+        padding: 16px;
+    }
+
+    .panel-head {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        margin-bottom: 10px;
+        padding-bottom: 10px;
+        border-bottom: 1px solid rgba(16, 44, 87, 0.1);
+    }
+
+    .panel-title {
+        margin: 0;
+        display: inline-flex;
+        align-items: center;
+        gap: 9px;
+        font-size: 22px;
+        color: #102c57;
+        font-weight: 800;
+    }
+
+    .panel-head-actions {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .panel-title i {
+        color: #146c94;
+    }
+
+    .form-grid {
+        display: grid;
+        gap: 12px;
+    }
+
+    .row-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 12px;
+    }
+
+    .field {
+        display: grid;
+        gap: 5px;
+    }
+
+    .field label {
+        margin: 0;
+        font-size: 13px;
+        font-weight: 700;
+        color: #234267;
+    }
+
+    .req {
+        color: #dc3545;
+    }
+
+    .input,
+    .select,
+    .textarea {
+        width: 100%;
+        border: 1px solid rgba(16, 44, 87, 0.18);
+        border-radius: 12px;
+        padding: 10px 12px;
+        background: #fff;
+        color: #344054;
+        font-size: 13px;
+        transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .textarea {
+        min-height: 76px;
+        resize: vertical;
+    }
+
+    .time-stack {
+        display: grid;
+        gap: 8px;
+    }
+
+    .time-row {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .time-row .input {
+        flex: 1;
+    }
+
+    .time-btn {
+        width: 34px;
+        height: 34px;
+        border: 1px solid rgba(16, 44, 87, 0.18);
+        border-radius: 10px;
+        background: #f4f8fc;
+        color: #234267;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: transform 0.15s ease, box-shadow 0.15s ease;
+    }
+
+    .time-btn:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 6px 12px rgba(16, 44, 87, 0.12);
+    }
+
+    .time-btn.remove {
+        color: #8d2d2d;
+        border-color: rgba(201, 96, 96, 0.35);
+        background: #fff3f3;
+    }
+
+    .input:focus,
+    .select:focus,
+    .textarea:focus {
+        outline: none;
+        border-color: rgba(63, 182, 168, 0.56);
+        box-shadow: 0 0 0 0.2rem rgba(63, 182, 168, 0.14);
+    }
+
+    .hint {
+        margin: 0;
+        color: #6b7c93;
+        font-size: 12px;
+        line-height: 1.45;
+    }
+
+    .active-wrap {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 13px;
+        color: #334e70;
+        background: #f6fafc;
+        border: 1px solid rgba(16, 44, 87, 0.1);
+        border-radius: 10px;
+        padding: 8px 10px;
+        width: fit-content;
+    }
+
+    .active-wrap input[type="checkbox"] {
+        width: 16px;
+        height: 16px;
+    }
+
+    .form-actions {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 10px;
+        border-top: 1px solid rgba(16, 44, 87, 0.1);
+        padding-top: 14px;
+        margin-top: 2px;
+    }
+
+    .btn-action {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        border-radius: 12px;
+        padding: 10px 14px;
+        font-size: 13px;
+        font-weight: 700;
+        text-decoration: none;
+        border: 1px solid transparent;
+        cursor: pointer;
+        transition: transform 0.18s ease, box-shadow 0.18s ease;
+    }
+
+    .btn-action:hover {
+        text-decoration: none;
+        transform: translateY(-1px);
+    }
+
+    .btn-cancel {
+        background: #f4f7fa;
+        border-color: rgba(16, 44, 87, 0.15);
+        color: #2d4e77;
+    }
+
+    .btn-cancel:hover {
+        color: #2d4e77;
+        box-shadow: 0 8px 16px rgba(16, 44, 87, 0.12);
+    }
+
+    .btn-save {
+        background: linear-gradient(135deg, #1e3a5f 0%, #146c94 100%);
+        border-color: rgba(12, 68, 96, 0.45);
+        color: #fff;
+        box-shadow: 0 10px 20px rgba(20, 108, 148, 0.24);
+    }
+
+    .btn-save:hover {
+        color: #fff;
+        box-shadow: 0 12px 24px rgba(20, 108, 148, 0.28);
+    }
+
+    @media (max-width: 992px) {
+        .row-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    @media (max-width: 640px) {
+        .form-actions {
+            flex-direction: column-reverse;
+            align-items: stretch;
+        }
+
+        .btn-action {
+            width: 100%;
+        }
+    }
+</style>
+
+<div class="jadwal-edit-page">
     <?php if (!empty($error)): ?>
-        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        <div class="admin-alert error" role="alert">
             <?php echo htmlspecialchars($error); ?>
-            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                <span aria-hidden="true">&times;</span>
-            </button>
         </div>
     <?php endif; ?>
 
-    <div class="row">
-        <div class="col-lg-8">
-            <div class="card shadow mb-4">
-                <div class="card-body">
-                    <form method="POST" action="">
-                        <div class="form-group">
-                            <label for="nama_ibadah">Nama Ibadah <span class="text-danger">*</span></label>
-                            <input type="text" class="form-control" id="nama_ibadah" name="nama_ibadah" 
-                                   value="<?php echo htmlspecialchars($_POST['nama_ibadah'] ?? $jadwal['nama_ibadah']); ?>" 
-                                   required>
-                        </div>
-
-                        <?php if ($has_kategori_column): ?>
-                            <div class="form-group">
-                                <label for="kategori">Kategori</label>
-                                <select class="form-control" id="kategori" name="kategori">
-                                    <option value="">-- Pilih Kategori (Opsional) --</option>
-                                    <?php
-                                    $selected_kategori = $_POST['kategori'] ?? ($jadwal['kategori'] ?? '');
-                                    $kategori_list = ['Ibadah Umum', 'Ibadah Anak', 'Ibadah Pemuda', 'Ibadah Khusus', 'Persekutuan Doa'];
-                                    foreach ($kategori_list as $kat) {
-                                        $selected = ($selected_kategori == $kat) ? 'selected' : '';
-                                        echo "<option value=\"{$kat}\" {$selected}>{$kat}</option>";
-                                    }
-                                    ?>
-                                </select>
-                            </div>
-                        <?php endif; ?>
-
-                        <div class="row">
-                            <div class="col-md-6">
-                                <div class="form-group">
-                                    <label for="hari">Hari <span class="text-danger">*</span></label>
-                                    <select class="form-control" id="hari" name="hari" required>
-                                        <option value="">-- Pilih Hari --</option>
-                                        <?php
-                                        $selected_hari = $_POST['hari'] ?? $jadwal['hari'];
-                                        $hari_list = ['Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu', 'Minggu'];
-                                        foreach ($hari_list as $h) {
-                                            $selected = ($selected_hari == $h) ? 'selected' : '';
-                                            echo "<option value=\"{$h}\" {$selected}>{$h}</option>";
-                                        }
-                                        ?>
-                                    </select>
-                                </div>
-                            </div>
-
-                            <div class="col-md-6">
-                                <div class="form-group">
-                                    <label for="jam">Jam <span class="text-danger">*</span></label>
-                                    <input type="text" class="form-control" id="jam" name="jam" 
-                                           value="<?php echo htmlspecialchars($_POST['jam'] ?? $jadwal['jam']); ?>" 
-                                           placeholder="Contoh: 08:00 WIB, 10:30 WIB"
-                                           required>
-                                    <small class="form-text text-muted">Contoh: 08:00 WIB atau 08:00 WIB, 10:30 WIB</small>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="form-group">
-                            <label for="ruangan">Ruangan</label>
-                            <input type="text" class="form-control" id="ruangan" name="ruangan" 
-                                   value="<?php echo htmlspecialchars($_POST['ruangan'] ?? ($jadwal['ruangan'] ?? '')); ?>">
-                        </div>
-
-                        <div class="form-group">
-                            <label for="keterangan">Keterangan</label>
-                            <textarea class="form-control" id="keterangan" name="keterangan" rows="4"><?php echo htmlspecialchars($_POST['keterangan'] ?? ($jadwal['keterangan'] ?? '')); ?></textarea>
-                        </div>
-
-                        <div class="form-group">
-                            <div class="custom-control custom-checkbox">
-                                <?php 
-                                $is_checked = isset($_POST['is_active']) ? 
-                                    (isset($_POST['is_active'])) : 
-                                    ($jadwal['is_active'] == 1);
-                                ?>
-                                <input type="checkbox" class="custom-control-input" id="is_active" name="is_active" 
-                                       <?php echo $is_checked ? 'checked' : ''; ?>>
-                                <label class="custom-control-label" for="is_active">Aktif</label>
-                            </div>
-                        </div>
-
-                        <hr>
-
-                        <div class="d-flex justify-content-between">
-                            <a href="index.php" class="btn btn-secondary">
-                                <i class="fas fa-times"></i> Batal
-                            </a>
-                            <button type="submit" class="btn btn-primary">
-                                <i class="fas fa-save"></i> Simpan Perubahan
-                            </button>
-                        </div>
-                    </form>
+    <div class="edit-layout">
+        <div class="panel panel-form">
+            <div class="panel-head">
+                <h2 class="panel-title"><i class="fas fa-pen-to-square"></i> Form Edit Jadwal Ibadah</h2>
+                <div class="panel-head-actions">
+                    <a href="index.php" class="btn-back">
+                        <i class="fas fa-arrow-left"></i> Kembali
+                    </a>
                 </div>
             </div>
-        </div>
+            <form method="POST" action="" class="form-grid">
+                <div class="field">
+                    <label for="nama_ibadah">Nama Ibadah <span class="req">*</span></label>
+                    <input type="text" class="input" id="nama_ibadah" name="nama_ibadah"
+                           value="<?php echo htmlspecialchars($_POST['nama_ibadah'] ?? $jadwal['nama_ibadah']); ?>"
+                           required>
+                </div>
 
-        <div class="col-lg-4">
-            <div class="card shadow mb-4">
-                <div class="card-header py-3">
-                    <h6 class="m-0 font-weight-bold text-primary">Informasi Jadwal</h6>
+                <?php if ($has_kategori_column): ?>
+                    <div class="field">
+                        <label for="kategori">Kategori</label>
+                        <select class="select" id="kategori" name="kategori">
+                            <option value="">-- Pilih Kategori (Opsional) --</option>
+                            <?php
+                            $selected_kategori = $_POST['kategori'] ?? ($jadwal['kategori'] ?? '');
+                            $kategori_list = ['Ibadah Umum', 'Ibadah Anak', 'Ibadah Pemuda', 'Ibadah Khusus', 'Persekutuan Doa'];
+                            foreach ($kategori_list as $kat) {
+                                $selected = ($selected_kategori == $kat) ? 'selected' : '';
+                                echo "<option value=\"{$kat}\" {$selected}>{$kat}</option>";
+                            }
+                            ?>
+                        </select>
+                    </div>
+                <?php endif; ?>
+
+                <div class="row-grid">
+                    <div class="field">
+                        <label for="hari">Hari <span class="req">*</span></label>
+                        <input type="text" class="input" id="hari" name="hari"
+                               value="<?php echo htmlspecialchars($_POST['hari'] ?? $jadwal['hari']); ?>"
+                               placeholder="Contoh: Jumat Minggu ke-4"
+                               required>
+                        <p class="hint">Tulis format hari bebas, contoh: Jumat Minggu ke-4 atau Selasa & Kamis.</p>
+                    </div>
+
+                    <div class="field">
+                        <label>Jam <span class="req">*</span></label>
+                        <input type="hidden" id="jam" name="jam" value="<?php echo htmlspecialchars($jam_value_for_form); ?>">
+                        <div class="time-stack" id="jam-list">
+                            <?php foreach ($jam_items_for_form as $idx => $jam_item): ?>
+                                <div class="time-row">
+                                    <input type="text" class="input jam-item"
+                                           value="<?php echo htmlspecialchars($jam_item); ?>"
+                                           placeholder="Contoh: 08:00 WIB"
+                                           <?php echo $idx === 0 ? 'required' : ''; ?>>
+                                    <button type="button" class="time-btn <?php echo $idx === 0 ? 'add' : 'remove'; ?>"
+                                            title="<?php echo $idx === 0 ? 'Tambah jam' : 'Hapus jam'; ?>">
+                                        <i class="fas <?php echo $idx === 0 ? 'fa-plus' : 'fa-trash'; ?>"></i>
+                                    </button>
+                                </div>
+                            <?php endforeach; ?>
+                        </div>
+                        <p class="hint">Bisa isi 1 jam atau beberapa jam. Setiap jam dipisah otomatis saat disimpan.</p>
+                    </div>
                 </div>
-                <div class="card-body">
-                    <?php if ($has_urutan_column && isset($jadwal['urutan'])): ?>
-                        <p class="mb-2"><strong>Urutan saat ini:</strong></p>
-                        <p class="text-muted"><?php echo $jadwal['urutan']; ?></p>
-                        <hr>
-                    <?php endif; ?>
-                    
-                    <?php if (isset($jadwal['created_at'])): ?>
-                        <p class="mb-2"><strong>Dibuat pada:</strong></p>
-                        <p class="text-muted"><?php echo date('d M Y H:i', strtotime($jadwal['created_at'])); ?></p>
-                        <hr>
-                    <?php endif; ?>
-                    
-                    <p class="mb-2"><i class="fas fa-info-circle text-info"></i> <strong>Catatan:</strong></p>
-                    <ul class="small">
-                        <?php if ($has_urutan_column): ?>
-                            <li>Urutan tidak bisa diubah di sini</li>
-                            <li>Gunakan tombol Move Up/Down di halaman utama</li>
-                        <?php endif; ?>
-                        <li>Perubahan langsung tersimpan</li>
-                    </ul>
+
+                <div class="field">
+                    <label for="ruangan">Ruangan</label>
+                    <input type="text" class="input" id="ruangan" name="ruangan"
+                           value="<?php echo htmlspecialchars($_POST['ruangan'] ?? ($jadwal['ruangan'] ?? '')); ?>">
                 </div>
-            </div>
+
+                <div class="field">
+                    <label for="keterangan">Keterangan</label>
+                    <textarea class="textarea" id="keterangan" name="keterangan"><?php echo htmlspecialchars($_POST['keterangan'] ?? ($jadwal['keterangan'] ?? '')); ?></textarea>
+                </div>
+
+                <div class="field">
+                    <?php
+                    $is_checked = isset($_POST['is_active']) ?
+                        (isset($_POST['is_active'])) :
+                        ($jadwal['is_active'] == 1);
+                    ?>
+                    <label>Status</label>
+                    <label class="active-wrap" for="is_active">
+                        <input type="checkbox" id="is_active" name="is_active" <?php echo $is_checked ? 'checked' : ''; ?>>
+                        <span>Aktifkan jadwal ini</span>
+                    </label>
+                </div>
+
+                <div class="form-actions">
+                    <a href="index.php" class="btn-action btn-cancel">
+                        <i class="fas fa-xmark"></i> Batal
+                    </a>
+                    <button type="submit" class="btn-action btn-save">
+                        <i class="fas fa-floppy-disk"></i> Simpan Perubahan
+                    </button>
+                </div>
+            </form>
         </div>
     </div>
 </div>
+
+<script>
+    (function () {
+        var jamList = document.getElementById('jam-list');
+        var jamHidden = document.getElementById('jam');
+        var form = jamList ? jamList.closest('form') : null;
+
+        if (!jamList || !jamHidden || !form) {
+            return;
+        }
+
+        function updateHiddenValue() {
+            var values = [];
+            var inputs = jamList.querySelectorAll('.jam-item');
+            inputs.forEach(function (input) {
+                var val = (input.value || '').trim();
+                if (val !== '') {
+                    values.push(val);
+                }
+            });
+            jamHidden.value = values.join(', ');
+        }
+
+        function addRow() {
+            var row = document.createElement('div');
+            row.className = 'time-row';
+            row.innerHTML = '' +
+                '<input type="text" class="input jam-item" placeholder="Contoh: 10:30 WIB">' +
+                '<button type="button" class="time-btn remove" title="Hapus jam">' +
+                '<i class="fas fa-trash"></i>' +
+                '</button>';
+            jamList.appendChild(row);
+        }
+
+        jamList.addEventListener('click', function (event) {
+            var btn = event.target.closest('.time-btn');
+            if (!btn) {
+                return;
+            }
+
+            if (btn.classList.contains('add')) {
+                addRow();
+                return;
+            }
+
+            if (btn.classList.contains('remove')) {
+                var row = btn.closest('.time-row');
+                if (row) {
+                    row.remove();
+                    if (!jamList.querySelector('.time-row')) {
+                        addRow();
+                    }
+                    updateHiddenValue();
+                }
+            }
+        });
+
+        jamList.addEventListener('input', function (event) {
+            if (event.target.classList.contains('jam-item')) {
+                updateHiddenValue();
+            }
+        });
+
+        form.addEventListener('submit', function () {
+            updateHiddenValue();
+        });
+
+        updateHiddenValue();
+    })();
+</script>
 
 <?php include __DIR__ . '/../includes/footer.php'; ?>
 

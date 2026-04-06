@@ -1,22 +1,9 @@
 <?php
 require_once __DIR__ . '/../includes/auth.php';
 require_once __DIR__ . '/../../config/database.php';
+require_once __DIR__ . '/_table_bootstrap.php';
 
-// Check if column 'urutan' exists
-$has_urutan_column = false;
-$check_columns = $conn->query("SHOW COLUMNS FROM jadwal_ibadah");
-while ($col = $check_columns->fetch_assoc()) {
-    if ($col['Field'] == 'urutan') {
-        $has_urutan_column = true;
-        break;
-    }
-}
-
-// If urutan column doesn't exist, redirect
-if (!$has_urutan_column) {
-    header("Location: index.php?error=Fitur move tidak tersedia (kolom urutan tidak ada)");
-    exit;
-}
+ensureJadwalIbadahTable($conn);
 
 // Check if ID and direction are provided
 if (!isset($_GET['id']) || !is_numeric($_GET['id']) || !isset($_GET['dir'])) {

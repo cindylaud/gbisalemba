@@ -214,7 +214,7 @@ $formulir_card_images = formulir_collect_images([
 </main>
 
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Manrope:wght@600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
 
 /* ============================================
    FORMULIR CARD STYLING
@@ -223,7 +223,7 @@ $formulir_card_images = formulir_collect_images([
     position: relative;
     isolation: isolate;
     overflow: hidden;
-    font-family: 'Manrope', 'Segoe UI', Tahoma, sans-serif;
+    font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     background:
     radial-gradient(circle at 9% 9%, rgba(42, 106, 168, 0.12) 0%, rgba(42, 106, 168, 0) 34%),
     radial-gradient(circle at 92% 15%, rgba(30, 129, 121, 0.08) 0%, rgba(30, 129, 121, 0) 30%),
@@ -329,7 +329,7 @@ $formulir_card_images = formulir_collect_images([
 
 .formulir-header-title {
     margin: 0;
-    font-family: 'Manrope', 'Segoe UI', Tahoma, sans-serif;
+    font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     font-size: clamp(40px, 6vw, 72px);
     line-height: 0.96;
     color: #ffffff;
@@ -455,7 +455,7 @@ $formulir_card_images = formulir_collect_images([
 }
 
 .formulir-title {
-    font-family: 'Playfair Display', Georgia, serif;
+    font-family: inherit;
     font-size: clamp(22px, 1.65vw, 28px);
     font-weight: 600;
     color: #102C57;

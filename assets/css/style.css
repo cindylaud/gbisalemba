@@ -5,7 +5,7 @@
    - Gembala photo 160x160 (1:1)
    ============================================ */
 
-@import url('https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;700;800&family=Caveat:wght@600;700&family=Playfair+Display:ital,wght@0,400..900;1,400..900&family=Great+Vibes&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
 
 /* ============================================
    CSS VARIABLES
@@ -336,7 +336,7 @@ header{
   animation: gembalaMarquee 24s linear infinite;
 }
 .gembala-running-track span {
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  font-family: inherit;
   font-size: clamp(20px, 3.2vw, 48px);
   font-weight: 800;
   text-transform: uppercase;
@@ -1061,9 +1061,9 @@ header{
   text-align: center;
   margin-bottom: 22px;
   letter-spacing: 0.04em;
-  font-family: 'Caveat', 'Brush Script MT', cursive;
-  font-size: clamp(50px, 6vw, 78px);
-  font-weight: 700;
+  font-family: inherit;
+  font-size: clamp(44px, 5vw, 64px);
+  font-weight: 800;
   text-transform: none;
 }
 
@@ -1543,16 +1543,16 @@ header{
   letter-spacing: 0.2em;
   text-transform: uppercase;
   color: rgba(226, 239, 255, 0.9);
-  font-family: 'Baloo 2', 'Segoe UI', sans-serif;
+  font-family: inherit;
 }
 
 .ibadah-showcase-title {
   margin: 0;
   max-width: 16ch;
-  font-family: 'Brillotus', 'Great Vibes', 'Segoe Script', 'Brush Script MT', 'Lucida Handwriting', cursive;
-  font-size: clamp(52px, 5.2vw, 74px);
-  line-height: 0.92;
-  font-weight: 400;
+  font-family: inherit;
+  font-size: clamp(38px, 4vw, 54px);
+  line-height: 1.02;
+  font-weight: 800;
   font-style: normal;
   color: #f5f9ff;
   text-align: center;
@@ -1562,24 +1562,58 @@ header{
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 8px;
-  margin-top: 16px;
+  gap: 12px;
+  margin-top: 24px;
 }
 
 .ibadah-showcase-times span {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  min-width: 126px;
-  padding: 8px 12px;
-  border-radius: 999px;
-  border: 1px solid rgba(237, 246, 255, 0.42);
-  background: rgba(231, 242, 255, 0.2);
-  font-family: 'Baloo 2', 'Segoe UI', sans-serif;
-  font-size: 16px;
-  font-weight: 700;
+  min-width: 140px;
+  padding: 14px 20px;
+  border-radius: 14px;
+  border: 1px solid rgba(255, 255, 255, 0.24);
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.18) 0%, rgba(177, 205, 232, 0.16) 100%);
+  font-family: inherit;
+  font-size: 17px;
+  font-weight: 800;
   color: #f6fbff;
   white-space: nowrap;
+  transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  box-shadow: 0 8px 18px rgba(13, 36, 63, 0.18);
+  position: relative;
+}
+
+.ibadah-showcase-times span::before {
+  content: '';
+  width: 10px;
+  height: 10px;
+  margin-right: 10px;
+  border-radius: 999px;
+  background: linear-gradient(135deg, #a8dbff 0%, #f8fdff 100%);
+  box-shadow: 0 0 0 4px rgba(168, 219, 255, 0.14);
+}
+
+.ibadah-showcase-times span:hover {
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.26) 0%, rgba(195, 219, 240, 0.24) 100%);
+  box-shadow: 0 12px 24px rgba(12, 35, 63, 0.24);
+  transform: translateY(-3px);
+  border-color: rgba(255, 255, 255, 0.38);
+}
+
+.ibadah-showcase-privacy-mask {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  width: 58px;
+  height: 58px;
+  z-index: 3;
+  border-radius: 14px;
+  background: linear-gradient(180deg, rgba(7, 18, 32, 0.96) 0%, rgba(16, 35, 58, 0.82) 100%);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  box-shadow: 0 10px 22px rgba(2, 8, 18, 0.28);
+  pointer-events: auto;
 }
 
 .ibadah-showcase-note {
@@ -1588,26 +1622,15 @@ header{
   line-height: 1.6;
   color: rgba(246, 251, 255, 0.92);
   text-align: center;
-}
-
-/* ============================================
-   CUSTOM FONTS
-   ============================================ */
-/* Brillotus (required) */
-@font-face {
-  font-family: 'Brillotus';
-  src: url('../fonts/Brillotus-Regular.ttf') format('truetype'),
-       url('../fonts/Brillotus.woff2') format('woff2'),
-       url('../fonts/Brillotus.woff') format('woff');
-  font-weight: normal;
-  font-style: normal;
-  font-display: swap;
+  font-family: inherit;
+  font-weight: 600;
+  letter-spacing: 0.2px;
 }
 
 .gembala-name {
-  font-family:'Brillotus', cursive;
+  font-family: inherit;
   font-size:48px;
-  font-weight: 400;
+  font-weight: 800;
   color: var(--white);
   margin: 0 0 4px;
   line-height: 1.15;
@@ -1615,9 +1638,9 @@ header{
   text-shadow: 0 6px 24px rgba(0,0,0,0.28);
 }
 .gembala-name-only {
-  font-family: 'Great Vibes', 'Segoe Script', 'Brush Script MT', 'Lucida Handwriting', 'Brillotus', cursive;
-  font-size: clamp(44px, 5vw, 68px);
-  font-weight: 400;
+  font-family: inherit;
+  font-size: clamp(38px, 4.5vw, 54px);
+  font-weight: 800;
   margin: 0;
   line-height: 1.18;
   letter-spacing: 0.01em;
@@ -1625,6 +1648,13 @@ header{
   flex-direction: column;
   align-items: center;
   gap: 14px;
+}
+.gembala-name,
+.gembala-name-only,
+.gembala-name-secondary,
+.gembala-separator em,
+.gembala-statement {
+  font-family: inherit;
 }
 .gembala-name-line {
   display: block;
@@ -1644,7 +1674,7 @@ header{
   background: linear-gradient(90deg, rgba(255,255,255,0.1), rgba(255,255,255,0.45), rgba(255,255,255,0.1));
 }
 .gembala-separator em {
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  font-family: inherit;
   font-style: normal;
   font-size: 12px;
   font-weight: 700;
@@ -1653,9 +1683,9 @@ header{
   color: rgba(255,255,255,0.78);
 }
 .gembala-name-secondary {
-  font-family:'Brillotus', 'Playfair Display', serif;
-  font-size: clamp(30px, 3.7vw, 42px);
-  font-weight: 400;
+  font-family: inherit;
+  font-size: clamp(26px, 3.4vw, 36px);
+  font-weight: 800;
   color: rgba(255,255,255,0.92);
   margin: 0 0 12px;
   line-height: 1.15;
@@ -2155,7 +2185,7 @@ header{
   border-radius: 999px;
   border: 1px solid rgba(255,255,255,0.45);
   background: rgba(255,255,255,0.12);
-  font-family: 'Baloo 2', 'Segoe UI', sans-serif;
+  font-family: inherit;
   font-size: 13px;
   letter-spacing: 0.12em;
   font-weight: 700;
@@ -2164,7 +2194,7 @@ header{
 
 .hero-vibes-title {
   margin: 0;
-  font-family: 'Baloo 2', 'Segoe UI', sans-serif;
+  font-family: inherit;
   font-size: clamp(36px, 6.2vw, 84px);
   font-weight: 800;
   line-height: 0.98;
@@ -2261,7 +2291,7 @@ header{
   bottom: 14px;
   margin: 0;
   color: #0f7f5f;
-  font-family: 'Caveat', cursive;
+  font-family: inherit;
   font-size: 30px;
   line-height: 1;
 }
@@ -2297,7 +2327,7 @@ header{
 
 .home-energy-track span {
   color: #fff;
-  font-family: 'Baloo 2', 'Segoe UI', sans-serif;
+  font-family: inherit;
   font-size: 20px;
   font-weight: 700;
   letter-spacing: 0.01em;
@@ -2325,7 +2355,7 @@ header{
 .home-variant-fruity .whats-new .section-title-big,
 .home-variant-fruity .ibadah-minggu-title,
 .home-variant-fruity .cta-title {
-  font-family: 'Baloo 2', 'Segoe UI', sans-serif;
+  font-family: inherit;
 }
 
 .home-variant-fruity .ibadah-minggu-section {
