@@ -875,22 +875,49 @@ $pelayanan_description_map = [
 }
 
 @media (max-width: 767px) {
+    .pelayanan-hero-section {
+        padding-bottom: 12px;
+    }
+
     .pelayanan-hero-section .container-large {
         padding: 0;
     }
 
+    .pelayanan-hero-banner {
+        height: clamp(180px, 31vh, 230px);
+    }
+
     .pelayanan-hero-title {
-        font-size: clamp(34px, 10.2vw, 50px);
+        font-size: clamp(30px, 9.4vw, 42px);
     }
 
     .pelayanan-grid-box {
-        padding: 4px 0;
+        padding: 0;
     }
 
     .pelayanan-alt-row {
+        grid-template-columns: 148px minmax(0, 1fr);
         border-radius: 0;
         padding: 0;
-        gap: 12px;
+        gap: 10px;
+    }
+
+    .pelayanan-alt-item.image-left .pelayanan-alt-media {
+        order: 1;
+    }
+
+    .pelayanan-alt-item.image-left .pelayanan-alt-content {
+        order: 2;
+        justify-self: start;
+    }
+
+    .pelayanan-alt-item.image-right .pelayanan-alt-media {
+        order: 2;
+    }
+
+    .pelayanan-alt-item.image-right .pelayanan-alt-content {
+        order: 1;
+        justify-self: start;
     }
 
     .pelayanan-alt-item::before,
@@ -899,20 +926,26 @@ $pelayanan_description_map = [
         transform: scale(0.66);
     }
 
+    .pelayanan-alt-media {
+        width: 148px;
+        max-width: 148px;
+        justify-self: start;
+    }
+
     .pelayanan-card-media {
         aspect-ratio: 1 / 1;
-        border-radius: 12px;
+        border-radius: 10px;
     }
 
     .pelayanan-card-title {
-        font-size: clamp(28px, 9.2vw, 36px);
-        line-height: 0.96;
+        font-size: clamp(22px, 6.2vw, 30px);
+        line-height: 1.02;
         max-width: 100%;
     }
 
     .pelayanan-card-description {
-        font-size: 15px;
-        line-height: 1.55;
+        font-size: 14px;
+        line-height: 1.45;
         max-width: none;
     }
 
@@ -927,11 +960,24 @@ $pelayanan_description_map = [
     }
 
     .pelayanan-contact-section {
-        padding: 8px 0 26px;
+        padding: 6px 0 14px;
     }
 
     .pelayanan-contact-card {
-        border-radius: 24px;
+        max-width: 620px;
+        border-radius: 18px;
+        padding: 16px 14px;
+    }
+
+    .pelayanan-contact-eyebrow {
+        margin-bottom: 10px;
+        font-size: 11px;
+        letter-spacing: 0.16em;
+    }
+
+    .pelayanan-contact-button {
+        padding: 11px 16px;
+        font-size: 13px;
     }
 
     .pelayanan-contact-button {

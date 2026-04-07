@@ -268,10 +268,6 @@ if (!isset($error) && isset($_GET['error']) && $_GET['error'] !== '') {
             margin: 0;
         }
 
-        .admin-topbar {
-            border-radius: 14px;
-        }
-
         .alert {
             padding: 13px 16px;
             margin-bottom: 16px;
@@ -293,14 +289,30 @@ if (!isset($error) && isset($_GET['error']) && $_GET['error'] !== '') {
 
         .layout {
             display: grid;
-            grid-template-columns: 1.2fr 0.8fr;
-            gap: 20px;
-            align-items: flex-start;
+            grid-template-columns: minmax(0, 1.55fr) minmax(260px, 0.45fr);
+            gap: 18px;
+            align-items: start;
         }
 
         @media (max-width: 1200px) {
             .layout {
                 grid-template-columns: 1fr;
+            }
+
+            .panel-list {
+                order: 1;
+                position: relative;
+                z-index: 2;
+            }
+
+            .panel-upload {
+                order: 2;
+                position: static;
+                top: auto;
+                max-width: none;
+                justify-self: stretch;
+                margin-top: 6px;
+                z-index: 1;
             }
         }
 
@@ -313,7 +325,16 @@ if (!isset($error) && isset($_GET['error']) && $_GET['error'] !== '') {
         }
 
         .panel-upload {
-            position: relative;
+            position: sticky;
+            top: 104px;
+            width: 100%;
+            max-width: 430px;
+            justify-self: end;
+        }
+
+        .table-scroll {
+            width: 100%;
+            overflow-x: auto;
         }
 
         .panel-title {
@@ -364,12 +385,12 @@ if (!isset($error) && isset($_GET['error']) && $_GET['error'] !== '') {
 
         thead th:nth-child(1),
         tbody td:nth-child(1) {
-            width: 78px;
+            width: 68px;
         }
 
         thead th:nth-child(2),
         tbody td:nth-child(2) {
-            min-width: 180px;
+            min-width: 150px;
             word-break: break-word;
             overflow-wrap: break-word;
             hyphens: auto;
@@ -377,22 +398,17 @@ if (!isset($error) && isset($_GET['error']) && $_GET['error'] !== '') {
 
         thead th:nth-child(3),
         tbody td:nth-child(3) {
-            width: 110px;
+            width: 92px;
         }
 
         thead th:nth-child(4),
         tbody td:nth-child(4) {
-            width: 95px;
+            width: 94px;
         }
 
         thead th:nth-child(5),
         tbody td:nth-child(5) {
-            width: 110px;
-        }
-
-        thead th:nth-child(6),
-        tbody td:nth-child(6) {
-            width: 200px;
+            width: 160px;
         }
 
         thead th {
@@ -429,8 +445,7 @@ if (!isset($error) && isset($_GET['error']) && $_GET['error'] !== '') {
         tbody td:nth-child(1),
         tbody td:nth-child(3),
         tbody td:nth-child(4),
-        tbody td:nth-child(5),
-        tbody td:nth-child(6) {
+        tbody td:nth-child(5) {
             text-align: center;
         }
 
@@ -517,14 +532,36 @@ if (!isset($error) && isset($_GET['error']) && $_GET['error'] !== '') {
             box-shadow: 0 8px 14px rgba(203, 63, 58, 0.24);
         }
 
-        .btn-small {
-            width: 136px;
-            min-width: 136px;
-            padding: 8px 12px;
-            border-radius: 11px;
-            font-size: 12px;
-            font-weight: 800;
-            letter-spacing: 0.1px;
+        .icon-action {
+            width: 34px;
+            height: 34px;
+            min-width: 34px;
+            border-radius: 10px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid transparent;
+            color: #fff;
+            text-decoration: none;
+            box-shadow: 0 6px 12px rgba(16, 44, 87, 0.12);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .icon-action:hover {
+            color: #fff;
+            text-decoration: none;
+            transform: translateY(-1px);
+            box-shadow: 0 8px 14px rgba(16, 44, 87, 0.16);
+        }
+
+        .icon-action.edit {
+            background: linear-gradient(135deg, #1e3a5f 0%, #146C94 100%);
+            border-color: rgba(19, 54, 97, 0.4);
+        }
+
+        .icon-action.delete {
+            background: linear-gradient(135deg, #e45f5a 0%, #cb3f3a 100%);
+            border-color: rgba(165, 40, 34, 0.45);
         }
 
         .btn-order {
@@ -555,9 +592,10 @@ if (!isset($error) && isset($_GET['error']) && $_GET['error'] !== '') {
 
         .actions {
             display: flex;
-            flex-direction: column;
+            flex-direction: row;
             gap: 8px;
             align-items: center;
+            justify-content: center;
         }
 
         .actions-order {
@@ -566,7 +604,7 @@ if (!isset($error) && isset($_GET['error']) && $_GET['error'] !== '') {
         }
 
         .form-group {
-            margin-bottom: 16px;
+            margin-bottom: 18px;
         }
 
         .form-group label {
@@ -723,7 +761,7 @@ if (!isset($error) && isset($_GET['error']) && $_GET['error'] !== '') {
         .form-row {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 16px;
+            gap: 18px;
         }
 
         .button-group {
@@ -775,31 +813,169 @@ if (!isset($error) && isset($_GET['error']) && $_GET['error'] !== '') {
             margin-bottom: 10px;
         }
 
-        @media (max-width: 980px) {
-            .layout {
-                grid-template-columns: 1fr;
-            }
-
-            .panel-upload {
-                position: static;
-                top: auto;
-            }
-        }
-
-        @media (max-width: 768px) {
+        @media (max-width: 767px) {
             .form-row {
                 grid-template-columns: 1fr;
             }
 
-            table th,
-            table td {
-                padding: 10px;
+            .admin-content {
+                padding: 12px 8px 20px;
             }
 
-            .btn-small {
+            .panel {
+                padding: 12px;
+                border-radius: 16px;
+            }
+
+            .table-scroll {
+                overflow: hidden;
+            }
+
+            table,
+            thead,
+            tbody,
+            th,
+            td,
+            tr {
+                display: block;
+                width: 100%;
+            }
+
+            table {
+                border: 0;
+                background: transparent;
+            }
+
+            thead {
+                display: none;
+            }
+
+            tbody tr {
+                position: relative;
+                display: flex;
+                flex-wrap: wrap;
+                align-items: flex-start;
+                gap: 10px 10px;
+                background: #fff;
+                border: 1px solid rgba(16, 44, 87, 0.1);
+                border-radius: 16px;
+                padding: 13px;
+                margin-bottom: 12px;
+                box-shadow: 0 8px 16px rgba(15, 39, 66, 0.05);
+            }
+
+            tbody td {
+                padding: 0;
+                border: 0;
+                min-width: 0;
+                text-align: left;
+            }
+
+            tbody td::before {
+                content: none;
+            }
+
+            tbody td[data-label="Foto"] {
+                order: 1;
+                flex: 0 0 56px;
+                display: flex;
+                align-items: center;
+                justify-content: flex-start;
+            }
+
+            tbody td[data-label="Judul"] {
+                order: 2;
+                flex: 1 1 calc(100% - 72px);
+                min-height: 56px;
+                display: flex;
+                align-items: center;
+                font-size: 14px;
+                font-weight: 800;
+                color: #0f2d52;
+                line-height: 1.3;
+                word-break: break-word;
+                padding-right: 44px;
+            }
+
+            tbody td[data-label="Urutan"] {
+                position: absolute;
+                top: 14px;
+                right: 14px;
+                z-index: 1;
+            }
+
+            tbody td[data-label="Urutan"] strong {
+                width: 30px;
+                height: 30px;
+                border-radius: 999px;
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                background: #eef2f7;
+                color: #1e3a5f;
+                font-size: 14px;
+                font-weight: 800;
+            }
+
+            tbody td[data-label="Status"] {
+                order: 3;
+                flex: 1 1 100%;
+                display: flex;
+                align-items: center;
+                justify-content: flex-start;
+                gap: 8px;
+                padding-top: 10px;
+                border-top: 1px dashed #e5edf5;
+            }
+
+            tbody td[data-label="Status"]::after {
+                content: 'Status';
+                order: -1;
+                font-size: 11px;
+                font-weight: 700;
+                letter-spacing: 0.3px;
+                text-transform: uppercase;
+                color: #7b8ea6;
+            }
+
+            tbody td[data-label="Aksi"] {
+                order: 4;
+                flex: 1 1 100%;
+                display: block;
+            }
+
+            .thumbnail {
+                width: 56px;
+                height: 56px;
+                border-radius: 12px;
+            }
+
+            .actions {
+                display: flex;
+                flex-direction: row;
+                width: 100%;
+                gap: 8px;
+                margin-top: 0;
+            }
+
+            .actions a,
+            .actions form {
+                flex: 1;
+                width: 100%;
+            }
+
+            .actions button,
+            .actions .icon-action {
                 width: 100%;
                 min-width: 0;
+                height: 36px;
+                border-radius: 10px;
             }
+
+            .icon-action i {
+                font-size: 14px;
+            }
+
         }
     </style>
 </head>
@@ -835,13 +1011,13 @@ if (!isset($error) && isset($_GET['error']) && $_GET['error'] !== '') {
         <div class="panel-title list-title">Daftar Pelayanan</div>
         <?php if (count($pelayanan_list) > 0): ?>
             <?php $total_rows = count($pelayanan_list); ?>
+                <div class="table-scroll">
                 <table>
                     <thead>
                         <tr>
                             <th>Urutan</th>
                             <th>Judul</th>
                             <th>Foto</th>
-                            <th>Posisi Foto</th>
                             <th>Status</th>
                             <th>Aksi</th>
                         </tr>
@@ -849,31 +1025,30 @@ if (!isset($error) && isset($_GET['error']) && $_GET['error'] !== '') {
                     <tbody>
                         <?php foreach ($pelayanan_list as $index => $item): ?>
                             <tr>
-                                <td><strong><?php echo htmlspecialchars($item['urutan']); ?></strong></td>
-                                <td><?php echo htmlspecialchars($item['judul']); ?></td>
-                                <td>
+                                <td data-label="Urutan"><strong><?php echo htmlspecialchars($item['urutan']); ?></strong></td>
+                                <td data-label="Judul"><?php echo htmlspecialchars($item['judul']); ?></td>
+                                <td data-label="Foto">
                                     <?php if (!empty($item['foto'])): ?>
                                         <img src="../uploads/pelayanan/<?php echo htmlspecialchars($item['foto']); ?>" alt="Foto" class="thumbnail">
                                     <?php else: ?>
                                         <span style="color:#999; font-size:12px;">Tidak ada foto</span>
                                     <?php endif; ?>
                                 </td>
-                                <td><?php echo isset($item['foto_posisi_y']) ? intval($item['foto_posisi_y']) : 50; ?>%</td>
-                                <td>
+                                <td data-label="Status">
                                     <span class="badge <?php echo $item['status'] === 'aktif' ? 'badge-active' : 'badge-inactive'; ?>">
                                         <?php echo $item['status'] === 'aktif' ? 'Aktif' : 'Nonaktif'; ?>
                                     </span>
                                 </td>
-                                <td>
+                                <td data-label="Aksi">
                                     <div class="actions">
-                                        <a href="?edit_id=<?php echo $item['id']; ?>" class="btn btn-primary btn-small">
-                                            <i class="fas fa-edit"></i> Edit
+                                        <a href="?edit_id=<?php echo $item['id']; ?>" class="icon-action edit" title="Edit" aria-label="Edit">
+                                            <i class="fas fa-pen"></i>
                                         </a>
                                         <form method="POST" style="display:inline;" onsubmit="return confirm('Yakin ingin menghapus?');">
                                             <input type="hidden" name="action" value="delete">
                                             <input type="hidden" name="id" value="<?php echo $item['id']; ?>">
-                                            <button type="submit" class="btn btn-danger btn-small">
-                                                <i class="fas fa-trash"></i> Hapus
+                                            <button type="submit" class="icon-action delete" title="Hapus" aria-label="Hapus">
+                                                <i class="fas fa-trash"></i>
                                             </button>
                                         </form>
                                     </div>
@@ -882,6 +1057,7 @@ if (!isset($error) && isset($_GET['error']) && $_GET['error'] !== '') {
                         <?php endforeach; ?>
                     </tbody>
                 </table>
+                </div>
         <?php else: ?>
             <div class="empty-state">
                 <div class="icon"><i class="fas fa-layer-group"></i></div>

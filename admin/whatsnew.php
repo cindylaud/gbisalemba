@@ -264,10 +264,6 @@ if ($res === false) {
             margin: 0;
         }
 
-        .admin-topbar {
-            border-radius: 14px;
-        }
-
         /* ── Alerts ── */
         .alert {
             padding: 13px 16px;
@@ -732,6 +728,104 @@ if ($res === false) {
 
             .actions {
                 flex-wrap: wrap;
+            }
+        }
+
+        @media (max-width: 767px) {
+            .panel {
+                padding: 14px;
+                border-radius: 16px;
+            }
+
+            .panel-list table,
+            .panel-list thead,
+            .panel-list tbody,
+            .panel-list tr,
+            .panel-list th,
+            .panel-list td {
+                display: block;
+                width: 100%;
+            }
+
+            .panel-list table {
+                border: 0;
+                background: transparent;
+            }
+
+            .panel-list thead {
+                display: none;
+            }
+
+            .panel-list tbody tr {
+                background: #fff;
+                border: 1px solid rgba(16, 44, 87, 0.1);
+                border-radius: 14px;
+                padding: 10px;
+                margin-bottom: 10px;
+                box-shadow: 0 8px 16px rgba(15, 39, 66, 0.05);
+            }
+
+            .panel-list tbody td {
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                gap: 10px;
+                padding: 8px 0;
+                border-bottom: 1px solid #edf3f8;
+                font-size: 13px;
+            }
+
+            .panel-list tbody td:last-child {
+                border-bottom: 0;
+                padding-bottom: 0;
+            }
+
+            .panel-list tbody td::before {
+                font-size: 11px;
+                font-weight: 800;
+                text-transform: uppercase;
+                letter-spacing: 0.3px;
+                color: #7388a2;
+            }
+
+            .panel-list tbody td:nth-child(1)::before { content: 'No'; }
+            .panel-list tbody td:nth-child(2)::before { content: 'Preview'; }
+            .panel-list tbody td:nth-child(3)::before { content: 'Urutan'; }
+            .panel-list tbody td:nth-child(4)::before { content: 'Status'; }
+            .panel-list tbody td:nth-child(5)::before { content: 'Aksi'; }
+
+            .panel-list tbody td:nth-child(2) img.thumb,
+            .panel-list tbody td:nth-child(2) .thumb-placeholder {
+                width: 86px;
+                height: 56px;
+            }
+
+            .panel-list tbody td:nth-child(3) .sort-form {
+                width: auto;
+                min-width: 0;
+            }
+
+            .panel-list tbody td:nth-child(5) {
+                display: block;
+            }
+
+            .panel-list tbody td:nth-child(5)::before {
+                display: block;
+                margin-bottom: 8px;
+            }
+
+            body.admin-theme td .actions,
+            .panel-list tbody td:nth-child(5) .actions {
+                display: flex !important;
+                flex-direction: row !important;
+                width: 100%;
+                gap: 8px !important;
+            }
+
+            body.admin-theme td .actions .btn,
+            .panel-list tbody td:nth-child(5) .actions .btn {
+                width: 100% !important;
+                min-width: 0 !important;
             }
         }
     </style>

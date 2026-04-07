@@ -873,6 +873,107 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['form_action'])) {
                 top: auto;
             }
         }
+
+        @media (max-width: 767px) {
+            .panel {
+                padding: 14px;
+                border-radius: 16px;
+            }
+
+            .panel-list table,
+            .panel-list thead,
+            .panel-list tbody,
+            .panel-list tr,
+            .panel-list th,
+            .panel-list td {
+                display: block;
+                width: 100%;
+            }
+
+            .panel-list table {
+                border: 0;
+                background: transparent;
+            }
+
+            .panel-list thead {
+                display: none;
+            }
+
+            .panel-list tbody tr {
+                background: #fff;
+                border: 1px solid rgba(16, 44, 87, 0.1);
+                border-radius: 14px;
+                padding: 10px;
+                margin-bottom: 10px;
+                box-shadow: 0 8px 16px rgba(15, 39, 66, 0.05);
+            }
+
+            .panel-list tbody td {
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                gap: 10px;
+                padding: 8px 0;
+                border-bottom: 1px solid #edf3f8;
+                font-size: 13px;
+                text-align: left;
+            }
+
+            .panel-list tbody td:last-child {
+                border-bottom: 0;
+                padding-bottom: 0;
+            }
+
+            .panel-list tbody td::before {
+                font-size: 11px;
+                font-weight: 800;
+                text-transform: uppercase;
+                letter-spacing: 0.3px;
+                color: #7388a2;
+            }
+
+            .panel-list tbody td:nth-child(1)::before { content: 'No'; }
+            .panel-list tbody td:nth-child(2)::before { content: 'Urutan'; }
+            .panel-list tbody td:nth-child(3)::before { content: 'Nama Formulir'; }
+            .panel-list tbody td:nth-child(4)::before { content: 'File'; }
+            .panel-list tbody td:nth-child(5)::before { content: 'Status'; }
+            .panel-list tbody td:nth-child(6)::before { content: 'Aksi'; }
+
+            .panel-list tbody td:nth-child(2) .sort-form {
+                width: auto;
+                margin: 0;
+            }
+
+            .panel-list tbody td:nth-child(4) .actions,
+            .panel-list tbody td:nth-child(6) .actions {
+                width: 100%;
+                justify-content: flex-end;
+            }
+
+            .panel-list tbody td:nth-child(6) {
+                display: block;
+            }
+
+            .panel-list tbody td:nth-child(6)::before {
+                display: block;
+                margin-bottom: 8px;
+            }
+
+            .panel-list tbody td:nth-child(6) .actions {
+                display: flex;
+                gap: 8px;
+            }
+
+            .panel-list tbody td:nth-child(6) .actions .btn,
+            .panel-list tbody td:nth-child(6) .actions form {
+                flex: 1;
+                width: 100%;
+            }
+
+            .panel-list tbody td:nth-child(6) .actions .btn {
+                width: 100%;
+            }
+        }
     </style>
 </head>
 <body class="admin-theme">

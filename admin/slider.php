@@ -252,10 +252,8 @@ if ($selected_card && !empty($selected_card['is_active'])) {
         .container {
             max-width: none;
             margin: 0;
-        }
-        
-        .admin-topbar {
-            border-radius: 14px;
+            width: 100%;
+            min-width: 0;
         }
         
         .alert {
@@ -282,6 +280,7 @@ if ($selected_card && !empty($selected_card['is_active'])) {
             grid-template-columns: minmax(0, 1.18fr) minmax(320px, 0.82fr);
             gap: 18px;
             align-items: start;
+            min-width: 0;
         }
 
         @media (max-width: 900px) {
@@ -296,6 +295,13 @@ if ($selected_card && !empty($selected_card['is_active'])) {
             border-radius: 22px;
             padding: 20px;
             box-shadow: 0 12px 26px rgba(15, 39, 66, 0.08);
+            min-width: 0;
+        }
+
+        .table-scroll {
+            width: 100%;
+            min-width: 0;
+            overflow-x: auto;
         }
 
         .panel-upload {
@@ -703,6 +709,20 @@ if ($selected_card && !empty($selected_card['is_active'])) {
         }
 
         @media (max-width: 768px) {
+            .admin-content {
+                padding-left: 10px;
+                padding-right: 10px;
+            }
+
+            .layout {
+                gap: 12px;
+            }
+
+            .panel {
+                padding: 14px;
+                border-radius: 16px;
+            }
+
             table th,
             table td {
                 padding: 10px;
@@ -720,6 +740,10 @@ if ($selected_card && !empty($selected_card['is_active'])) {
             .btn-manage {
                 width: 100%;
                 min-width: 0;
+            }
+
+            .table-scroll {
+                overflow-x: auto;
             }
         }
     </style>
@@ -749,6 +773,7 @@ if ($selected_card && !empty($selected_card['is_active'])) {
                 <div class="panel-title list-title">Daftar Slider</div>
                 <p class="slot-note">Pilih slot yang ingin dikelola, lalu ubah di panel kanan.</p>
 
+                <div class="table-scroll">
                 <table>
                     <thead>
                         <tr>
@@ -796,6 +821,7 @@ if ($selected_card && !empty($selected_card['is_active'])) {
                         <?php endfor; ?>
                     </tbody>
                 </table>
+                </div>
             </div>
 
             <div class="panel panel-upload">

@@ -930,11 +930,19 @@ require_once __DIR__ . '/includes/header.php';
     .cool-manifesto,
     .cool-history-categories,
     .cool-join-section {
-        padding: 18px 0 40px;
+        padding: 12px 0 24px;
     }
 
     .cool-join-section {
-        padding-top: 10px;
+        padding-top: 6px;
+    }
+
+    .cool-reasons {
+        padding: 8px 0 18px;
+    }
+
+    .cool-history-categories {
+        padding-top: 8px;
     }
 
     .cool-manifesto-title {
@@ -972,18 +980,65 @@ require_once __DIR__ . '/includes/header.php';
     }
 
     .cool-reasons-frame {
-        padding: 34px 18px;
+        padding: 22px 12px;
         border-radius: 24px;
     }
 
-    .cool-category-card,
-    .cool-contact-item {
-        grid-template-columns: 1fr;
+    .cool-category-card {
+        grid-template-columns: 44px 1fr;
+        gap: 10px;
+        padding: 10px 10px;
+        border-radius: 12px;
+        align-items: center;
     }
 
-    .cool-category-icon,
+    .cool-category-icon {
+        width: 44px;
+        height: 44px;
+        border-radius: 12px;
+        font-size: 18px;
+        margin-bottom: 0;
+    }
+
+    .cool-category-card h3 {
+        font-size: 15px;
+        line-height: 1.1;
+        margin: 0 0 2px;
+    }
+
+    .cool-category-card p {
+        font-size: 11px;
+        line-height: 1.3;
+    }
+
+    .cool-contact-stack {
+        gap: 8px;
+    }
+
+    .cool-contact-item {
+        grid-template-columns: 44px 1fr;
+        gap: 10px;
+        padding: 10px 10px;
+        border-radius: 14px;
+        align-items: center;
+    }
+
     .cool-contact-item i {
-        margin-bottom: 4px;
+        width: 44px;
+        height: 44px;
+        border-radius: 12px;
+        font-size: 15px;
+        margin-bottom: 0;
+    }
+
+    .cool-contact-item strong {
+        font-size: 12px;
+        line-height: 1.2;
+    }
+
+    .cool-contact-item span {
+        font-size: 10px;
+        line-height: 1.2;
     }
 
     .cool-btn,

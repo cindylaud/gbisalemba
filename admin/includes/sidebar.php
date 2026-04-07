@@ -38,6 +38,12 @@ $menuItems = [
 	['href' => $adminBaseUrl . '/logout.php', 'icon' => 'fa-right-from-bracket', 'label' => 'Logout'],
 ];
 ?>
+<button type="button" class="admin-menu-toggle" id="admin-menu-toggle" aria-label="Buka menu">
+	<i class="fa-solid fa-bars"></i>
+</button>
+
+<div class="admin-sidebar-backdrop" id="admin-sidebar-backdrop"></div>
+
 <aside class="admin-sidebar">
 	<div class="admin-brand">
 		<img src="<?php echo htmlspecialchars($baseUrl); ?>/assets/images/logo/logo%20gbi.png" alt="Logo GBI">
@@ -58,3 +64,52 @@ $menuItems = [
 		<?php endforeach; ?>
 	</ul>
 </aside>
+
+<script>
+(function () {
+	var toggle = document.getElementById('admin-menu-toggle');
+	var backdrop = document.getElementById('admin-sidebar-backdrop');
+	if (!toggle || !backdrop) {
+		return;
+	}
+
+	function placeToggleInTopbar() {
+		var topbar = document.querySelector('.admin-topbar');
+		if (topbar && toggle.parentNode !== topbar) {
+			topbar.appendChild(toggle);
+		}
+	}
+
+	function closeMenu() {
+		document.body.classList.remove('admin-menu-open');
+	}
+
+	if (document.readyState === 'loading') {
+		document.addEventListener('DOMContentLoaded', placeToggleInTopbar);
+	} else {
+		placeToggleInTopbar();
+	}
+
+	toggle.addEventListener('click', function () {
+		document.body.classList.toggle('admin-menu-open');
+	});
+
+	backdrop.addEventListener('click', closeMenu);
+
+	var links = document.querySelectorAll('.admin-sidebar .admin-nav a');
+	links.forEach(function (link) {
+		link.addEventListener('click', function () {
+			if (window.innerWidth <= 992) {
+				closeMenu();
+			}
+		});
+	});
+
+	window.addEventListener('resize', function () {
+		if (window.innerWidth > 992) {
+			closeMenu();
+		}
+		placeToggleInTopbar();
+	});
+})();
+</script>

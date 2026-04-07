@@ -5,7 +5,6 @@ require_once __DIR__ . '/_table_bootstrap.php';
 
 $table_state = ensureJadwalIbadahTable($conn);
 $has_urutan_column = (bool) ($table_state['has_urutan_column'] ?? false);
-$has_kategori_column = (bool) ($table_state['has_kategori_column'] ?? false);
 
 // Determine ORDER BY clause
 if ($has_urutan_column) {
@@ -353,6 +352,92 @@ include __DIR__ . '/../includes/header.php';
             font-size: 13px;
         }
     }
+
+    @media (max-width: 767px) {
+        .panel-list {
+            padding: 14px;
+            border-radius: 16px;
+        }
+
+        .jadwal-table-wrap {
+            border: 0;
+            background: transparent;
+            overflow: visible;
+        }
+
+        .jadwal-table,
+        .jadwal-table thead,
+        .jadwal-table tbody,
+        .jadwal-table tr,
+        .jadwal-table th,
+        .jadwal-table td {
+            display: block;
+            width: 100%;
+        }
+
+        .jadwal-table thead {
+            display: none;
+        }
+
+        .jadwal-table tbody tr {
+            background: #fff;
+            border: 1px solid rgba(16, 44, 87, 0.1);
+            border-radius: 14px;
+            padding: 10px;
+            margin-bottom: 10px;
+            box-shadow: 0 8px 16px rgba(15, 39, 66, 0.05);
+        }
+
+        .jadwal-table tbody td {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+            padding: 8px 0;
+            border-bottom: 1px solid #edf3f8;
+            text-align: left !important;
+            font-size: 13px;
+        }
+
+        .jadwal-table tbody td:last-child {
+            border-bottom: 0;
+            padding-bottom: 0;
+        }
+
+        .jadwal-table tbody td::before {
+            font-size: 11px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+            color: #7388a2;
+        }
+
+        .jadwal-table tbody td:nth-child(1)::before { content: 'No'; }
+        .jadwal-table tbody td:nth-child(2)::before { content: 'Nama Ibadah'; }
+        .jadwal-table tbody td:nth-child(3)::before { content: 'Hari'; }
+        .jadwal-table tbody td:nth-child(4)::before { content: 'Jam'; }
+        .jadwal-table tbody td:nth-child(5)::before { content: 'Ruangan'; }
+        .jadwal-table tbody td:nth-child(6)::before { content: 'Keterangan'; }
+        .jadwal-table tbody td:nth-child(7)::before { content: 'Status'; }
+        .jadwal-table tbody td:nth-child(8)::before { content: 'Urutan'; }
+        .jadwal-table tbody td:nth-child(9)::before { content: 'Aksi'; }
+
+        .jadwal-table tbody td:nth-child(9) {
+            display: block;
+        }
+
+        .jadwal-table tbody td:nth-child(9)::before {
+            display: block;
+            margin-bottom: 8px;
+        }
+
+        .jadwal-table tbody td:nth-child(9) .actions {
+            display: flex;
+            gap: 8px;
+            width: 100%;
+            justify-content: flex-start;
+        }
+    }
 </style>
 
 <div class="jadwal-page">
@@ -393,9 +478,6 @@ include __DIR__ . '/../includes/header.php';
                         <tr>
                             <th width="5%">No</th>
                             <th width="20%">Nama Ibadah</th>
-                            <?php if ($has_kategori_column): ?>
-                                <th width="12%">Kategori</th>
-                            <?php endif; ?>
                             <th width="10%">Hari</th>
                             <th width="12%">Jam</th>
                             <th width="12%">Ruangan</th>
@@ -416,9 +498,6 @@ include __DIR__ . '/../includes/header.php';
                                 <td>
                                     <span class="jadwal-name"><?php echo htmlspecialchars($jadwal['nama_ibadah']); ?></span>
                                 </td>
-                                <?php if ($has_kategori_column): ?>
-                                    <td><?php echo htmlspecialchars($jadwal['kategori'] ?? '-'); ?></td>
-                                <?php endif; ?>
                                 <td><?php echo htmlspecialchars($jadwal['hari']); ?></td>
                                 <td><?php echo htmlspecialchars($jadwal['jam']); ?></td>
                                 <td><?php echo htmlspecialchars($jadwal['ruangan'] ?? '-'); ?></td>

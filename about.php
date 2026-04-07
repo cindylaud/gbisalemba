@@ -182,7 +182,7 @@ $about_photo_3 = about_find_first_image([
                     </div>
                     <div class="about-gbi-leader-meta">
                         <h4 class="about-gbi-leader-position">Wakil Gembala</h4>
-                        <h5 class="about-gbi-leader-name">Ps. David Natanael<br>Ps. Rita Emia Nata</h5>
+                        <h5 class="about-gbi-leader-name">Ps. David Natanael &amp; Ps. Rita Emia Nata</h5>
                     </div>
                 </article>
 
@@ -192,7 +192,7 @@ $about_photo_3 = about_find_first_image([
                     </div>
                     <div class="about-gbi-leader-meta">
                         <h4 class="about-gbi-leader-position">Gembala</h4>
-                        <h5 class="about-gbi-leader-name">Ps. David Natanael<br>Ps. Rita Emia Nata</h5>
+                        <h5 class="about-gbi-leader-name">Ps. David Natanael &amp; Ps. Rita Emia Nata</h5>
                     </div>
                 </article>
 
@@ -202,7 +202,7 @@ $about_photo_3 = about_find_first_image([
                     </div>
                     <div class="about-gbi-leader-meta">
                         <h4 class="about-gbi-leader-position">Wakil Gembala</h4>
-                        <h5 class="about-gbi-leader-name">Ps. David Natanael<br>Ps. Rita Emia Nata</h5>
+                        <h5 class="about-gbi-leader-name">Ps. David Natanael &amp; Ps. Rita Emia Nata</h5>
                     </div>
                 </article>
             </div>
@@ -705,7 +705,7 @@ $about_photo_3 = about_find_first_image([
 
 @media (max-width: 700px) {
     .about-gbi-wrap {
-        padding: 0 0 60px;
+        padding: 0 0 30px;
     }
 
     .about-gbi-shell {
@@ -732,7 +732,7 @@ $about_photo_3 = about_find_first_image([
 
     .about-gbi-hero {
         padding-top: 14px;
-        padding-bottom: 56px;
+        padding-bottom: 42px;
     }
 
     .about-gbi-hero-media {
@@ -761,6 +761,7 @@ $about_photo_3 = about_find_first_image([
     .about-gbi-intro {
         padding-top: 18px;
         padding-bottom: 22px;
+        margin-top: 14px;
     }
 
     .about-gbi-intro h2,
@@ -790,13 +791,40 @@ $about_photo_3 = about_find_first_image([
         font-size: 19px;
     }
 
-    .about-gbi-gallery-grid,
+    .about-gbi-gallery-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        column-gap: 10px;
+        row-gap: 6px;
+    }
+
     .about-gbi-leaders-grid {
-        grid-template-columns: 1fr;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 8px;
+    }
+
+    .about-gbi-leaders {
+        padding-top: 34px;
+        padding-bottom: 28px;
+    }
+
+    .about-gbi-leader-photo-wrap {
+        aspect-ratio: 1 / 1.14;
     }
 
     .about-gbi-leader-meta {
-        padding: 14px 12px 14px;
+        padding: 10px 8px 11px;
+    }
+
+    .about-gbi-leader-position {
+        font-size: 9px;
+        letter-spacing: 0.07em;
+        padding: 3px 8px;
+    }
+
+    .about-gbi-leader-name {
+        margin-top: 6px;
+        font-size: clamp(11px, 2.8vw, 14px);
+        line-height: 1.25;
     }
 }
 

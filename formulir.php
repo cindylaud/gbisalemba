@@ -391,7 +391,7 @@ $formulir_card_images = formulir_collect_images([
 }
 
 .formulir-section {
-    padding: 0 0 58px !important;
+    padding: 0 0 22px !important;
 }
 
 .formulir-grid {
@@ -626,49 +626,59 @@ $formulir_card_images = formulir_collect_images([
 
 /* Mobile: < 768px */
 @media (max-width: 767px) {
+    .formulir-section {
+        padding: 0 0 10px !important;
+    }
+
     .formulir-header-section {
         padding: 0;
     }
 
     .formulir-hero-banner {
-        min-height: 250px;
+        height: clamp(180px, 31vh, 230px);
+        min-height: 0;
     }
 
     .formulir-header-title {
-        font-size: clamp(34px, 10vw, 48px);
+        font-size: clamp(30px, 9.2vw, 42px);
     }
 
     .formulir-grid {
         grid-template-columns: 1fr;
-        gap: 20px;
+        gap: 14px;
     }
 
     .formulir-card {
-        min-height: 340px;
-        border-radius: 18px;
-    }
-
-    .formulir-card-media {
-        height: 170px;
-    }
-
-    .formulir-card-content {
-        padding: 14px 14px 16px;
-    }
-
-    .formulir-process-section {
-        padding: 0 0 20px;
-    }
-
-    .formulir-process-shell {
-        padding: 20px 14px;
+        min-height: 310px;
         border-radius: 16px;
     }
 
+    .formulir-card-media {
+        height: 150px;
+    }
+
+    .formulir-card-content {
+        padding: 12px 12px 14px;
+    }
+
+    .formulir-process-section {
+        padding: 0 0 10px;
+    }
+
+    .formulir-process-shell {
+        padding: 14px 10px;
+        border-radius: 16px;
+    }
+
+    .formulir-process-title {
+        margin-bottom: 12px;
+        font-size: clamp(20px, 6.4vw, 28px);
+    }
+
     .formulir-step-flow {
-        grid-template-columns: 1fr;
-        gap: 18px;
-        padding-top: 0;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 8px;
+        padding: 0;
     }
 
     .formulir-step-flow-line {
@@ -676,14 +686,31 @@ $formulir_card_images = formulir_collect_images([
     }
 
     .formulir-step-item {
-        padding: 16px;
-        border-radius: 18px;
+        padding: 10px 8px;
+        border-radius: 14px;
         background: rgba(255, 255, 255, 0.74);
         border: 1px solid rgba(30, 58, 95, 0.08);
     }
 
+    .formulir-step-icon {
+        width: 30px;
+        height: 30px;
+        font-size: 12px;
+        margin-bottom: 8px;
+    }
+
+    .formulir-step-label {
+        font-size: 8px;
+        margin-bottom: 3px;
+    }
+
+    .formulir-step-item strong {
+        font-size: 11px;
+        line-height: 1.25;
+    }
+
     .formulir-title {
-        font-size: clamp(24px, 8vw, 30px);
+        font-size: clamp(20px, 7vw, 26px);
     }
 
     .formulir-description {
