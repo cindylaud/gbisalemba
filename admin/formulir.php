@@ -545,7 +545,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['form_action'])) {
         .btn-sort {
             background: #6c757d;
             color: white;
-            padding: 5px 8px;
+            padding: 6px 7px;
+            min-width: 30px;
+            height: 30px;
+            border-radius: 8px;
         }
 
         .btn-sort:hover { background: #545b62; }
@@ -572,18 +575,61 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['form_action'])) {
         .btn-danger:hover { background: #c82333; }
 
         .sort-form {
-            display: flex;
+            display: inline-flex;
             align-items: center;
-            gap: 6px;
+            gap: 4px;
+            justify-content: center;
+            flex-wrap: nowrap;
+            white-space: nowrap;
+            margin: 0;
+        }
+
+        tbody td:nth-child(2) {
+            white-space: nowrap;
         }
 
         .sort-form input[type="number"] {
-            width: 60px;
-            padding: 5px 8px;
-            border: 1px solid #ccc;
-            border-radius: 6px;
+            width: 58px;
+            min-width: 58px;
+            padding: 6px 8px;
+            border: 1px solid rgba(16, 44, 87, 0.2);
+            border-radius: 10px;
             font-size: 13px;
             text-align: center;
+            margin: 0;
+        }
+
+        .sort-form .btn-sort {
+            margin: 0;
+            flex: 0 0 auto;
+            width: 28px;
+            min-width: 28px;
+            height: 28px;
+            padding: 0;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 9px;
+        }
+
+        .sort-actions {
+            display: inline-flex;
+            gap: 4px;
+            align-items: center;
+        }
+
+        body.admin-theme .panel-list .sort-form {
+            display: inline-flex !important;
+            flex-wrap: nowrap !important;
+            align-items: center !important;
+            justify-content: center !important;
+            gap: 4px !important;
+        }
+
+        body.admin-theme .panel-list .sort-form input[type='number'] {
+            width: 54px !important;
+            min-width: 54px !important;
+            margin: 0 !important;
         }
 
         .form-group { margin-bottom: 16px; }
@@ -743,23 +789,27 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['form_action'])) {
         }
 
         .btn-submit {
-            width: 100%;
-            padding: 13px 20px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            width: fit-content;
+            min-width: 170px;
+            padding: 8px 12px;
             border: none;
-            border-radius: 8px;
-            font-size: 15px;
+            border-radius: 10px;
+            font-size: 12px;
             font-weight: 700;
             cursor: pointer;
-            transition: all 0.3s ease;
-            background: linear-gradient(135deg, #146C94 0%, #0f5273 100%);
+            transition: all 0.2s ease;
+            background: linear-gradient(135deg, #1e3a5f 0%, #146C94 100%);
             color: white;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
+            letter-spacing: 0.15px;
         }
 
         .btn-submit:hover {
-            transform: scale(1.02);
-            box-shadow: 0 6px 15px rgba(20, 108, 148, 0.3);
+            transform: translateY(-1px);
+            box-shadow: 0 8px 14px rgba(20, 108, 148, 0.24);
         }
 
         .file-box {
@@ -807,7 +857,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['form_action'])) {
         <header class="admin-topbar">
             <div>
                 <h1>Kelola Formulir</h1>
-                <div class="admin-topbar-meta">Atur file PDF formulir untuk kebutuhan jemaat</div>
             </div>
             <div class="admin-topbar-meta">Halo, <strong><?php echo htmlspecialchars($_SESSION['username'] ?? 'Admin'); ?></strong></div>
         </header>
@@ -850,8 +899,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['form_action'])) {
                                     <form method="POST" class="sort-form">
                                         <input type="hidden" name="id" value="<?php echo $item['id']; ?>">
                                         <input type="number" value="<?php echo intval($item['urutan']); ?>" min="1" readonly>
-                                        <button type="submit" name="action" value="move_up" class="btn btn-sort" title="Naik">↑</button>
-                                        <button type="submit" name="action" value="move_down" class="btn btn-sort" title="Turun">↓</button>
+                                        <div class="sort-actions">
+                                            <button type="submit" name="action" value="move_up" class="btn btn-sort" title="Naik"><i class="fas fa-chevron-up"></i></button>
+                                            <button type="submit" name="action" value="move_down" class="btn btn-sort" title="Turun"><i class="fas fa-chevron-down"></i></button>
+                                        </div>
                                     </form>
                                 </td>
                                 <td><?php echo htmlspecialchars($item['nama_formulir']); ?></td>
@@ -975,6 +1026,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['form_action'])) {
                 </div>
                 
                     <button type="submit" class="btn-submit">
+                        <i class="fas fa-save"></i>
                         <?php echo $edit_data ? 'Perbarui Formulir' : 'Tambah Formulir'; ?>
                     </button>
                     <?php if ($edit_data): ?>

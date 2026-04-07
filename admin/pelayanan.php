@@ -19,6 +19,80 @@ function ensurePelayananPositionColumn(mysqli $conn) {
 ensurePelayananPositionColumn($conn);
 
 // =====================================================================
+// HANDLE MOVE ORDER (UP / DOWN)
+// =====================================================================
+if (isset($_GET['action']) && $_GET['action'] === 'move' && isset($_GET['id'], $_GET['direction'])) {
+    $moveId = intval($_GET['id']);
+    $direction = $_GET['direction'] === 'up' ? 'up' : ($_GET['direction'] === 'down' ? 'down' : '');
+
+    if ($moveId <= 0 || $direction === '') {
+        header('Location: pelayanan.php?error=' . urlencode('Permintaan pindah urutan tidak valid.'));
+        exit;
+    }
+
+    $orderedRows = [];
+    $stmtMove = $conn->prepare("SELECT id, urutan FROM pelayanan ORDER BY urutan ASC, id ASC");
+    $stmtMove->execute();
+    $moveResult = $stmtMove->get_result();
+    while ($row = $moveResult->fetch_assoc()) {
+        $orderedRows[] = $row;
+    }
+    $stmtMove->close();
+
+    $currentIndex = -1;
+    foreach ($orderedRows as $index => $row) {
+        if ((int) $row['id'] === $moveId) {
+            $currentIndex = $index;
+            break;
+        }
+    }
+
+    if ($currentIndex === -1) {
+        header('Location: pelayanan.php?error=' . urlencode('Data pelayanan tidak ditemukan.'));
+        exit;
+    }
+
+    $targetIndex = $direction === 'up' ? $currentIndex - 1 : $currentIndex + 1;
+    if ($targetIndex < 0 || $targetIndex >= count($orderedRows)) {
+        header('Location: pelayanan.php');
+        exit;
+    }
+
+    $currentRow = $orderedRows[$currentIndex];
+    $targetRow = $orderedRows[$targetIndex];
+
+    $swapStmt = $conn->prepare(
+        "UPDATE pelayanan
+         SET urutan = CASE
+             WHEN id = ? THEN ?
+             WHEN id = ? THEN ?
+             ELSE urutan
+         END
+         WHERE id IN (?, ?)"
+    );
+    $swapStmt->bind_param(
+        "iiiiii",
+        $currentRow['id'],
+        $targetRow['urutan'],
+        $targetRow['id'],
+        $currentRow['urutan'],
+        $currentRow['id'],
+        $targetRow['id']
+    );
+
+    if ($swapStmt->execute()) {
+        $swapStmt->close();
+        header('Location: pelayanan.php?success=' . urlencode('Urutan pelayanan berhasil diperbarui.'));
+        exit;
+    }
+
+    $dbError = $swapStmt->error;
+    $swapStmt->close();
+    header('Location: pelayanan.php?error=' . urlencode('Gagal memperbarui urutan: ' . $dbError));
+    exit;
+}
+
+// =====================================================================
 // HANDLE DELETE ACTION
 // =====================================================================
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['action'] === 'delete') {
@@ -204,6 +278,14 @@ while ($row = $result->fetch_assoc()) {
     $pelayanan_list[] = $row;
 }
 $stmt->close();
+
+if (!isset($success) && isset($_GET['success']) && $_GET['success'] !== '') {
+    $success = trim((string) $_GET['success']);
+}
+
+if (!isset($error) && isset($_GET['error']) && $_GET['error'] !== '') {
+    $error = trim((string) $_GET['error']);
+}
 
 ?>
 <!DOCTYPE html>
@@ -450,11 +532,42 @@ $stmt->close();
             letter-spacing: 0.1px;
         }
 
+        .btn-order {
+            width: 40px;
+            min-width: 40px;
+            height: 34px;
+            padding: 0;
+            border-radius: 10px;
+            background: linear-gradient(135deg, #1e3a5f 0%, #146C94 100%);
+            color: #fff;
+            box-shadow: 0 6px 12px rgba(20, 108, 148, 0.22);
+        }
+
+        .btn-order:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 10px 16px rgba(20, 108, 148, 0.26);
+        }
+
+        .btn-order.is-disabled,
+        .btn-order.is-disabled:hover {
+            background: #d5dde6;
+            color: #8b9aac;
+            box-shadow: none;
+            transform: none;
+            cursor: not-allowed;
+            pointer-events: none;
+        }
+
         .actions {
             display: flex;
             flex-direction: column;
             gap: 8px;
             align-items: center;
+        }
+
+        .actions-order {
+            display: flex;
+            gap: 8px;
         }
 
         .form-group {
@@ -703,7 +816,6 @@ $stmt->close();
         <header class="admin-topbar">
             <div>
                 <h1>Kelola Pelayanan</h1>
-                <div class="admin-topbar-meta">Manajemen data bidang pelayanan jemaat</div>
             </div>
             <div class="admin-topbar-meta">Halo, <strong><?php echo htmlspecialchars($_SESSION['username'] ?? 'Admin'); ?></strong></div>
         </header>
@@ -727,6 +839,7 @@ $stmt->close();
     <div class="panel panel-list">
         <div class="panel-title list-title">Daftar Pelayanan</div>
         <?php if (count($pelayanan_list) > 0): ?>
+            <?php $total_rows = count($pelayanan_list); ?>
                 <table>
                     <thead>
                         <tr>
@@ -739,7 +852,7 @@ $stmt->close();
                         </tr>
                     </thead>
                     <tbody>
-                        <?php foreach ($pelayanan_list as $item): ?>
+                        <?php foreach ($pelayanan_list as $index => $item): ?>
                             <tr>
                                 <td><strong><?php echo htmlspecialchars($item['urutan']); ?></strong></td>
                                 <td><?php echo htmlspecialchars($item['judul']); ?></td>
@@ -758,6 +871,27 @@ $stmt->close();
                                 </td>
                                 <td>
                                     <div class="actions">
+                                        <div class="actions-order">
+                                            <?php if ($index > 0): ?>
+                                                <a href="?action=move&id=<?php echo $item['id']; ?>&direction=up" class="btn btn-order" title="Naik">
+                                                    <i class="fas fa-arrow-up"></i>
+                                                </a>
+                                            <?php else: ?>
+                                                <span class="btn btn-order is-disabled" title="Sudah paling atas">
+                                                    <i class="fas fa-arrow-up"></i>
+                                                </span>
+                                            <?php endif; ?>
+
+                                            <?php if ($index < $total_rows - 1): ?>
+                                                <a href="?action=move&id=<?php echo $item['id']; ?>&direction=down" class="btn btn-order" title="Turun">
+                                                    <i class="fas fa-arrow-down"></i>
+                                                </a>
+                                            <?php else: ?>
+                                                <span class="btn btn-order is-disabled" title="Sudah paling bawah">
+                                                    <i class="fas fa-arrow-down"></i>
+                                                </span>
+                                            <?php endif; ?>
+                                        </div>
                                         <a href="?edit_id=<?php echo $item['id']; ?>" class="btn btn-primary btn-small">
                                             <i class="fas fa-edit"></i> Edit
                                         </a>

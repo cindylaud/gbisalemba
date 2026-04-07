@@ -155,6 +155,28 @@ for ($i = 1; $i <= 4; $i++) {
         $with_image_count++;
     }
 }
+
+$selected_slot = isset($_GET['slot']) ? intval($_GET['slot']) : (isset($_POST['urutan']) ? intval($_POST['urutan']) : 1);
+if ($selected_slot < 1 || $selected_slot > 4) {
+    $selected_slot = 1;
+}
+
+$selected_card = $cards[$selected_slot] ?? null;
+$selected_has_image = false;
+$selected_image_path = '';
+$selected_is_active = false;
+
+if ($selected_card && !empty($selected_card['image']) && $selected_card['image'] !== 'default.png') {
+    $selected_file_path = __DIR__ . '/../uploads/slider/' . $selected_card['image'];
+    if (file_exists($selected_file_path)) {
+        $selected_has_image = true;
+        $selected_image_path = '../uploads/slider/' . $selected_card['image'];
+    }
+}
+
+if ($selected_card && !empty($selected_card['is_active'])) {
+    $selected_is_active = true;
+}
 ?>
 
 <!DOCTYPE html>
@@ -163,6 +185,7 @@ for ($i = 1; $i <= 4; $i++) {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Kelola Slider - Admin GBI Salemba</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <?php $admin_theme_path = dirname(__DIR__) . '/assets/css/admin-theme.css'; ?>
     <link rel="stylesheet" href="/<?php echo htmlspecialchars(basename(dirname(__DIR__))); ?>/assets/css/admin-theme.css?v=<?php echo urlencode((string) (is_file($admin_theme_path) ? filemtime($admin_theme_path) : time())); ?>">
     <style>
@@ -184,107 +207,253 @@ for ($i = 1; $i <= 4; $i++) {
             margin: 0;
         }
         
-        .slider-page-toolbar {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 12px;
-            margin-bottom: 16px;
-            flex-wrap: wrap;
-        }
-        
-        .back-link {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            padding: 10px 16px;
-            background: #1e3a5f;
-            color: #fff;
-            text-decoration: none;
-            border-radius: 999px;
-            font-weight: 600;
-            box-shadow: 0 8px 16px rgba(15, 39, 66, 0.1);
-            transition: transform 0.2s ease, box-shadow 0.2s ease;
-        }
-        
-        .back-link:hover {
-            color: #fff;
-            transform: translateY(-1px);
-            box-shadow: 0 16px 26px rgba(15, 39, 66, 0.18);
-        }
-
-        .slider-page-note {
-            margin: 0;
-            color: #6b7c93;
-            font-size: 12px;
-            font-weight: 500;
+        .admin-topbar {
+            border-radius: 14px;
         }
         
         .alert {
-            padding: 15px 20px;
-            margin-bottom: 20px;
-            border-radius: 8px;
-            font-weight: 500;
+            padding: 13px 16px;
+            margin-bottom: 16px;
+            border-radius: 12px;
+            font-weight: 600;
         }
-        
+
         .alert-success {
             background-color: #d4edda;
             color: #155724;
             border: 1px solid #c3e6cb;
         }
-        
+
         .alert-danger {
             background-color: #f8d7da;
             color: #721c24;
             border: 1px solid #f5c6cb;
         }
-        
-        .cards-grid {
+
+        .layout {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-            gap: 16px;
+            grid-template-columns: minmax(0, 1.18fr) minmax(320px, 0.82fr);
+            gap: 18px;
+            align-items: start;
         }
-        
-        @media (max-width: 768px) {
-            .cards-grid {
+
+        @media (max-width: 900px) {
+            .layout {
                 grid-template-columns: 1fr;
             }
         }
-        
-        .slider-card {
+
+        .panel {
+            background: linear-gradient(180deg, #ffffff 0%, #f8fbfe 100%);
+            border: 1px solid rgba(16, 44, 87, 0.1);
+            border-radius: 22px;
+            padding: 20px;
+            box-shadow: 0 12px 26px rgba(15, 39, 66, 0.08);
+        }
+
+        .panel-upload {
+            position: sticky;
+            top: 104px;
             background: #ffffff;
             border: 1px solid rgba(16, 44, 87, 0.08);
-            border-radius: 18px;
-            padding: 14px;
-            box-shadow: 0 8px 18px rgba(15, 39, 66, 0.06);
-            transition: transform 0.18s ease, box-shadow 0.18s ease;
-            overflow: hidden;
+            border-radius: 16px;
+            padding: 16px;
+            box-shadow: 0 4px 14px rgba(15, 39, 66, 0.05);
         }
-        
-        .slider-card:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 12px 24px rgba(15, 39, 66, 0.1);
-        }
-        
-        .card-title {
+
+        .panel-title {
             display: flex;
             align-items: center;
-            justify-content: space-between;
-            gap: 12px;
-            font-size: 16px;
-            font-weight: 700;
+            gap: 10px;
+            font-size: 19px;
+            font-weight: 800;
             color: #102C57;
-            margin-bottom: 12px;
-            text-align: left;
+            margin-bottom: 14px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid rgba(16, 44, 87, 0.1);
+        }
+
+        .panel-title::before {
+            font-family: 'Font Awesome 6 Free';
+            font-weight: 900;
+            color: #146C94;
+            font-size: 17px;
+        }
+
+        .list-title::before {
+            content: '\f03a';
+        }
+
+        .upload-title::before {
+            content: '\f030';
+        }
+
+        .panel-upload .panel-title {
+            gap: 8px;
+            margin-bottom: 10px;
             padding-bottom: 10px;
+            font-size: 18px;
             border-bottom: 1px solid rgba(16, 44, 87, 0.08);
         }
-        
+
+        .panel-upload .panel-title::before {
+            font-size: 16px;
+            color: #1f7aa3;
+        }
+
+        .panel-upload .slot-note {
+            margin-top: 0;
+            margin-bottom: 12px;
+            font-size: 11px;
+            color: #6f8099;
+            font-weight: 500;
+        }
+
+        .slot-note {
+            margin-top: -4px;
+            margin-bottom: 14px;
+            font-size: 12px;
+            color: #6b7c93;
+            font-weight: 600;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+            background: #fff;
+            border-radius: 14px;
+            overflow: hidden;
+            border: 1px solid rgba(16, 44, 87, 0.08);
+        }
+
+        thead th {
+            background: linear-gradient(180deg, #eff7fb 0%, #e4f0f5 100%);
+            color: #1e3a5f;
+            padding: 11px 12px;
+            text-align: left;
+            font-size: 12px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.45px;
+            border-bottom: 1px solid #d9e9ef;
+        }
+
+        thead th:nth-child(1),
+        tbody td:nth-child(1),
+        thead th:nth-child(3),
+        tbody td:nth-child(3),
+        thead th:nth-child(4),
+        tbody td:nth-child(4),
+        thead th:nth-child(5),
+        tbody td:nth-child(5) {
+            text-align: center;
+        }
+
+        tbody tr {
+            border-bottom: 1px solid #edf3f8;
+            transition: background 0.2s ease;
+        }
+
+        tbody tr:last-child {
+            border-bottom: none;
+        }
+
+        tbody tr:hover {
+            background-color: rgba(63, 182, 168, 0.06);
+        }
+
+        tbody tr.is-current {
+            background-color: rgba(20, 108, 148, 0.08);
+        }
+
+        tbody td {
+            padding: 12px;
+            vertical-align: middle;
+            font-size: 13px;
+        }
+
+        .thumb {
+            width: 96px;
+            height: 60px;
+            object-fit: cover;
+            border-radius: 10px;
+            display: block;
+            background: #eef4f8;
+            border: 1px solid rgba(16, 44, 87, 0.1);
+        }
+
+        .thumb-placeholder {
+            width: 96px;
+            height: 60px;
+            background: #eef4f8;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            color: #8fa1b4;
+            border: 1px dashed rgba(16, 44, 87, 0.18);
+        }
+
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 5px 10px;
+            border-radius: 999px;
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.4px;
+        }
+
+        .badge-active {
+            background: rgba(47, 158, 68, 0.14);
+            color: #1f6a31;
+        }
+
+        .badge-inactive {
+            background: rgba(108, 117, 125, 0.14);
+            color: #4f5963;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            padding: 8px 12px;
+            border-radius: 10px;
+            font-size: 12px;
+            font-weight: 700;
+            text-decoration: none;
+            cursor: pointer;
+            border: none;
+            transition: all 0.2s ease;
+            white-space: nowrap;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #1e3a5f 0%, #146C94 100%);
+            color: #fff;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 8px 14px rgba(20, 108, 148, 0.24);
+            color: #fff;
+        }
+
+        .btn-manage {
+            width: 112px;
+        }
+
         .preview-box {
             width: 100%;
             aspect-ratio: 16 / 9;
-            background: #f4f7fb;
-            border: 1px solid rgba(16, 44, 87, 0.08);
+            background: #eef4f8;
+            border: 1px solid rgba(16, 44, 87, 0.1);
             border-radius: 16px;
             display: flex;
             align-items: center;
@@ -293,53 +462,77 @@ for ($i = 1; $i <= 4; $i++) {
             overflow: hidden;
             position: relative;
         }
-        
+
+        .panel-upload .preview-box {
+            margin-bottom: 10px;
+            border-radius: 12px;
+            border-color: rgba(16, 44, 87, 0.08);
+            background: #f5f8fb;
+        }
+
         .preview-box img {
             width: 100%;
             height: 100%;
             object-fit: cover;
             display: block;
         }
-        
+
         .preview-box .placeholder {
             text-align: center;
             color: #6b7c93;
         }
-        
+
         .preview-box .placeholder .icon {
             font-size: 34px;
             margin-bottom: 6px;
             opacity: 0.5;
         }
-        
+
         .preview-box .placeholder .text {
             font-size: 12px;
             font-weight: 600;
         }
-        
+
         .form-group {
-            margin-bottom: 9px;
+            margin-bottom: 16px;
         }
-        
+
+        .panel-upload .form-group {
+            margin-bottom: 12px;
+        }
+
         .form-group label {
             display: block;
-            margin-bottom: 8px;
-            font-weight: 600;
+            margin-bottom: 6px;
+            font-weight: 700;
             color: #102C57;
-            font-size: 12px;
+            font-size: 13px;
         }
-        
+
+        .panel-upload .form-group label {
+            font-size: 12px;
+            font-weight: 700;
+            color: #2c4567;
+        }
+
         .form-group input[type="file"] {
             width: 100%;
-            padding: 10px;
-            border: 1px solid rgba(20, 108, 148, 0.2);
-            border-radius: 10px;
-            font-size: 12px;
+            padding: 10px 12px;
+            border: 1px solid rgba(16, 44, 87, 0.2);
+            border-radius: 12px;
+            font-size: 13px;
             background: white;
             cursor: pointer;
             transition: border-color 0.2s ease, box-shadow 0.2s ease;
         }
-        
+
+        .panel-upload .form-group input[type="file"] {
+            padding: 8px 10px;
+            border-radius: 10px;
+            font-size: 12px;
+            border-color: rgba(16, 44, 87, 0.16);
+        }
+
         .form-group input[type="file"]:hover {
             border-color: rgba(20, 108, 148, 0.5);
         }
@@ -348,84 +541,108 @@ for ($i = 1; $i <= 4; $i++) {
             outline: none;
             box-shadow: 0 0 0 0.2rem rgba(63, 182, 168, 0.14);
         }
-        
+
         .info-text {
-            font-size: 11px;
+            font-size: 12px;
             color: #6b7c93;
             margin-top: 5px;
             font-style: italic;
-            line-height: 1.5;
+            line-height: 1.45;
         }
-        
+
+        .panel-upload .info-text {
+            font-size: 11px;
+            line-height: 1.4;
+            margin-top: 4px;
+        }
+
         .checkbox-group {
             display: flex;
             align-items: center;
             gap: 10px;
-            margin-bottom: 12px;
+            margin-bottom: 14px;
             padding: 11px 12px;
             background: #f8fbfd;
             border: 1px solid rgba(16, 44, 87, 0.08);
             border-radius: 12px;
         }
-        
+
+        .panel-upload .checkbox-group {
+            margin-bottom: 12px;
+            padding: 9px 10px;
+            border-radius: 10px;
+            background: #fafcfe;
+        }
+
         .checkbox-group input[type="checkbox"] {
             width: 20px;
             height: 20px;
             cursor: pointer;
             accent-color: #146C94;
         }
-        
+
         .checkbox-group label {
-            font-weight: 600;
+            font-weight: 700;
             color: #102C57;
             cursor: pointer;
             user-select: none;
             margin: 0;
-            font-size: 12px;
+            font-size: 13px;
         }
-        
+
+        .panel-upload .checkbox-group label {
+            font-size: 12px;
+            font-weight: 600;
+        }
+
         .btn-submit {
-            width: 100%;
-            padding: 12px 18px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            width: fit-content;
+            min-width: 170px;
+            padding: 8px 12px;
             border: none;
             border-radius: 10px;
-            font-size: 13px;
+            font-size: 12px;
             font-weight: 700;
             cursor: pointer;
             transition: all 0.2s ease;
-            background: #146C94;
+            background: linear-gradient(135deg, #1e3a5f 0%, #146C94 100%);
             color: white;
-            text-transform: uppercase;
-            letter-spacing: 0.35px;
+            letter-spacing: 0.15px;
         }
 
-        .btn-submit::before {
-            content: '\\f0c7';
-            font-family: 'Font Awesome 6 Free';
-            font-weight: 900;
-            margin-right: 8px;
-        }
-        
         .btn-submit:hover {
             transform: translateY(-1px);
-            box-shadow: 0 8px 16px rgba(20, 108, 148, 0.18);
+            box-shadow: 0 10px 18px rgba(20, 108, 148, 0.24);
         }
-        
+
         .btn-submit:active {
             transform: translateY(0);
         }
-        
+
         .status-badge {
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            padding: 5px 9px;
+            padding: 5px 11px;
             border-radius: 999px;
-            font-size: 9px;
+            font-size: 11px;
             font-weight: 700;
-            margin-top: 0;
-            letter-spacing: 0.35px;
+            letter-spacing: 0.4px;
             text-transform: uppercase;
+        }
+
+        .status-row {
+            margin-bottom: 10px;
+        }
+
+        .panel-upload .status-badge {
+            padding: 4px 10px;
+            font-size: 10px;
+            letter-spacing: 0.3px;
         }
         
         .status-active {
@@ -439,25 +656,23 @@ for ($i = 1; $i <= 4; $i++) {
         }
 
         @media (max-width: 768px) {
-            .slider-page-toolbar {
-                align-items: stretch;
-            }
-
-            .back-link {
-                width: 100%;
-                justify-content: center;
-            }
-
-            .cards-grid {
-                grid-template-columns: 1fr;
-            }
-
-            .card-title {
-                font-size: 15px;
+            table th,
+            table td {
+                padding: 10px;
             }
 
             .preview-box {
                 aspect-ratio: 16 / 10;
+            }
+
+            .panel-upload {
+                position: static;
+                top: auto;
+            }
+
+            .btn-manage {
+                width: 100%;
+                min-width: 0;
             }
         }
     </style>
@@ -469,17 +684,11 @@ for ($i = 1; $i <= 4; $i++) {
             <header class="admin-topbar">
                 <div>
                     <h1>Kelola Slider</h1>
-                    <div class="admin-topbar-meta">Atur 4 hero visual utama di beranda gereja</div>
                 </div>
                 <div class="admin-topbar-meta">Halo, <strong><?php echo htmlspecialchars($_SESSION['username'] ?? 'Admin'); ?></strong></div>
             </header>
             <div class="admin-content">
     <div class="container">
-        <div class="slider-page-toolbar">
-            <a href="index.php" class="back-link">← Kembali ke Dashboard</a>
-            <p class="slider-page-note">Tersedia 4 slot foto utama. Upload, aktifkan, lalu simpan perubahan per kartu.</p>
-        </div>
-        
         <?php if ($message): ?>
             <div class="alert alert-success">✓ <?php echo htmlspecialchars($message); ?></div>
         <?php endif; ?>
@@ -487,65 +696,97 @@ for ($i = 1; $i <= 4; $i++) {
         <?php if ($error): ?>
             <div class="alert alert-danger">✗ <?php echo htmlspecialchars($error); ?></div>
         <?php endif; ?>
-        
-        <div class="cards-grid">
-            <?php for ($i = 1; $i <= 4; $i++): 
-                $card_data = isset($cards[$i]) ? $cards[$i] : null;
-                
-                // Cek gambar: harus ada nilai (bukan default.png) dan file fisik exists
-                $has_image = false;
-                if ($card_data && !empty($card_data['image']) && $card_data['image'] !== 'default.png') {
-                    $file_path = __DIR__ . '/../uploads/slider/' . $card_data['image'];
-                    $has_image = file_exists($file_path);
-                }
-                
-                $image_path = $has_image ? '../uploads/slider/' . $card_data['image'] : '';
-                $is_active = $card_data && $card_data['is_active'] == 1;
-            ?>
-                <div class="slider-card">
-                    <div class="card-title">
-                        <span>Foto <?php echo $i; ?></span>
-                        <span class="status-badge <?php echo $is_active ? 'status-active' : 'status-inactive'; ?>"><?php echo $is_active ? 'AKTIF' : 'NONAKTIF'; ?></span>
-                    </div>
-                    
-                    <div class="preview-box">
-                        <?php if ($has_image): ?>
-                            <img src="<?php echo htmlspecialchars($image_path); ?>" 
-                                 alt="Slider <?php echo $i; ?>"
-                                 title="Slider <?php echo $i; ?>">
-                        <?php else: ?>
-                            <div class="placeholder">
-                                <div class="icon">📷</div>
-                                <div class="text">Belum ada gambar</div>
-                            </div>
-                        <?php endif; ?>
-                    </div>
-                    
-                    <form method="POST" enctype="multipart/form-data">
-                        <input type="hidden" name="urutan" value="<?php echo $i; ?>">
-                        
-                        <div class="form-group">
-                            <label for="image_<?php echo $i; ?>">Upload Gambar Baru</label>
-                            <input type="file" 
-                                   id="image_<?php echo $i; ?>" 
-                                   name="image" 
-                                   accept=".jpg,.jpeg,.png,.webp">
-                            <p class="info-text">JPG, JPEG, PNG, WEBP • Maksimal 30MB • Auto resize & optimize</p>
+
+        <div class="layout">
+            <div class="panel panel-list">
+                <div class="panel-title list-title">Daftar Slider</div>
+                <p class="slot-note">Pilih slot yang ingin dikelola, lalu ubah di panel kanan.</p>
+
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Slot</th>
+                            <th>Preview</th>
+                            <th>Status</th>
+                            <th>Pakai Foto</th>
+                            <th>Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php for ($i = 1; $i <= 4; $i++): ?>
+                            <?php
+                                $card_data = $cards[$i] ?? null;
+                                $has_image = false;
+                                $image_path = '';
+                                if ($card_data && !empty($card_data['image']) && $card_data['image'] !== 'default.png') {
+                                    $file_path = __DIR__ . '/../uploads/slider/' . $card_data['image'];
+                                    if (file_exists($file_path)) {
+                                        $has_image = true;
+                                        $image_path = '../uploads/slider/' . $card_data['image'];
+                                    }
+                                }
+                                $is_active = $card_data && $card_data['is_active'] == 1;
+                            ?>
+                            <tr class="<?php echo $selected_slot === $i ? 'is-current' : ''; ?>">
+                                <td><strong>Foto <?php echo $i; ?></strong></td>
+                                <td>
+                                    <?php if ($has_image): ?>
+                                        <img src="<?php echo htmlspecialchars($image_path); ?>" alt="Slider <?php echo $i; ?>" class="thumb">
+                                    <?php else: ?>
+                                        <div class="thumb-placeholder"><i class="fas fa-camera"></i></div>
+                                    <?php endif; ?>
+                                </td>
+                                <td>
+                                    <span class="badge <?php echo $is_active ? 'badge-active' : 'badge-inactive'; ?>">
+                                        <?php echo $is_active ? 'Aktif' : 'Nonaktif'; ?>
+                                    </span>
+                                </td>
+                                <td><?php echo $has_image ? 'Ya' : 'Tidak'; ?></td>
+                                <td>
+                                    <a href="?slot=<?php echo $i; ?>" class="btn btn-primary btn-manage">Kelola</a>
+                                </td>
+                            </tr>
+                        <?php endfor; ?>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="panel panel-upload">
+                <div class="panel-title upload-title">Kelola Foto <?php echo $selected_slot; ?></div>
+                <p class="slot-note">Upload gambar baru atau ubah status tayang untuk slot terpilih.</p>
+
+                <div class="preview-box">
+                    <?php if ($selected_has_image): ?>
+                        <img src="<?php echo htmlspecialchars($selected_image_path); ?>" alt="Slider <?php echo $selected_slot; ?>" title="Slider <?php echo $selected_slot; ?>">
+                    <?php else: ?>
+                        <div class="placeholder">
+                            <div class="icon"><i class="fas fa-camera"></i></div>
+                            <div class="text">Belum ada gambar</div>
                         </div>
-                        
-                        <div class="checkbox-group">
-                            <input type="checkbox" 
-                                   id="active_<?php echo $i; ?>" 
-                                   name="is_active" 
-                                   value="1" 
-                                   <?php echo $is_active ? 'checked' : ''; ?>>
-                            <label for="active_<?php echo $i; ?>">Tampilkan di Frontend</label>
-                        </div>
-                        
-                        <button type="submit" class="btn-submit">💾 Simpan Perubahan</button>
-                    </form>
+                    <?php endif; ?>
                 </div>
-            <?php endfor; ?>
+
+                <div class="status-row">
+                    <span class="status-badge <?php echo $selected_is_active ? 'status-active' : 'status-inactive'; ?>"><?php echo $selected_is_active ? 'AKTIF' : 'NONAKTIF'; ?></span>
+                </div>
+
+                <form method="POST" enctype="multipart/form-data">
+                    <input type="hidden" name="urutan" value="<?php echo $selected_slot; ?>">
+
+                    <div class="form-group">
+                        <label for="image_selected">Upload Gambar Baru</label>
+                        <input type="file" id="image_selected" name="image" accept=".jpg,.jpeg,.png,.webp">
+                        <p class="info-text">JPG, JPEG, PNG, WEBP • Maksimal 30MB • Auto resize & optimize</p>
+                    </div>
+
+                    <div class="checkbox-group">
+                        <input type="checkbox" id="active_selected" name="is_active" value="1" <?php echo $selected_is_active ? 'checked' : ''; ?>>
+                        <label for="active_selected">Tampilkan di Frontend</label>
+                    </div>
+
+                    <button type="submit" class="btn-submit"><i class="fas fa-save"></i> Simpan Perubahan</button>
+                </form>
+            </div>
         </div>
     </div>
             </div>

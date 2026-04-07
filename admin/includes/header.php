@@ -29,5 +29,6 @@ $adminThemeVersion = is_file($adminThemePath) ? filemtime($adminThemePath) : tim
 			<div>
 				<h1><?php echo htmlspecialchars($pageTitle); ?></h1>
 			</div>
+			<div class="admin-topbar-meta">Halo, <strong><?php echo htmlspecialchars($_SESSION['username'] ?? 'Admin'); ?></strong></div>
 		</header>
 		<div class="admin-content">

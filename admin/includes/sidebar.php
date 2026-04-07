@@ -35,8 +35,7 @@ $menuItems = [
 	<div class="admin-brand">
 		<img src="<?php echo htmlspecialchars($baseUrl); ?>/assets/images/logo/logo%20gbi.png" alt="Logo GBI">
 		<div>
-			<p class="admin-brand-title">GBI Admin</p>
-			<p class="admin-brand-subtitle">Salemba Ministry Panel</p>
+			<p class="admin-brand-title">GBI Salemba</p>
 		</div>
 	</div>
 

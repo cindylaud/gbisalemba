@@ -483,7 +483,6 @@ while ($row = $res->fetch_assoc()) {
             font-size: 13px;
             color: #102C57;
         }
-        .form-group input[type="file"],
         .form-group input[type="number"] {
             width: 100%;
             padding: 10px 12px;
@@ -492,6 +491,79 @@ while ($row = $res->fetch_assoc()) {
             font-size: 13px;
             background: white;
             transition: border-color 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .file-upload-wrap {
+            border: 1px dashed rgba(20, 108, 148, 0.35);
+            border-radius: 12px;
+            background: linear-gradient(180deg, rgba(255, 255, 255, 0.92) 0%, rgba(240, 247, 252, 0.9) 100%);
+            padding: 12px;
+            transition: border-color 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .file-upload-wrap.is-highlight {
+            border-color: rgba(20, 108, 148, 0.62);
+            box-shadow: 0 0 0 0.2rem rgba(63, 182, 168, 0.14);
+        }
+
+        .file-input-native {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            padding: 0;
+            margin: -1px;
+            overflow: hidden;
+            clip: rect(0, 0, 0, 0);
+            white-space: nowrap;
+            border: 0;
+        }
+
+        .file-upload-button {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            border: none;
+            border-radius: 10px;
+            padding: 10px 14px;
+            background: linear-gradient(135deg, #1e3a5f 0%, #146C94 100%);
+            color: #fff;
+            font-size: 12px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .file-upload-button:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 8px 14px rgba(20, 108, 148, 0.22);
+        }
+
+        .file-upload-name {
+            margin-top: 10px;
+            padding: 9px 10px;
+            border-radius: 9px;
+            border: 1px solid rgba(16, 44, 87, 0.15);
+            background: rgba(255, 255, 255, 0.86);
+            font-size: 12px;
+            color: #405f7b;
+            font-weight: 600;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .file-upload-meta {
+            margin-top: 10px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 12px;
+            color: #59708a;
+            font-weight: 600;
+        }
+
+        .file-upload-meta i {
+            color: #146C94;
         }
         .form-group input:focus {
             outline: none;
@@ -507,22 +579,26 @@ while ($row = $res->fetch_assoc()) {
         }
 
         .btn-submit {
-            width: 100%;
-            padding: 13px 20px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            width: fit-content;
+            min-width: 170px;
+            padding: 8px 12px;
             border: none;
-            border-radius: 12px;
-            font-size: 14px;
+            border-radius: 10px;
+            font-size: 12px;
             font-weight: 700;
             cursor: pointer;
             transition: all 0.2s ease;
             background: linear-gradient(135deg, #1e3a5f 0%, #146C94 100%);
             color: white;
-            text-transform: uppercase;
-            letter-spacing: 0.4px;
+            letter-spacing: 0.15px;
         }
 
         .btn-submit i {
-            font-size: 13px;
+            font-size: 11px;
         }
         .btn-submit:hover {
             transform: translateY(-1px);
@@ -753,11 +829,22 @@ while ($row = $res->fetch_assoc()) {
 
                 <div class="form-group">
                     <label for="image">Pilih Gambar *</label>
-                    <input type="file"
-                           id="image"
-                           name="image"
-                           accept=".jpg,.jpeg,.png,.webp"
-                           required>
+                    <div class="file-upload-wrap" id="coming_file_wrap">
+                        <input type="file"
+                               id="image"
+                               class="file-input-native"
+                               name="image"
+                               accept=".jpg,.jpeg,.png,.webp"
+                               required>
+                        <button type="button" id="coming_file_button" class="file-upload-button">
+                            <i class="fas fa-cloud-upload-alt"></i> Pilih Gambar
+                        </button>
+                        <div class="file-upload-name" id="coming_file_name">Belum ada file dipilih</div>
+                        <div class="file-upload-meta">
+                            <i class="fas fa-file-image"></i>
+                            <span>Upload gambar terbaik untuk Coming Soon</span>
+                        </div>
+                    </div>
                     <p class="info-text">Format: JPG, JPEG, PNG, WEBP &bull; Maks. 50MB &bull; Otomatis diubah ke WEBP (maks. 1920px, quality 80)</p>
                 </div>
 
@@ -771,7 +858,7 @@ while ($row = $res->fetch_assoc()) {
                     <p class="info-text">Angka lebih kecil tampil lebih awal</p>
                 </div>
 
-                <button type="submit" class="btn-submit"><i class="fas fa-upload"></i> Upload Gambar</button>
+                <button type="submit" class="btn-submit"><i class="fas fa-save"></i> Simpan Data</button>
             </form>
         </div>
 
@@ -781,6 +868,35 @@ while ($row = $res->fetch_assoc()) {
         </div>
     </main>
 </div>
+<script>
+(function () {
+    const input = document.getElementById('image');
+    const button = document.getElementById('coming_file_button');
+    const fileName = document.getElementById('coming_file_name');
+    const wrap = document.getElementById('coming_file_wrap');
+
+    if (!input || !button || !fileName || !wrap) {
+        return;
+    }
+
+    button.addEventListener('click', function () {
+        input.click();
+    });
+
+    input.addEventListener('change', function () {
+        const file = input.files && input.files[0] ? input.files[0] : null;
+        fileName.textContent = file ? file.name : 'Belum ada file dipilih';
+    });
+
+    button.addEventListener('dragenter', function () {
+        wrap.classList.add('is-highlight');
+    });
+
+    button.addEventListener('dragleave', function () {
+        wrap.classList.remove('is-highlight');
+    });
+})();
+</script>
 </body>
 </html>
 
