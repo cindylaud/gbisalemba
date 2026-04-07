@@ -1,6 +1,16 @@
 <?php
+// Enable error reporting untuk debugging
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
+
 require_once __DIR__ . '/../config/database.php';
 require_once __DIR__ . '/includes/auth.php';
+
+// Cek database connection
+if ($conn->connect_error) {
+    die('Error: Koneksi database gagal - ' . htmlspecialchars($conn->connect_error));
+}
 
 // =====================================================================
 // KONFIGURASI UPLOAD
@@ -11,19 +21,24 @@ define('ALLOWED_MIME', 'application/pdf');
 
 // Pastikan folder upload ada
 if (!is_dir(UPLOAD_DIR)) {
-    mkdir(UPLOAD_DIR, 0755, true);
+    @mkdir(UPLOAD_DIR, 0755, true);
 }
 
 // =====================================================================
 // AMBIL DATA FORMULIR UNTUK LIST
 // =====================================================================
+$formulir_list = [];
 $stmt = $conn->prepare("SELECT id, nama_formulir, file, deskripsi, status, urutan, created_at 
                        FROM formulir 
                        ORDER BY urutan ASC");
-$stmt->execute();
-$result = $stmt->get_result();
-$formulir_list = $result->fetch_all(MYSQLI_ASSOC);
-$stmt->close();
+if ($stmt) {
+    $stmt->execute();
+    $result = $stmt->get_result();
+    $formulir_list = $result->fetch_all(MYSQLI_ASSOC) ?? [];
+    $stmt->close();
+} else {
+    $error = 'Query error: ' . $conn->error;
+}
 
 // =====================================================================
 // HANDLE EDIT DATA (Load data jika ada parameter edit_id)
@@ -34,13 +49,15 @@ if (isset($_GET['edit_id'])) {
     $stmt = $conn->prepare("SELECT id, nama_formulir, file, deskripsi, status, urutan 
                            FROM formulir 
                            WHERE id = ?");
-    $stmt->bind_param("i", $edit_id);
-    $stmt->execute();
-    $result = $stmt->get_result();
-    if ($result->num_rows > 0) {
-        $edit_data = $result->fetch_assoc();
+    if ($stmt) {
+        $stmt->bind_param("i", $edit_id);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        if ($result->num_rows > 0) {
+            $edit_data = $result->fetch_assoc();
+        }
+        $stmt->close();
     }
-    $stmt->close();
 }
 
 // =====================================================================
@@ -385,7 +402,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['form_action'])) {
     <title>Kelola Formulir - Admin GBI Salemba</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <?php $admin_theme_path = dirname(__DIR__) . '/assets/css/admin-theme.css'; ?>
-    <link rel="stylesheet" href="/<?php echo htmlspecialchars(basename(dirname(__DIR__))); ?>/assets/css/admin-theme.css?v=<?php echo urlencode((string) (is_file($admin_theme_path) ? filemtime($admin_theme_path) : time())); ?>">
+    <?php
+    $admin_script_path = str_replace('\\', '/', $_SERVER['SCRIPT_NAME'] ?? '');
+    $admin_base_url = strpos($admin_script_path, '/admin/') !== false
+        ? substr($admin_script_path, 0, strpos($admin_script_path, '/admin/'))
+        : rtrim(str_replace('\\', '/', dirname($admin_script_path)), '/');
+    if ($admin_base_url === '/') {
+        $admin_base_url = '';
+    }
+    ?>
+    <link rel="stylesheet" href="<?php echo htmlspecialchars($admin_base_url); ?>/assets/css/admin-theme.css?v=<?php echo urlencode((string) (is_file($admin_theme_path) ? filemtime($admin_theme_path) : time())); ?>">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
 

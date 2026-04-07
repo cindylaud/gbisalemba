@@ -31,7 +31,16 @@ $stmt->close();
     <title>Kelola Formulir - Admin GBI Salemba</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <?php $admin_theme_path = dirname(__DIR__) . '/assets/css/admin-theme.css'; ?>
-    <link rel="stylesheet" href="/<?php echo htmlspecialchars(basename(dirname(__DIR__))); ?>/assets/css/admin-theme.css?v=<?php echo urlencode((string) (is_file($admin_theme_path) ? filemtime($admin_theme_path) : time())); ?>">
+    <?php
+    $admin_script_path = str_replace('\\', '/', $_SERVER['SCRIPT_NAME'] ?? '');
+    $admin_base_url = strpos($admin_script_path, '/admin/') !== false
+        ? substr($admin_script_path, 0, strpos($admin_script_path, '/admin/'))
+        : rtrim(str_replace('\\', '/', dirname($admin_script_path)), '/');
+    if ($admin_base_url === '/') {
+        $admin_base_url = '';
+    }
+    ?>
+    <link rel="stylesheet" href="<?php echo htmlspecialchars($admin_base_url); ?>/assets/css/admin-theme.css?v=<?php echo urlencode((string) (is_file($admin_theme_path) ? filemtime($admin_theme_path) : time())); ?>">
     <style>
         * {
             margin: 0;

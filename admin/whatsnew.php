@@ -1,4 +1,9 @@
 <?php
+// Enable error reporting untuk debugging
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
+
 require_once __DIR__ . '/../config/database.php';
 require_once __DIR__ . '/includes/auth.php';
 require_once __DIR__ . '/../includes/image-helper.php';
@@ -10,7 +15,7 @@ define('WN_ALLOWED',    ['jpg', 'jpeg', 'png', 'webp']);
 define('WN_MAX_WIDTH',  1920);
 define('WN_WEBP_QUALITY', 80);
 
-function ensureComingSoonTable(mysqli $conn): void {
+function ensureComingSoonTable($conn) {
     $hasComingSoon = false;
     $hasWhatsNew = false;
 
@@ -25,12 +30,15 @@ function ensureComingSoonTable(mysqli $conn): void {
     }
 
     if (!$hasComingSoon && $hasWhatsNew) {
-        $conn->query("RENAME TABLE whats_new TO coming_soon");
+        $rename_result = $conn->query("RENAME TABLE whats_new TO coming_soon");
+        if ($rename_result === false) {
+            return "Error renaming table: " . $conn->error;
+        }
         $hasComingSoon = true;
     }
 
     if (!$hasComingSoon) {
-        $conn->query(
+        $create_result = $conn->query(
             "CREATE TABLE IF NOT EXISTS coming_soon (
                 id INT AUTO_INCREMENT PRIMARY KEY,
                 image VARCHAR(255) NOT NULL,
@@ -39,10 +47,18 @@ function ensureComingSoonTable(mysqli $conn): void {
                 created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
             )"
         );
+        if ($create_result === false) {
+            return "Error creating table: " . $conn->error;
+        }
     }
+    
+    return null; // Success
 }
 
-ensureComingSoonTable($conn);
+$table_error = ensureComingSoonTable($conn);
+if ($table_error !== null) {
+    die('Error: ' . htmlspecialchars($table_error));
+}
 
 $message = '';
 $error   = '';
@@ -207,8 +223,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
 // ============================================================
 $items = [];
 $res = $conn->query("SELECT * FROM " . COMING_SOON_TABLE . " ORDER BY urutan ASC");
-while ($row = $res->fetch_assoc()) {
-    $items[] = $row;
+if ($res === false) {
+    $error = 'Gagal mengambil data: ' . $conn->error;
+} else {
+    while ($row = $res->fetch_assoc()) {
+        $items[] = $row;
+    }
 }
 ?>
 <!DOCTYPE html>
@@ -219,7 +239,16 @@ while ($row = $res->fetch_assoc()) {
     <title>Kelola Coming Soon - Admin GBI Salemba</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <?php $admin_theme_path = dirname(__DIR__) . '/assets/css/admin-theme.css'; ?>
-    <link rel="stylesheet" href="/<?php echo htmlspecialchars(basename(dirname(__DIR__))); ?>/assets/css/admin-theme.css?v=<?php echo urlencode((string) (is_file($admin_theme_path) ? filemtime($admin_theme_path) : time())); ?>">
+    <?php
+    $admin_script_path = str_replace('\\', '/', $_SERVER['SCRIPT_NAME'] ?? '');
+    $admin_base_url = strpos($admin_script_path, '/admin/') !== false
+        ? substr($admin_script_path, 0, strpos($admin_script_path, '/admin/'))
+        : rtrim(str_replace('\\', '/', dirname($admin_script_path)), '/');
+    if ($admin_base_url === '/') {
+        $admin_base_url = '';
+    }
+    ?>
+    <link rel="stylesheet" href="<?php echo htmlspecialchars($admin_base_url); ?>/assets/css/admin-theme.css?v=<?php echo urlencode((string) (is_file($admin_theme_path) ? filemtime($admin_theme_path) : time())); ?>">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
 

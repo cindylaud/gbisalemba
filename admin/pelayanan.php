@@ -1,6 +1,21 @@
 <?php
+// Enable error reporting untuk debugging
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
+
 require_once __DIR__ . '/../config/database.php';
 require_once __DIR__ . '/includes/auth.php';
+
+// Cek database connection
+if ($conn->connect_error) {
+    die('Error: Koneksi database gagal - ' . htmlspecialchars($conn->connect_error));
+}
+
+// Load image helper with error handling
+if (!file_exists(__DIR__ . '/../includes/image-helper.php')) {
+    die('Error: File image-helper.php tidak ditemukan');
+}
 require_once __DIR__ . '/../includes/image-helper.php';
 
 // Define constants
@@ -9,7 +24,7 @@ define('UPLOAD_DIR', '../uploads/pelayanan/');
 define('MAX_IMAGE_WIDTH', 1600); // pixels
 define('JPEG_QUALITY', 80); // 0-100
 
-function ensurePelayananPositionColumn(mysqli $conn) {
+function ensurePelayananPositionColumn($conn) {
     $check = $conn->query("SHOW COLUMNS FROM pelayanan LIKE 'foto_posisi_y'");
     if ($check && $check->num_rows === 0) {
         $conn->query("ALTER TABLE pelayanan ADD COLUMN foto_posisi_y TINYINT UNSIGNED NOT NULL DEFAULT 50 AFTER foto");
@@ -17,80 +32,6 @@ function ensurePelayananPositionColumn(mysqli $conn) {
 }
 
 ensurePelayananPositionColumn($conn);
-
-// =====================================================================
-// HANDLE MOVE ORDER (UP / DOWN)
-// =====================================================================
-if (isset($_GET['action']) && $_GET['action'] === 'move' && isset($_GET['id'], $_GET['direction'])) {
-    $moveId = intval($_GET['id']);
-    $direction = $_GET['direction'] === 'up' ? 'up' : ($_GET['direction'] === 'down' ? 'down' : '');
-
-    if ($moveId <= 0 || $direction === '') {
-        header('Location: pelayanan.php?error=' . urlencode('Permintaan pindah urutan tidak valid.'));
-        exit;
-    }
-
-    $orderedRows = [];
-    $stmtMove = $conn->prepare("SELECT id, urutan FROM pelayanan ORDER BY urutan ASC, id ASC");
-    $stmtMove->execute();
-    $moveResult = $stmtMove->get_result();
-    while ($row = $moveResult->fetch_assoc()) {
-        $orderedRows[] = $row;
-    }
-    $stmtMove->close();
-
-    $currentIndex = -1;
-    foreach ($orderedRows as $index => $row) {
-        if ((int) $row['id'] === $moveId) {
-            $currentIndex = $index;
-            break;
-        }
-    }
-
-    if ($currentIndex === -1) {
-        header('Location: pelayanan.php?error=' . urlencode('Data pelayanan tidak ditemukan.'));
-        exit;
-    }
-
-    $targetIndex = $direction === 'up' ? $currentIndex - 1 : $currentIndex + 1;
-    if ($targetIndex < 0 || $targetIndex >= count($orderedRows)) {
-        header('Location: pelayanan.php');
-        exit;
-    }
-
-    $currentRow = $orderedRows[$currentIndex];
-    $targetRow = $orderedRows[$targetIndex];
-
-    $swapStmt = $conn->prepare(
-        "UPDATE pelayanan
-         SET urutan = CASE
-             WHEN id = ? THEN ?
-             WHEN id = ? THEN ?
-             ELSE urutan
-         END
-         WHERE id IN (?, ?)"
-    );
-    $swapStmt->bind_param(
-        "iiiiii",
-        $currentRow['id'],
-        $targetRow['urutan'],
-        $targetRow['id'],
-        $currentRow['urutan'],
-        $currentRow['id'],
-        $targetRow['id']
-    );
-
-    if ($swapStmt->execute()) {
-        $swapStmt->close();
-        header('Location: pelayanan.php?success=' . urlencode('Urutan pelayanan berhasil diperbarui.'));
-        exit;
-    }
-
-    $dbError = $swapStmt->error;
-    $swapStmt->close();
-    header('Location: pelayanan.php?error=' . urlencode('Gagal memperbarui urutan: ' . $dbError));
-    exit;
-}
 
 // =====================================================================
 // HANDLE DELETE ACTION
@@ -294,9 +235,21 @@ if (!isset($error) && isset($_GET['error']) && $_GET['error'] !== '') {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Kelola Pelayanan - Admin GBI Salemba</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <?php $admin_theme_path = dirname(__DIR__) . '/assets/css/admin-theme.css'; ?>
-    <link rel="stylesheet" href="/<?php echo htmlspecialchars(basename(dirname(__DIR__))); ?>/assets/css/admin-theme.css?v=<?php echo urlencode((string) (is_file($admin_theme_path) ? filemtime($admin_theme_path) : time())); ?>">
+    <?php
+    $admin_script_path = str_replace('\\', '/', $_SERVER['SCRIPT_NAME'] ?? '');
+    $admin_base_url = strpos($admin_script_path, '/admin/') !== false
+        ? substr($admin_script_path, 0, strpos($admin_script_path, '/admin/'))
+        : rtrim(str_replace('\\', '/', dirname($admin_script_path)), '/');
+    if ($admin_base_url === '/') {
+        $admin_base_url = '';
+    }
+    ?>
+    <link rel="stylesheet" href="<?php echo htmlspecialchars($admin_base_url); ?>/assets/css/admin-theme.css?v=<?php echo urlencode((string) (is_file($admin_theme_path) ? filemtime($admin_theme_path) : time())); ?>">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
 
@@ -305,6 +258,9 @@ if (!isset($error) && isset($_GET['error']) && $_GET['error'] !== '') {
             background-color: #F3F9FB;
             color: #102C57;
             line-height: 1.6;
+            overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
         }
 
         .container {
@@ -337,9 +293,15 @@ if (!isset($error) && isset($_GET['error']) && $_GET['error'] !== '') {
 
         .layout {
             display: grid;
-            grid-template-columns: minmax(0, 1.2fr) minmax(360px, 0.8fr);
-            gap: 18px;
-            align-items: start;
+            grid-template-columns: 1.2fr 0.8fr;
+            gap: 20px;
+            align-items: flex-start;
+        }
+
+        @media (max-width: 1200px) {
+            .layout {
+                grid-template-columns: 1fr;
+            }
         }
 
         .panel {
@@ -351,8 +313,7 @@ if (!isset($error) && isset($_GET['error']) && $_GET['error'] !== '') {
         }
 
         .panel-upload {
-            position: sticky;
-            top: 104px;
+            position: relative;
         }
 
         .panel-title {
@@ -392,12 +353,46 @@ if (!isset($error) && isset($_GET['error']) && $_GET['error'] !== '') {
 
         table {
             width: 100%;
+            table-layout: auto;
             border-collapse: separate;
             border-spacing: 0;
             background: white;
             border-radius: 14px;
             overflow: hidden;
             border: 1px solid rgba(16, 44, 87, 0.08);
+        }
+
+        thead th:nth-child(1),
+        tbody td:nth-child(1) {
+            width: 78px;
+        }
+
+        thead th:nth-child(2),
+        tbody td:nth-child(2) {
+            min-width: 180px;
+            word-break: break-word;
+            overflow-wrap: break-word;
+            hyphens: auto;
+        }
+
+        thead th:nth-child(3),
+        tbody td:nth-child(3) {
+            width: 110px;
+        }
+
+        thead th:nth-child(4),
+        tbody td:nth-child(4) {
+            width: 95px;
+        }
+
+        thead th:nth-child(5),
+        tbody td:nth-child(5) {
+            width: 110px;
+        }
+
+        thead th:nth-child(6),
+        tbody td:nth-child(6) {
+            width: 200px;
         }
 
         thead th {
@@ -523,8 +518,8 @@ if (!isset($error) && isset($_GET['error']) && $_GET['error'] !== '') {
         }
 
         .btn-small {
-            width: 150px;
-            min-width: 150px;
+            width: 136px;
+            min-width: 136px;
             padding: 8px 12px;
             border-radius: 11px;
             font-size: 12px;
@@ -871,27 +866,6 @@ if (!isset($error) && isset($_GET['error']) && $_GET['error'] !== '') {
                                 </td>
                                 <td>
                                     <div class="actions">
-                                        <div class="actions-order">
-                                            <?php if ($index > 0): ?>
-                                                <a href="?action=move&id=<?php echo $item['id']; ?>&direction=up" class="btn btn-order" title="Naik">
-                                                    <i class="fas fa-arrow-up"></i>
-                                                </a>
-                                            <?php else: ?>
-                                                <span class="btn btn-order is-disabled" title="Sudah paling atas">
-                                                    <i class="fas fa-arrow-up"></i>
-                                                </span>
-                                            <?php endif; ?>
-
-                                            <?php if ($index < $total_rows - 1): ?>
-                                                <a href="?action=move&id=<?php echo $item['id']; ?>&direction=down" class="btn btn-order" title="Turun">
-                                                    <i class="fas fa-arrow-down"></i>
-                                                </a>
-                                            <?php else: ?>
-                                                <span class="btn btn-order is-disabled" title="Sudah paling bawah">
-                                                    <i class="fas fa-arrow-down"></i>
-                                                </span>
-                                            <?php endif; ?>
-                                        </div>
                                         <a href="?edit_id=<?php echo $item['id']; ?>" class="btn btn-primary btn-small">
                                             <i class="fas fa-edit"></i> Edit
                                         </a>

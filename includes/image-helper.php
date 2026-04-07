@@ -74,8 +74,17 @@ function validateImageUpload($file, $max_size = 10485760, $allowed_types = ['ima
  */
 function optimizeAndSaveImageAsWebp($source_path, $dest_path, $max_width = 1920, $quality = 80) {
     try {
+        // Check GD Library
+        if (!extension_loaded('gd')) {
+            return ['success' => false, 'error' => 'PHP GD Library tidak tersedia'];
+        }
+
         if (!function_exists('imagewebp')) {
-            return ['success' => false, 'error' => 'PHP GD dengan dukungan WebP tidak tersedia'];
+            // Fallback: Simpan sebagai JPEG jika WebP tidak tersedia
+            if (!function_exists('imagejpeg')) {
+                return ['success' => false, 'error' => 'PHP GD Library tidak memiliki image support'];
+            }
+            $dest_path = preg_replace('/\.webp$/i', '.jpg', $dest_path);
         }
 
         if (!file_exists($source_path)) {
@@ -173,13 +182,21 @@ function optimizeAndSaveImageAsWebp($source_path, $dest_path, $max_width = 1920,
             return ['success' => false, 'error' => 'Gagal resize image'];
         }
 
-        $save_success = imagewebp($output_image, $dest_path, $quality);
+        // Save dengan format yang tersedia
+        $save_success = false;
+        if (function_exists('imagewebp')) {
+            $save_success = @imagewebp($output_image, $dest_path, $quality);
+        } else if (function_exists('imagejpeg')) {
+            // Fallback ke JPEG
+            $dest_path = preg_replace('/\.webp$/i', '.jpg', $dest_path);
+            $save_success = @imagejpeg($output_image, $dest_path, $quality);
+        }
 
         imagedestroy($source_image);
         imagedestroy($output_image);
 
         if (!$save_success) {
-            return ['success' => false, 'error' => 'Gagal menyimpan file WEBP'];
+            return ['success' => false, 'error' => 'Gagal menyimpan file (WEBP/JPEG)'];
         }
 
         return [

@@ -2,7 +2,7 @@
 include __DIR__ . '/includes/auth.php';
 require_once __DIR__ . '/../config/database.php';
 
-function dashboardCount(mysqli $conn, string $table, string $where = ''): int {
+function dashboardCount($conn, $table, $where = '') {
     $sql = "SELECT COUNT(*) AS total FROM {$table}" . ($where !== '' ? " WHERE {$where}" : '');
     try {
         $res = $conn->query($sql);

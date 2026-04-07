@@ -1,9 +1,16 @@
 <?php
-$baseUrl = '/' . basename(dirname(__DIR__, 2));
+$scriptPath = str_replace('\\', '/', $_SERVER['SCRIPT_NAME'] ?? '');
+$adminPos = strpos($scriptPath, '/admin/');
+$baseUrl = $adminPos !== false
+	? substr($scriptPath, 0, $adminPos)
+	: rtrim(str_replace('\\', '/', dirname($scriptPath)), '/');
+if ($baseUrl === '/') {
+	$baseUrl = '';
+}
 $adminBaseUrl = $baseUrl . '/admin';
 $currentPath = parse_url($_SERVER['REQUEST_URI'] ?? '', PHP_URL_PATH) ?: '';
 
-function isMenuActive(string $currentPath, string $href): bool {
+function isMenuActive($currentPath, $href) {
 	if (strpos($href, '/jadwal_ibadah/index.php') !== false && strpos($currentPath, '/jadwal/') !== false) {
 		return true;
 	}

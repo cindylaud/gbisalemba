@@ -3,8 +3,10 @@
 <head>
     <?php
     $scriptName = str_replace('\\', '/', $_SERVER['SCRIPT_NAME'] ?? '');
-    $projectDir = '/' . basename(dirname(__DIR__));
-    $basePath = (strpos($scriptName, $projectDir . '/') === 0 || $scriptName === $projectDir) ? $projectDir : '';
+    $basePath = rtrim(str_replace('\\', '/', dirname($scriptName)), '/');
+    if ($basePath === '/') {
+        $basePath = '';
+    }
     ?>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">

@@ -1,6 +1,6 @@
 <?php
 
-function ensureJadwalIbadahTable(mysqli $conn): array
+function ensureJadwalIbadahTable($conn)
 {
     $create_table_sql =
         "CREATE TABLE IF NOT EXISTS jadwal_ibadah (

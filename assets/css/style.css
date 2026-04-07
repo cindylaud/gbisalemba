@@ -8,6 +8,17 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
 
 /* ============================================
+   LOCAL FONTS
+   ============================================ */
+@font-face {
+  font-family: 'Brillotus';
+  src: url('../fonts/brillotus/Brillotus.otf') format('opentype');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* ============================================
    CSS VARIABLES
    ============================================ */
 :root{
@@ -31,6 +42,8 @@ body{
   line-height:1.6;
   color:var(--text-dark);
   background-color:var(--blue-soft);
+  -webkit-font-smoothing:antialiased;
+  -moz-osx-font-smoothing:grayscale;
 }
 a{text-decoration:none;color:inherit}
 ul,ol{list-style:none}
@@ -1549,10 +1562,10 @@ header{
 .ibadah-showcase-title {
   margin: 0;
   max-width: 16ch;
-  font-family: inherit;
+  font-family: 'Brillotus', cursive;
   font-size: clamp(38px, 4vw, 54px);
   line-height: 1.02;
-  font-weight: 800;
+  font-weight: normal;
   font-style: normal;
   color: #f5f9ff;
   text-align: center;
@@ -1638,9 +1651,9 @@ header{
   text-shadow: 0 6px 24px rgba(0,0,0,0.28);
 }
 .gembala-name-only {
-  font-family: inherit;
+  font-family: 'Brillotus', cursive;
   font-size: clamp(38px, 4.5vw, 54px);
-  font-weight: 800;
+  font-weight: normal;
   margin: 0;
   line-height: 1.18;
   letter-spacing: 0.01em;
@@ -1650,7 +1663,6 @@ header{
   gap: 14px;
 }
 .gembala-name,
-.gembala-name-only,
 .gembala-name-secondary,
 .gembala-separator em,
 .gembala-statement {
@@ -1660,6 +1672,7 @@ header{
   display: block;
   line-height: 1.02;
   text-align: center;
+  font-family: 'Brillotus', cursive;
 }
 .gembala-separator {
   display: inline-flex;

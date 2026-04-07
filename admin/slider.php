@@ -1,6 +1,21 @@
 <?php
+// Enable error reporting untuk debugging
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
+
 require_once __DIR__ . '/../config/database.php';
 require_once __DIR__ . '/includes/auth.php';
+
+// Cek database connection
+if ($conn->connect_error) {
+    die('Error: Koneksi database gagal - ' . htmlspecialchars($conn->connect_error));
+}
+
+// Load image helper with error handling
+if (!file_exists(__DIR__ . '/../includes/image-helper.php')) {
+    die('Error: File image-helper.php tidak ditemukan');
+}
 require_once __DIR__ . '/../includes/image-helper.php';
 
 // Define constants untuk slider
@@ -15,15 +30,34 @@ $error = '';
 // Auto-seed: Pastikan record urutan 1-4 selalu ada (image 'default.png' karena NOT NULL)
 for ($i = 1; $i <= 4; $i++) {
     $check = $conn->prepare("SELECT id FROM slider WHERE urutan = ?");
+    if (!$check) {
+        $error = 'Database error (check): ' . $conn->error;
+        break;
+    }
     $check->bind_param("i", $i);
-    $check->execute();
+    if (!$check->execute()) {
+        $error = 'Database error (execute check): ' . $check->error;
+        $check->close();
+        break;
+    }
     $result = $check->get_result();
     
     if ($result->num_rows == 0) {
         $default_img = 'default.png';
         $insert = $conn->prepare("INSERT INTO slider (urutan, title, subtitle, image, is_active, created_at) VALUES (?, NULL, NULL, ?, 0, NOW())");
+        if (!$insert) {
+            $error = 'Database error (insert): ' . $conn->error;
+            $check->close();
+            break;
+        }
         $insert->bind_param("is", $i, $default_img);
-        $insert->execute();
+        if (!$insert->execute()) {
+            $error = 'Database error (insert execute): ' . $insert->error;
+            $insert->close();
+            $check->close();
+            break;
+        }
+        $insert->close();
     }
     $check->close();
 }
@@ -140,6 +174,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['urutan'])) {
 // Get data untuk 4 card (urutan 1-4)
 $query = "SELECT id, urutan, image, is_active FROM slider WHERE urutan IN (1,2,3,4) ORDER BY urutan ASC";
 $result = $conn->query($query);
+if ($result === false) {
+    $error = 'Query error: ' . $conn->error;
+    die('Error: ' . htmlspecialchars($error));
+}
 $cards = [];
 while ($row = $result->fetch_assoc()) {
     $cards[$row['urutan']] = $row;
@@ -187,7 +225,16 @@ if ($selected_card && !empty($selected_card['is_active'])) {
     <title>Kelola Slider - Admin GBI Salemba</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <?php $admin_theme_path = dirname(__DIR__) . '/assets/css/admin-theme.css'; ?>
-    <link rel="stylesheet" href="/<?php echo htmlspecialchars(basename(dirname(__DIR__))); ?>/assets/css/admin-theme.css?v=<?php echo urlencode((string) (is_file($admin_theme_path) ? filemtime($admin_theme_path) : time())); ?>">
+    <?php
+    $admin_script_path = str_replace('\\', '/', $_SERVER['SCRIPT_NAME'] ?? '');
+    $admin_base_url = strpos($admin_script_path, '/admin/') !== false
+        ? substr($admin_script_path, 0, strpos($admin_script_path, '/admin/'))
+        : rtrim(str_replace('\\', '/', dirname($admin_script_path)), '/');
+    if ($admin_base_url === '/') {
+        $admin_base_url = '';
+    }
+    ?>
+    <link rel="stylesheet" href="<?php echo htmlspecialchars($admin_base_url); ?>/assets/css/admin-theme.css?v=<?php echo urlencode((string) (is_file($admin_theme_path) ? filemtime($admin_theme_path) : time())); ?>">
     <style>
         * {
             margin: 0;

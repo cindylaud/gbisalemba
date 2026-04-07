@@ -64,5 +64,3 @@ if (!function_exists('close_connection')) {
 // Register shutdown function untuk menutup koneksi otomatis
 register_shutdown_function('close_connection');
 
-?>
-

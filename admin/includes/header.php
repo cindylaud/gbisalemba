@@ -3,7 +3,14 @@ if (session_status() === PHP_SESSION_NONE) {
 	session_start();
 }
 
-$baseUrl = '/' . basename(dirname(__DIR__, 2));
+$scriptPath = str_replace('\\', '/', $_SERVER['SCRIPT_NAME'] ?? '');
+$adminPos = strpos($scriptPath, '/admin/');
+$baseUrl = $adminPos !== false
+	? substr($scriptPath, 0, $adminPos)
+	: rtrim(str_replace('\\', '/', dirname($scriptPath)), '/');
+if ($baseUrl === '/') {
+	$baseUrl = '';
+}
 $adminBaseUrl = $baseUrl . '/admin';
 $currentPath = parse_url($_SERVER['REQUEST_URI'] ?? '', PHP_URL_PATH) ?: '';
 $defaultTitle = ucwords(str_replace(['-', '_'], ' ', pathinfo($_SERVER['SCRIPT_NAME'] ?? '', PATHINFO_FILENAME)));
