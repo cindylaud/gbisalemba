@@ -2,10 +2,22 @@
 require_once __DIR__ . '/../includes/auth.php';
 require_once __DIR__ . '/../../config/database.php';
 require_once __DIR__ . '/_table_bootstrap.php';
+require_once __DIR__ . '/../../includes/image-helper.php';
+
+define('JADWAL_UPLOAD_DIR', __DIR__ . '/../../uploads/jadwal/');
+define('JADWAL_MAX_SIZE', 12 * 1024 * 1024); // 12MB
+define('JADWAL_MAX_WIDTH', 1920);
+define('JADWAL_QUALITY', 80);
+
+// Ensure upload directory exists
+if (!is_dir(JADWAL_UPLOAD_DIR)) {
+    @mkdir(JADWAL_UPLOAD_DIR, 0755, true);
+}
 
 $table_state = ensureJadwalIbadahTable($conn);
 $has_urutan_column = (bool) ($table_state['has_urutan_column'] ?? false);
 $has_kategori_column = (bool) ($table_state['has_kategori_column'] ?? false);
+$has_image_columns = (bool) ($table_state['has_image_columns'] ?? false);
 
 $error = '';
 $success = '';
@@ -19,55 +31,106 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $ruangan = trim($_POST['ruangan'] ?? '');
     $keterangan = trim($_POST['keterangan'] ?? '');
     $is_active = isset($_POST['is_active']) ? 1 : 0;
+    $image_filename = '';
+    $image_fit = trim($_POST['image_fit'] ?? 'cover');
+    $image_pos_y = intval($_POST['image_pos_y'] ?? 50);
 
     // Validation
     if (empty($nama_ibadah) || empty($hari) || empty($jam)) {
         $error = 'Nama ibadah, hari, dan jam wajib diisi';
     } else {
-        // Get next urutan if column exists
-        $next_urutan = 0;
-        if ($has_urutan_column) {
-            $stmt_urutan = $conn->prepare("SELECT COALESCE(MAX(urutan), 0) + 1 AS next_urutan FROM jadwal_ibadah");
-            $stmt_urutan->execute();
-            $result_urutan = $stmt_urutan->get_result();
-            $row_urutan = $result_urutan->fetch_assoc();
-            $next_urutan = $row_urutan['next_urutan'];
-            $stmt_urutan->close();
+        // Handle image upload if file provided
+        if ($has_image_columns && isset($_FILES['image']) && $_FILES['image']['error'] === UPLOAD_ERR_OK) {
+            $validation = validateImageUpload($_FILES['image'], JADWAL_MAX_SIZE);
+            if (!$validation['valid']) {
+                $error = $validation['error'];
+            } else {
+                // Generate unique filename and process image
+                $new_filename = generateUniqueFilename($_FILES['image']['name'], 'jadwal_');
+                $upload_path = JADWAL_UPLOAD_DIR . $new_filename;
+                
+                $optimize_result = optimizeAndSaveImage(
+                    $_FILES['image']['tmp_name'],
+                    $upload_path,
+                    JADWAL_MAX_WIDTH,
+                    JADWAL_QUALITY
+                );
+                
+                if (!$optimize_result['success']) {
+                    $error = "Gagal memproses gambar: " . $optimize_result['error'];
+                } else {
+                    $image_filename = $new_filename;
+                }
+            }
         }
 
-        // Build INSERT query dynamically based on available columns
-        $fields = ['nama_ibadah', 'hari', 'jam', 'ruangan', 'keterangan', 'is_active'];
-        $values = [$nama_ibadah, $hari, $jam, $ruangan, $keterangan, $is_active];
-        $types = 'sssssi';
+        // If no image upload error, proceed with database insert
+        if (empty($error)) {
+            // Get next urutan if column exists
+            $next_urutan = 0;
+            if ($has_urutan_column) {
+                $stmt_urutan = $conn->prepare("SELECT COALESCE(MAX(urutan), 0) + 1 AS next_urutan FROM jadwal_ibadah");
+                $stmt_urutan->execute();
+                $result_urutan = $stmt_urutan->get_result();
+                $row_urutan = $result_urutan->fetch_assoc();
+                $next_urutan = $row_urutan['next_urutan'];
+                $stmt_urutan->close();
+            }
 
-        if ($has_kategori_column) {
-            $fields[] = 'kategori';
-            $values[] = $kategori;
-            $types .= 's';
-        }
+            // Build INSERT query dynamically based on available columns
+            $fields = ['nama_ibadah', 'hari', 'jam', 'ruangan', 'keterangan', 'is_active'];
+            $values = [$nama_ibadah, $hari, $jam, $ruangan, $keterangan, $is_active];
+            $types = 'sssssi';
 
-        if ($has_urutan_column) {
-            $fields[] = 'urutan';
-            $values[] = $next_urutan;
-            $types .= 'i';
-        }
+            if ($has_kategori_column) {
+                $fields[] = 'kategori';
+                $values[] = $kategori;
+                $types .= 's';
+            }
 
-        $fields_str = implode(', ', $fields);
-        $placeholders = implode(', ', array_fill(0, count($fields), '?'));
-        
-        $query = "INSERT INTO jadwal_ibadah ({$fields_str}) VALUES ({$placeholders})";
-        $stmt = $conn->prepare($query);
-        $stmt->bind_param($types, ...$values);
-        
-        if ($stmt->execute()) {
+            if ($has_image_columns) {
+                $fields[] = 'image';
+                $values[] = $image_filename; // Can be empty string
+                $types .= 's';
+                
+                if (!empty($image_filename)) {
+                    $fields[] = 'image_fit';
+                    $values[] = $image_fit;
+                    $types .= 's';
+                    
+                    $fields[] = 'image_pos_y';
+                    $values[] = $image_pos_y;
+                    $types .= 'i';
+                }
+            }
+
+            if ($has_urutan_column) {
+                $fields[] = 'urutan';
+                $values[] = $next_urutan;
+                $types .= 'i';
+            }
+
+            $fields_str = implode(', ', $fields);
+            $placeholders = implode(', ', array_fill(0, count($fields), '?'));
+            
+            $query = "INSERT INTO jadwal_ibadah ({$fields_str}) VALUES ({$placeholders})";
+            $stmt = $conn->prepare($query);
+            $stmt->bind_param($types, ...$values);
+            
+            if ($stmt->execute()) {
+                $stmt->close();
+                header("Location: index.php?success=Jadwal ibadah berhasil ditambahkan");
+                exit;
+            } else {
+                // Delete image if database insert failed
+                if (!empty($image_filename)) {
+                    @unlink(JADWAL_UPLOAD_DIR . $image_filename);
+                }
+                $error = 'Gagal menambahkan jadwal ibadah: ' . $conn->error;
+            }
+            
             $stmt->close();
-            header("Location: index.php?success=Jadwal ibadah berhasil ditambahkan");
-            exit;
-        } else {
-            $error = 'Gagal menambahkan jadwal ibadah: ' . $conn->error;
         }
-        
-        $stmt->close();
     }
 }
 
@@ -95,7 +158,7 @@ include __DIR__ . '/../includes/header.php';
         <div class="col-lg-8">
             <div class="card shadow mb-4">
                 <div class="card-body">
-                    <form method="POST" action="">
+                    <form method="POST" action="" enctype="multipart/form-data">
                         <div class="form-group">
                             <label for="nama_ibadah">Nama Ibadah <span class="text-danger">*</span></label>
                             <input type="text" class="form-control" id="nama_ibadah" name="nama_ibadah" 
@@ -165,6 +228,41 @@ include __DIR__ . '/../includes/header.php';
                                 <label class="custom-control-label" for="is_active">Aktif</label>
                             </div>
                         </div>
+
+                        <?php if ($has_image_columns): ?>
+                            <hr>
+                            <h5 class="font-weight-bold mb-3">Gambar Jadwal (Opsional)</h5>
+                            
+                            <div class="form-group">
+                                <label for="image">Upload Gambar</label>
+                                <div class="custom-file">
+                                    <input type="file" class="custom-file-input" id="image" name="image" 
+                                           accept="image/jpeg,image/png,image/webp">
+                                    <label class="custom-file-label" for="image">Pilih gambar...</label>
+                                </div>
+                                <small class="form-text text-muted">JPG, PNG, WebP. Maksimal 12 MB. Akan dioptimalkan otomatis.</small>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label for="image_fit">Fit Gambar</label>
+                                        <select class="form-control" id="image_fit" name="image_fit">
+                                            <option value="cover" selected>Cover (crop untuk fill)</option>
+                                            <option value="contain">Contain (tampilkan penuh)</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label for="image_pos_y">Posisi Vertikal (%)</label>
+                                        <input type="range" class="form-control-range" id="image_pos_y" name="image_pos_y" 
+                                               min="0" max="100" value="50" step="5">
+                                        <small class="form-text text-muted">0% = atas, 50% = tengah, 100% = bawah</small>
+                                    </div>
+                                </div>
+                            </div>
+                        <?php endif; ?>
 
                         <hr>
 

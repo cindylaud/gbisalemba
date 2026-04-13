@@ -21,7 +21,7 @@
     <link rel="stylesheet" href="<?php echo $basePath; ?>/assets/css/style.css?v=<?php echo filemtime(__DIR__ . '/../assets/css/style.css'); ?>">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
-<body>
+<body class="<?php echo isset($pageBodyClass) ? htmlspecialchars($pageBodyClass, ENT_QUOTES, 'UTF-8') : ''; ?>">
 
 <header>
     <div class="header-nav">

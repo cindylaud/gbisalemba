@@ -77,6 +77,21 @@ function ensureJadwalIbadahTable($conn)
         $columns['urutan'] = true;
     }
 
+    if (!isset($columns['image'])) {
+        $safe_query($conn, "ALTER TABLE jadwal_ibadah ADD COLUMN image VARCHAR(255) DEFAULT NULL AFTER keterangan");
+        $columns['image'] = true;
+    }
+
+    if (!isset($columns['image_fit'])) {
+        $safe_query($conn, "ALTER TABLE jadwal_ibadah ADD COLUMN image_fit VARCHAR(50) DEFAULT 'cover' AFTER image");
+        $columns['image_fit'] = true;
+    }
+
+    if (!isset($columns['image_pos_y'])) {
+        $safe_query($conn, "ALTER TABLE jadwal_ibadah ADD COLUMN image_pos_y INT DEFAULT 50 AFTER image_fit");
+        $columns['image_pos_y'] = true;
+    }
+
     if ($has_jadwal_legacy) {
         $count_result = $safe_query($conn, "SELECT COUNT(*) AS total FROM jadwal_ibadah");
         $current_total = 0;
@@ -168,5 +183,6 @@ function ensureJadwalIbadahTable($conn)
     return [
         'has_urutan_column' => true,
         'has_kategori_column' => true,
+        'has_image_columns' => isset($columns['image']) && isset($columns['image_fit']) && isset($columns['image_pos_y']),
     ];
 }

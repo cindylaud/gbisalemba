@@ -31,6 +31,22 @@ if (!function_exists('gbi_find_first_image')) {
     }
 }
 
+if (!function_exists('gbi_text_excerpt')) {
+    function gbi_text_excerpt($text, $limit = 140)
+    {
+        $plain = trim(strip_tags((string) $text));
+        if ($plain === '') {
+            return '';
+        }
+
+        if (function_exists('mb_strlen') && function_exists('mb_substr')) {
+            return mb_strlen($plain) > $limit ? mb_substr($plain, 0, $limit) . '...' : $plain;
+        }
+
+        return strlen($plain) > $limit ? substr($plain, 0, $limit) . '...' : $plain;
+    }
+}
+
 $ibadah_photo = gbi_find_first_image([
     'assets/images/umum',
     'uploads/slider',
@@ -48,68 +64,84 @@ $cta_photo = gbi_find_first_image([
     'assets/images/gembala'
 ], $ibadah_photo);
 ?>
-
 <main class="main-content home-variant-formal">
 
 <!-- 1. HERO / SLIDER SECTION -->
 <section class="hero-slider" id="sliderSection">
-  <?php
-  $q = "SELECT image, urutan
-        FROM slider
-        WHERE is_active = 1
-          AND image IS NOT NULL
-          AND image <> ''
-          AND image <> 'default.png'
-        ORDER BY urutan ASC
-        LIMIT 4";
-  $res = $conn->query($q);
+    <?php
+    $q = "SELECT image, urutan
+                FROM slider
+                WHERE is_active = 1
+                    AND image IS NOT NULL
+                    AND image <> ''
+                    AND image <> 'default.png'
+                ORDER BY urutan ASC
+                LIMIT 4";
+    $res = $conn->query($q);
 
-  $images = [];
-  while ($row = $res->fetch_assoc()) {
-      $images[] = $row['image'];
-  }
+    $images = [];
+    while ($row = $res->fetch_assoc()) {
+            $images[] = $row['image'];
+    }
 
-  if (empty($images)) {
-      // fallback kalau belum ada foto aktif
-      ?>
-      <div class="hero-slide active">
-        <div class="hero-bg" style="background: linear-gradient(135deg,#102C57 0%,#DAC0A3 100%);"></div>
-        <div class="hero-overlay"></div>
-      </div>
-      <?php
-  } else {
-      foreach ($images as $i => $img) { ?>
-        <div class="hero-slide <?php echo $i === 0 ? 'active' : ''; ?>">
-          <div class="hero-bg" style="background-image:url('uploads/slider/<?php echo htmlspecialchars($img); ?>');" ></div>
-          <div class="hero-overlay"></div>
+    if (empty($images)) {
+            ?>
+            <div class="hero-slide active">
+                <div class="hero-bg" style="background: linear-gradient(135deg,#102C57 0%,#DAC0A3 100%);"></div>
+                <div class="hero-overlay"></div>
+            </div>
+            <?php
+    } else {
+            foreach ($images as $i => $img) { ?>
+                <div class="hero-slide <?php echo $i === 0 ? 'active' : ''; ?>">
+                    <div class="hero-bg" style="background-image:url('uploads/slider/<?php echo htmlspecialchars($img); ?>');"></div>
+                    <div class="hero-overlay"></div>
+                </div>
+            <?php } ?>
+
+            <?php if (count($images) > 1): ?>
+                <button class="hero-btn hero-btn-prev" type="button" onclick="sliderPrev()" aria-label="Slide sebelumnya">&#8249;</button>
+                <button class="hero-btn hero-btn-next" type="button" onclick="sliderNext()" aria-label="Slide berikutnya">&#8250;</button>
+                <div class="hero-dots">
+                    <?php for ($i = 0; $i < count($images); $i++): ?>
+                        <span class="hero-dot <?php echo $i === 0 ? 'active' : ''; ?>" onclick="sliderGoto(<?php echo $i; ?>)"></span>
+                    <?php endfor; ?>
+                </div>
+            <?php endif; ?>
+    <?php } ?>
+
+    <div class="hero-countdown-card" id="heroCountdown" aria-live="polite" data-server-now="<?= (int) round(microtime(true) * 1000) ?>" data-live-window="120">
+        <p class="hero-countdown-kicker">Welcome To Our Church</p>
+        <h1 class="hero-countdown-title">GBI SALEMBA</h1>
+
+        <div class="hero-countdown-box">
+            <p class="hero-countdown-label" id="heroCountdownLabel">Next Service Starts In</p>
+            <div class="hero-countdown-values" id="heroCountdownValues">
+                <div class="hero-countdown-item"><span id="heroCountdownDays">00</span><small>Days</small></div>
+                <div class="hero-countdown-item"><span id="heroCountdownHours">00</span><small>Hrs</small></div>
+                <div class="hero-countdown-item"><span id="heroCountdownMinutes">00</span><small>Min</small></div>
+                <div class="hero-countdown-item"><span id="heroCountdownSeconds">00</span><small>Sec</small></div>
+            </div>
         </div>
-      <?php } ?>
 
-      <?php if (count($images) > 1): ?>
-        <div class="hero-dots">
-          <?php for ($i=0; $i<count($images); $i++): ?>
-            <span class="hero-dot <?php echo $i===0?'active':''; ?>" onclick="sliderGoto(<?php echo $i; ?>)"></span>
-          <?php endfor; ?>
+        <p class="hero-countdown-caption" id="heroServiceLabel">Menuju Ibadah Raya Minggu 08:00 WIB</p>
+        <div class="hero-live-actions" id="heroLiveActions" hidden>
+            <a href="https://www.youtube.com/@gbisalemba/live" target="_blank" rel="noopener noreferrer" class="hero-live-btn hero-live-btn-primary">Gabung Online</a>
+            <a href="https://maps.app.goo.gl/6duXhZBcrC26enUPA" target="_blank" rel="noopener noreferrer" class="hero-live-btn hero-live-btn-secondary">Lokasi Gereja</a>
         </div>
-      <?php endif; ?>
-
-  <?php } ?>
+    </div>
 </section>
 
 <!-- 2. COMING SOON SECTION -->
 <section class="whats-new">
-  <div class="container-large">
+    <div class="container-large">
         <h2 class="section-title-big">COMING SOON</h2>
 
-                <div class="whats-new-slider" id="whatsNewSlider" tabindex="0" aria-label="Slider Coming Soon">
-                    <div class="whats-new-decor" aria-hidden="true">
-                    </div>
+        <div class="whats-new-slider" id="whatsNewSlider" tabindex="0" aria-label="Slider Coming Soon">
+            <div class="whats-new-decor" aria-hidden="true"></div>
 
             <?php
-            $q_wn = "SELECT image FROM coming_soon
-                             WHERE is_active = 1
-                             ORDER BY urutan ASC
-                             LIMIT 5";
+            $q_wn = "SELECT image FROM coming_soon WHERE is_active = 1 ORDER BY urutan ASC LIMIT 5";
             $r_wn = $conn->query($q_wn);
 
             $wn_images = [];
@@ -132,20 +164,72 @@ $cta_photo = gbi_find_first_image([
                     <button class="whats-new-nav next" type="button" id="whatsNewNext" aria-label="Foto berikutnya">&#8250;</button>
                     <div class="whats-new-dots" id="whatsNewDots" aria-label="Navigasi foto"></div>
                 <?php endif; ?>
-            <?php
-            else: ?>
+            <?php else: ?>
                 <div class="whats-new-empty">
-                    <div class="whats-new-empty-content">
-                        <span>Belum ada foto terbaru</span>
-                    </div>
+                    <div class="whats-new-empty-content"><span>Belum ada foto terbaru</span></div>
                 </div>
             <?php endif; ?>
         </div>
-
-  </div>
+    </div>
 </section>
 
-<!-- 3. IBADAH MINGGU SECTION -->
+<!-- 3. RENUNGAN SECTION -->
+<section class="section glass-default renungan-home-section reveal-on-scroll" data-reveal="section" data-delay="0">
+    <div class="container-large">
+        <div class="renungan-home-head">
+            <h2 class="section-title">Renungan Harian</h2>
+            <p class="renungan-home-subtitle">Temukan kekuatan baru melalui kebenaran Firman Tuhan setiap hari.</p>
+        </div>
+
+        <?php
+        $renunganTerbaru = [];
+        $renunganQuery = $conn->query('SELECT id, judul, isi, ayat, tanggal, gambar FROM renungan ORDER BY tanggal DESC, id DESC LIMIT 3');
+        if ($renunganQuery) {
+            while ($row = $renunganQuery->fetch_assoc()) {
+                $renunganTerbaru[] = $row;
+            }
+        }
+        ?>
+
+        <?php if (empty($renunganTerbaru)): ?>
+            <div class="renungan-empty-state">
+                <p>Renungan terbaru sedang disiapkan. Silakan cek kembali segera.</p>
+            </div>
+        <?php else: ?>
+            <div class="renungan-grid">
+                <?php foreach ($renunganTerbaru as $item): ?>
+                    <?php
+                    $imageUrl = !empty($item['gambar']) ? 'uploads/renungan/' . $item['gambar'] : '';
+                    $hasImage = $imageUrl !== '' && is_file(__DIR__ . '/' . $imageUrl);
+                    ?>
+                    <article class="renungan-card reveal-on-scroll" data-reveal="up">
+                        <?php if ($hasImage): ?>
+                            <a href="renungan-detail.php?id=<?php echo (int) $item['id']; ?>" class="renungan-cover-link" aria-label="Baca renungan <?php echo htmlspecialchars($item['judul']); ?>">
+                                <img class="renungan-cover" src="<?php echo htmlspecialchars($imageUrl); ?>" alt="<?php echo htmlspecialchars($item['judul']); ?>">
+                            </a>
+                        <?php else: ?>
+                            <div class="renungan-cover renungan-cover-placeholder" aria-hidden="true"></div>
+                        <?php endif; ?>
+
+                        <div class="renungan-content">
+                            <p class="renungan-date"><?php echo htmlspecialchars(date('d F Y', strtotime((string) $item['tanggal']))); ?></p>
+                            <h3 class="renungan-card-title"><?php echo htmlspecialchars($item['judul']); ?></h3>
+                            <p class="renungan-verse"><?php echo htmlspecialchars($item['ayat']); ?></p>
+                            <p class="renungan-excerpt"><?php echo htmlspecialchars(gbi_text_excerpt($item['isi'], 130)); ?></p>
+                            <a href="renungan-detail.php?id=<?php echo (int) $item['id']; ?>" class="renungan-read-more">Baca Selengkapnya</a>
+                        </div>
+                    </article>
+                <?php endforeach; ?>
+            </div>
+
+            <div class="renungan-home-footer">
+                <a href="renungan.php" class="renungan-more-btn">Lihat Semua Renungan</a>
+            </div>
+        <?php endif; ?>
+    </div>
+</section>
+
+<!-- 4. IBADAH MINGGU SECTION -->
 <section class="ibadah-minggu-section reveal-on-scroll" data-reveal="section" data-delay="0">
     <div class="ibadah-blob ibadah-blob-1"></div>
     <div class="ibadah-blob ibadah-blob-2"></div>
@@ -204,25 +288,21 @@ $cta_photo = gbi_find_first_image([
     <div class="container-large">
         <?php
         $gembala_data = [
-            'nama_line_1' => 'Ps. David Natanael',
-            'nama_line_2' => 'Ps. Rita Emia Nata'
+                'nama_line_1' => 'Ps. David Natanael',
+                'nama_line_2' => 'Ps. Rita Emia Nata'
         ];
         ?>
         <div class="gembala-layout">
             <div class="gembala-photo reveal-on-scroll" data-reveal="left" data-delay="80">
                 <div class="gembala-photo-frame">
-                    <img src="<?php echo htmlspecialchars($gembala_photo); ?>"
-                         alt="Bapak dan Ibu Gembala GBI Salemba"
-                         class="gembala-img">
+                    <img src="<?php echo htmlspecialchars($gembala_photo); ?>" alt="Bapak dan Ibu Gembala GBI Salemba" class="gembala-img">
                 </div>
                 <div class="gembala-photo-accent"></div>
             </div>
             <div class="gembala-info reveal-on-scroll" data-reveal="right" data-delay="160">
                 <h3 class="gembala-name gembala-name-only">
                     <span class="gembala-name-line"><?php echo htmlspecialchars($gembala_data['nama_line_1']); ?></span>
-                    <span class="gembala-separator" aria-hidden="true">
-                        <span></span><em>dan</em><span></span>
-                    </span>
+                    <span class="gembala-separator" aria-hidden="true"><span></span><em>dan</em><span></span></span>
                     <span class="gembala-name-line"><?php echo htmlspecialchars($gembala_data['nama_line_2']); ?></span>
                 </h3>
             </div>
@@ -256,29 +336,29 @@ $cta_photo = gbi_find_first_image([
 <script src="assets/js/slider.js"></script>
 <script src="assets/js/whats-new-slider.js"></script>
 <script src="assets/js/home-reveal.js"></script>
+<script src="assets/js/hero-countdown.js"></script>
 
 <script>
-// Auto-load video iframe when scrolling into view
 (function() {
-  const videoIframe = document.querySelector('.ibadah-showcase-video');
-  if (!videoIframe || videoIframe.getAttribute('src')) return;
-  
-  const observer = new IntersectionObserver(function(entries) {
-    entries.forEach(function(entry) {
-      if (entry.isIntersecting) {
-        const src = entry.target.getAttribute('data-src');
-        if (src && !entry.target.getAttribute('src')) {
-          entry.target.setAttribute('src', src);
-          observer.unobserve(entry.target);
-        }
-      }
+    const videoIframe = document.querySelector('.ibadah-showcase-video');
+    if (!videoIframe || videoIframe.getAttribute('src')) return;
+
+    const observer = new IntersectionObserver(function(entries) {
+        entries.forEach(function(entry) {
+            if (entry.isIntersecting) {
+                const src = entry.target.getAttribute('data-src');
+                if (src && !entry.target.getAttribute('src')) {
+                    entry.target.setAttribute('src', src);
+                    observer.unobserve(entry.target);
+                }
+            }
+        });
+    }, {
+        threshold: 0.1,
+        rootMargin: '50px'
     });
-  }, { 
-    threshold: 0.1,
-    rootMargin: '50px'
-  });
-  
-  observer.observe(videoIframe);
+
+    observer.observe(videoIframe);
 })();
 </script>
 

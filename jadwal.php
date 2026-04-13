@@ -74,7 +74,7 @@ if (!function_exists('jadwal_resolve_key')) {
 $jadwal_list = [];
 $error_message = '';
 
-$stmt = $conn->prepare("SELECT id, nama_ibadah, hari, jam, ruangan, keterangan FROM jadwal_ibadah WHERE is_active = 1 ORDER BY id ASC");
+$stmt = $conn->prepare("SELECT id, nama_ibadah, hari, jam, ruangan, keterangan, image, image_fit, image_pos_y FROM jadwal_ibadah WHERE is_active = 1 ORDER BY urutan ASC, id ASC");
 
 if ($stmt) {
     $stmt->execute();
