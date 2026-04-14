@@ -31,29 +31,6 @@ include __DIR__ . '/../includes/header.php';
         gap: 16px;
     }
 
-    .btn-add-jadwal {
-        display: inline-flex;
-        align-items: center;
-        gap: 8px;
-        background: linear-gradient(135deg, #1e3a5f 0%, #163357 100%);
-        color: #fff;
-        border: 1px solid rgba(12, 43, 80, 0.5);
-        border-radius: 12px;
-        padding: 10px 16px;
-        font-size: 13px;
-        font-weight: 700;
-        text-decoration: none;
-        box-shadow: 0 10px 20px rgba(16, 44, 87, 0.2);
-        transition: transform 0.18s ease, box-shadow 0.18s ease;
-    }
-
-    .btn-add-jadwal:hover {
-        color: #fff;
-        text-decoration: none;
-        transform: translateY(-1px);
-        box-shadow: 0 12px 24px rgba(16, 44, 87, 0.25);
-    }
-
     .admin-alert {
         border-radius: 12px;
         padding: 12px 14px;
@@ -172,6 +149,29 @@ include __DIR__ . '/../includes/header.php';
     .jadwal-name {
         font-weight: 700;
         color: #243b5f;
+    }
+
+    .jadwal-photo-thumb {
+        width: 56px;
+        height: 56px;
+        border-radius: 12px;
+        object-fit: cover;
+        object-position: center;
+        border: 1px solid rgba(16, 44, 87, 0.14);
+        background: #eef4f8;
+    }
+
+    .jadwal-photo-empty {
+        width: 56px;
+        height: 56px;
+        border-radius: 12px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border: 1px dashed rgba(16, 44, 87, 0.18);
+        background: #f4f8fc;
+        color: #9ab1c8;
+        font-size: 18px;
     }
 
     .status-badge {
@@ -414,24 +414,25 @@ include __DIR__ . '/../includes/header.php';
 
         .jadwal-table tbody td:nth-child(1)::before { content: 'No'; }
         .jadwal-table tbody td:nth-child(2)::before { content: 'Nama Ibadah'; }
-        .jadwal-table tbody td:nth-child(3)::before { content: 'Hari'; }
-        .jadwal-table tbody td:nth-child(4)::before { content: 'Jam'; }
-        .jadwal-table tbody td:nth-child(5)::before { content: 'Ruangan'; }
-        .jadwal-table tbody td:nth-child(6)::before { content: 'Keterangan'; }
-        .jadwal-table tbody td:nth-child(7)::before { content: 'Status'; }
-        .jadwal-table tbody td:nth-child(8)::before { content: 'Urutan'; }
-        .jadwal-table tbody td:nth-child(9)::before { content: 'Aksi'; }
+        .jadwal-table tbody td:nth-child(3)::before { content: 'Foto'; }
+        .jadwal-table tbody td:nth-child(4)::before { content: 'Hari'; }
+        .jadwal-table tbody td:nth-child(5)::before { content: 'Jam'; }
+        .jadwal-table tbody td:nth-child(6)::before { content: 'Ruangan'; }
+        .jadwal-table tbody td:nth-child(7)::before { content: 'Keterangan'; }
+        .jadwal-table tbody td:nth-child(8)::before { content: 'Status'; }
+        .jadwal-table tbody td:nth-child(9)::before { content: 'Urutan'; }
+        .jadwal-table tbody td:nth-child(10)::before { content: 'Aksi'; }
 
-        .jadwal-table tbody td:nth-child(9) {
+        .jadwal-table tbody td:nth-child(10) {
             display: block;
         }
 
-        .jadwal-table tbody td:nth-child(9)::before {
+        .jadwal-table tbody td:nth-child(10)::before {
             display: block;
             margin-bottom: 8px;
         }
 
-        .jadwal-table tbody td:nth-child(9) .actions {
+        .jadwal-table tbody td:nth-child(10) .actions {
             display: flex;
             gap: 8px;
             width: 100%;
@@ -458,18 +459,12 @@ include __DIR__ . '/../includes/header.php';
     <div class="panel-list">
         <div class="panel-head">
             <div class="panel-title"><i class="fas fa-calendar-week"></i> Daftar Jadwal Ibadah</div>
-            <a href="tambah.php" class="btn-add-jadwal">
-                <i class="fas fa-plus"></i> Tambah Jadwal Ibadah
-            </a>
         </div>
         <?php if (empty($jadwal_list)): ?>
             <div class="empty-state">
                 <i class="fas fa-calendar-alt"></i>
                 <h5>Belum ada jadwal ibadah</h5>
-                <p>Silakan tambah jadwal ibadah baru.</p>
-                <a href="tambah.php" class="btn-add-jadwal">
-                    <i class="fas fa-plus"></i> Tambah Jadwal Ibadah
-                </a>
+                <p>Belum ada data jadwal. Silakan hubungi developer jika perlu menambah jadwal baru.</p>
             </div>
         <?php else: ?>
             <div class="jadwal-table-wrap">
@@ -477,14 +472,15 @@ include __DIR__ . '/../includes/header.php';
                     <thead>
                         <tr>
                             <th width="5%">No</th>
-                            <th width="20%">Nama Ibadah</th>
+                            <th width="18%">Nama Ibadah</th>
+                            <th width="9%">Foto</th>
                             <th width="10%">Hari</th>
                             <th width="12%">Jam</th>
                             <th width="12%">Ruangan</th>
-                            <th width="15%">Keterangan</th>
+                            <th width="13%">Keterangan</th>
                             <th width="8%">Status</th>
                             <th width="12%">Urutan</th>
-                            <th class="col-aksi" width="16%">Aksi</th>
+                            <th class="col-aksi" width="15%">Aksi</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -497,6 +493,18 @@ include __DIR__ . '/../includes/header.php';
                                 <td class="col-no"><?php echo $no++; ?></td>
                                 <td>
                                     <span class="jadwal-name"><?php echo htmlspecialchars($jadwal['nama_ibadah']); ?></span>
+                                </td>
+                                <td class="col-no">
+                                    <?php if (!empty($jadwal['image']) && file_exists(__DIR__ . '/../../uploads/jadwal/' . $jadwal['image'])): ?>
+                                        <img
+                                            src="../../uploads/jadwal/<?php echo rawurlencode($jadwal['image']); ?>"
+                                            alt="Foto <?php echo htmlspecialchars($jadwal['nama_ibadah']); ?>"
+                                            class="jadwal-photo-thumb"
+                                            style="object-fit: <?php echo htmlspecialchars((string) ($jadwal['image_fit'] ?? 'cover')); ?>; object-position: center <?php echo max(0, min(100, (int) ($jadwal['image_pos_y'] ?? 50))); ?>%;"
+                                        >
+                                    <?php else: ?>
+                                        <span class="jadwal-photo-empty"><i class="fas fa-image"></i></span>
+                                    <?php endif; ?>
                                 </td>
                                 <td><?php echo htmlspecialchars($jadwal['hari']); ?></td>
                                 <td><?php echo htmlspecialchars($jadwal['jam']); ?></td>

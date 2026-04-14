@@ -1,5 +1,6 @@
 <?php
 require_once __DIR__ . '/config/database.php';
+require_once __DIR__ . '/includes/headline-helper.php';
 include __DIR__ . '/includes/header.php';
 
 if (!function_exists('formulir_find_first_image')) {
@@ -74,31 +75,89 @@ if (!function_exists('formulir_collect_images')) {
     }
 }
 
-// Get all active formulir, ordered by id DESC
-$query = "SELECT id, nama_formulir, deskripsi, file, status FROM formulir 
-          WHERE status = 'aktif' 
-          ORDER BY id DESC";
+if (!function_exists('formulir_get_cover_photo_url')) {
+    function formulir_get_cover_photo_url(array $row, $fallback = 'assets/images/default-avatar.png') {
+        if (!empty($row['foto'])) {
+            $candidate = 'uploads/formulir/foto/' . $row['foto'];
+            if (file_exists($candidate)) {
+                return $candidate;
+            }
+        }
+
+        return $fallback;
+    }
+}
+
+if (!function_exists('formulir_get_cover_photo_meta')) {
+    function formulir_get_cover_photo_meta(array $row, $fallback = 'assets/images/default-avatar.png'): array {
+        $photo_url = formulir_get_cover_photo_url($row, $fallback);
+        $position_y = isset($row['foto_posisi_y']) ? (int) $row['foto_posisi_y'] : 50;
+        if ($position_y < 0) {
+            $position_y = 0;
+        } elseif ($position_y > 100) {
+            $position_y = 100;
+        }
+
+        return [
+            'url' => $photo_url,
+            'pos_y' => $position_y,
+        ];
+    }
+}
+
+if (!function_exists('formulir_is_active_row')) {
+    function formulir_is_active_row(array $row): bool {
+        if (array_key_exists('status', $row)) {
+            return (string) $row['status'] === 'aktif';
+        }
+
+        if (array_key_exists('is_active', $row)) {
+            return (int) $row['is_active'] === 1;
+        }
+
+        return true;
+    }
+}
+
+$query = "SELECT * FROM formulir ORDER BY COALESCE(urutan, id) ASC, id ASC";
 $result = $conn->query($query);
 
 $formulir_items = [];
 if ($result instanceof mysqli_result) {
     while ($row = $result->fetch_assoc()) {
-        $formulir_items[] = $row;
+        if (formulir_is_active_row($row)) {
+            $formulir_items[] = $row;
+        }
     }
 }
 
-$formulir_hero_photo = formulir_find_first_image([
+$fallback_formulir_photo = formulir_find_first_image([
     'uploads/pelayanan',
     'uploads/slider',
     'assets/images/gembala'
 ]);
+
+$formulir_hero_photo_meta = !empty($formulir_items)
+    ? formulir_get_cover_photo_meta($formulir_items[0], $fallback_formulir_photo)
+    : ['url' => $fallback_formulir_photo, 'pos_y' => 50];
+
+$formulir_hero_photo = $formulir_hero_photo_meta['url'];
+
+headline_ensure_table($conn);
+$formulir_headline_setting = headline_get_setting($conn, 'formulir', ['pos_y' => 28, 'zoom' => 102]);
+$formulir_headline_custom = headline_resolve_public_image($formulir_headline_setting['image']);
+if ($formulir_headline_custom !== '') {
+    $formulir_hero_photo = $formulir_headline_custom;
+}
+$formulir_hero_pos_y = (int) ($formulir_headline_setting['pos_y'] ?? 28);
+$formulir_hero_zoom = (int) ($formulir_headline_setting['zoom'] ?? 102);
+$formulir_hero_scale = number_format($formulir_hero_zoom / 100, 2, '.', '');
 
 $formulir_card_images = formulir_collect_images([
     'uploads/pelayanan',
     'uploads/slider',
     'assets/images/gembala'
 ], $formulir_hero_photo);
-
 ?>
 
 <main class="main-content formulir-page">
@@ -107,7 +166,7 @@ $formulir_card_images = formulir_collect_images([
 <section class="formulir-header-section">
     <div class="container-large">
         <div class="formulir-hero-banner">
-            <img src="<?php echo htmlspecialchars($formulir_hero_photo); ?>" alt="Formulir GBI Salemba" class="formulir-hero-image">
+            <img src="<?php echo htmlspecialchars($formulir_hero_photo); ?>" alt="Formulir GBI Salemba" class="formulir-hero-image" style="object-position:center <?php echo $formulir_hero_pos_y; ?>%; transform:scale(<?php echo htmlspecialchars($formulir_hero_scale); ?>);">
             <div class="formulir-hero-overlay"></div>
             <div class="formulir-hero-content">
                 <div class="formulir-hero-copy">
@@ -139,12 +198,13 @@ $formulir_card_images = formulir_collect_images([
                 foreach ($formulir_items as $index => $row) {
                     // Check if file exists
                     $file_exists = !empty($row['file']) && file_exists('uploads/formulir/' . $row['file']);
-                    $card_image = $formulir_card_images[$index % count($formulir_card_images)];
+                    $card_meta = formulir_get_cover_photo_meta($row, $formulir_card_images[$index % count($formulir_card_images)]);
+                    $card_image = $card_meta['url'];
                     $card_description = trim((string)($row['deskripsi'] ?? ''));
                     ?>
                     <div class="formulir-card">
                         <div class="formulir-card-media">
-                            <img src="<?php echo htmlspecialchars($card_image); ?>" alt="<?php echo htmlspecialchars($row['nama_formulir']); ?>" class="formulir-card-photo">
+                            <img src="<?php echo htmlspecialchars($card_image); ?>" alt="<?php echo htmlspecialchars($row['nama_formulir']); ?>" class="formulir-card-photo" style="object-position:center <?php echo (int) $card_meta['pos_y']; ?>%;">
                         </div>
                         <div class="formulir-card-content">
                             <h3 class="formulir-title"><?php echo htmlspecialchars($row['nama_formulir']); ?></h3>

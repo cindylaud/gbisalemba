@@ -1,11 +1,12 @@
 <?php
 require_once __DIR__ . '/../config/database.php';
 require_once __DIR__ . '/includes/auth.php';
+require_once __DIR__ . '/../includes/renungan-richtext.php';
 
 $admin_page_title = 'Tambah Renungan';
 $uploadDir = __DIR__ . '/../uploads/renungan/';
 $allowedExt = ['jpg', 'jpeg', 'png', 'webp'];
-$maxSize = 4 * 1024 * 1024;
+$maxSize = 25 * 1024 * 1024;
 
 if (!is_dir($uploadDir)) {
     @mkdir($uploadDir, 0755, true);
@@ -20,11 +21,11 @@ $tanggal = date('Y-m-d');
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $judul = trim($_POST['judul'] ?? '');
     $ayat = trim($_POST['ayat'] ?? '');
-    $isi = trim($_POST['isi'] ?? '');
+    $isi = gbi_sanitize_renungan_html($_POST['isi'] ?? '');
     $tanggal = trim($_POST['tanggal'] ?? '');
 
-    if ($judul === '' || $ayat === '' || $isi === '' || $tanggal === '') {
-        $error = 'Semua field wajib diisi kecuali gambar.';
+    if ($judul === '' || $isi === '' || $tanggal === '') {
+        $error = 'Judul, isi, dan tanggal wajib diisi. Ayat boleh dikosongkan.';
     }
 
     $gambarName = null;
@@ -33,7 +34,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if ((int) $_FILES['gambar']['error'] !== UPLOAD_ERR_OK) {
             $error = 'Upload gambar gagal. Silakan coba lagi.';
         } elseif ((int) $_FILES['gambar']['size'] > $maxSize) {
-            $error = 'Ukuran gambar maksimal 4MB.';
+            $error = 'Ukuran gambar maksimal 25MB.';
         } else {
             $ext = strtolower(pathinfo((string) $_FILES['gambar']['name'], PATHINFO_EXTENSION));
             if (!in_array($ext, $allowedExt, true)) {
@@ -50,7 +51,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 
     if ($error === '') {
-        $stmt = $conn->prepare('INSERT INTO renungan (judul, isi, ayat, tanggal, gambar) VALUES (?, ?, ?, ?, ?)');
+        $stmt = $conn->prepare('INSERT INTO renungan (judul, isi, ayat, tanggal, gambar) VALUES (?, ?, NULLIF(?, \'\'), ?, ?)');
         if ($stmt) {
             $stmt->bind_param('sssss', $judul, $isi, $ayat, $tanggal, $gambarName);
             if ($stmt->execute()) {
@@ -87,8 +88,8 @@ include __DIR__ . '/includes/header.php';
         </div>
 
         <div class="form-group">
-            <label for="ayat">Ayat</label>
-            <input type="text" id="ayat" name="ayat" class="form-control" placeholder="Contoh: Yohanes 3:16" value="<?php echo htmlspecialchars($ayat); ?>" required>
+            <label for="ayat">Ayat (Opsional)</label>
+            <input type="text" id="ayat" name="ayat" class="form-control" placeholder="Contoh: Yohanes 3:16" value="<?php echo htmlspecialchars($ayat); ?>">
         </div>
 
         <div class="form-group">
@@ -99,12 +100,26 @@ include __DIR__ . '/includes/header.php';
         <div class="form-group">
             <label for="gambar">Gambar (Opsional)</label>
             <input type="file" id="gambar" name="gambar" class="form-control-file" accept=".jpg,.jpeg,.png,.webp">
-            <small class="form-text text-muted">Format: JPG/JPEG/PNG/WEBP, maksimal 4MB.</small>
+            <small class="form-text text-muted">Format: JPG/JPEG/PNG/WEBP, maksimal 25MB.</small>
         </div>
 
         <div class="form-group">
             <label for="isi">Isi Renungan</label>
-            <textarea id="isi" name="isi" class="form-control" rows="8" required><?php echo htmlspecialchars($isi); ?></textarea>
+            <div class="renungan-editor-wrap" data-renungan-editor>
+                <div class="renungan-editor-toolbar" role="toolbar" aria-label="Format isi renungan">
+                    <button type="button" class="btn btn-light btn-sm" data-cmd="bold" title="Bold"><strong>B</strong></button>
+                    <button type="button" class="btn btn-light btn-sm" data-cmd="italic" title="Italic"><em>I</em></button>
+                    <button type="button" class="btn btn-light btn-sm" data-cmd="underline" title="Underline"><u>U</u></button>
+                    <button type="button" class="btn btn-light btn-sm" data-cmd="insertUnorderedList" title="Bullet List">• List</button>
+                    <button type="button" class="btn btn-light btn-sm" data-cmd="insertOrderedList" title="Number List">1. List</button>
+                    <button type="button" class="btn btn-light btn-sm" data-block="blockquote" title="Kutipan">Quote</button>
+                    <button type="button" class="btn btn-light btn-sm" data-block="h3" title="Heading">H3</button>
+                    <button type="button" class="btn btn-light btn-sm" data-cmd="removeFormat" title="Hapus Format">Clear</button>
+                </div>
+                <div id="isiEditor" class="renungan-editor" contenteditable="true" data-placeholder="Tulis isi renungan di sini..."><?php echo gbi_editor_initial_html($isi); ?></div>
+            </div>
+            <textarea id="isi" name="isi" class="d-none"><?php echo htmlspecialchars($isi); ?></textarea>
+            <small class="form-text text-muted">Anda bisa gunakan bold, italic, underline, heading, quote, dan list.</small>
         </div>
 
         <button type="submit" class="btn btn-primary">
@@ -112,5 +127,49 @@ include __DIR__ . '/includes/header.php';
         </button>
     </form>
 </div>
+
+<script>
+(function () {
+    var editorWrap = document.querySelector('[data-renungan-editor]');
+    if (!editorWrap) {
+        return;
+    }
+
+    var form = editorWrap.closest('form');
+    var editor = document.getElementById('isiEditor');
+    var textarea = document.getElementById('isi');
+
+    if (!form || !editor || !textarea) {
+        return;
+    }
+
+    var syncContent = function () {
+        textarea.value = editor.innerHTML.trim();
+    };
+
+    editor.addEventListener('input', syncContent);
+    syncContent();
+
+    editorWrap.querySelectorAll('[data-cmd]').forEach(function (button) {
+        button.addEventListener('click', function () {
+            document.execCommand(button.getAttribute('data-cmd'), false, null);
+            syncContent();
+            editor.focus();
+        });
+    });
+
+    editorWrap.querySelectorAll('[data-block]').forEach(function (button) {
+        button.addEventListener('click', function () {
+            document.execCommand('formatBlock', false, button.getAttribute('data-block'));
+            syncContent();
+            editor.focus();
+        });
+    });
+
+    form.addEventListener('submit', function () {
+        syncContent();
+    });
+})();
+</script>
 
 <?php include __DIR__ . '/includes/footer.php'; ?>

@@ -19,7 +19,7 @@ if (!function_exists('gbi_excerpt')) {
 }
 
 $renunganItems = [];
-$query = $conn->query('SELECT id, judul, isi, ayat, tanggal, gambar FROM renungan ORDER BY tanggal DESC, id DESC');
+$query = $conn->query('SELECT id, judul, isi, ayat, tanggal FROM renungan ORDER BY tanggal DESC, id DESC');
 if ($query) {
 	while ($row = $query->fetch_assoc()) {
 		$renunganItems[] = $row;
@@ -27,13 +27,11 @@ if ($query) {
 }
 ?>
 
-<main class="main-content renungan-page-main">
+<main class="main-content renungan-page-main renungan-cool-page">
 	<section class="section glass-default renungan-page-section">
 		<div class="container-large">
 			<div class="renungan-heading-wrap">
-				<p class="renungan-kicker">Daily Bread</p>
 				<h1 class="renungan-page-title">Renungan Harian</h1>
-				<p class="renungan-page-subtitle">Temukan kekuatan baru melalui kebenaran Firman Tuhan setiap hari.</p>
 			</div>
 
 			<?php if (empty($renunganItems)): ?>

@@ -32,6 +32,7 @@ $menuItems = [
 	['href' => $adminBaseUrl . '/slider.php', 'icon' => 'fa-images', 'label' => 'Kelola Slider'],
 	['href' => $adminBaseUrl . '/whatsnew.php', 'icon' => 'fa-bullhorn', 'label' => 'Kelola Coming Soon'],
 	['href' => $adminBaseUrl . '/jadwal_ibadah/index.php', 'icon' => 'fa-calendar-days', 'label' => 'Kelola Jadwal'],
+	['href' => $adminBaseUrl . '/headline.php', 'icon' => 'fa-image', 'label' => 'Kelola Headline'],
 	['href' => $adminBaseUrl . '/pelayanan.php', 'icon' => 'fa-hands-praying', 'label' => 'Kelola Pelayanan'],
 	['href' => $adminBaseUrl . '/renungan.php', 'icon' => 'fa-book-open', 'label' => 'Kelola Renungan'],
 	['href' => $adminBaseUrl . '/formulir.php', 'icon' => 'fa-file-lines', 'label' => 'Kelola Formulir'],

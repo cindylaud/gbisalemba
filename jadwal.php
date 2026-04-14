@@ -1,6 +1,7 @@
 <?php
 require_once __DIR__ . '/includes/header.php';
 require_once __DIR__ . '/config/database.php';
+require_once __DIR__ . '/includes/headline-helper.php';
 
 if (!function_exists('jadwal_collect_images')) {
     function jadwal_collect_images(array $directories) {
@@ -70,84 +71,58 @@ if (!function_exists('jadwal_resolve_key')) {
     }
 }
 
+if (!function_exists('jadwal_row_is_active')) {
+    function jadwal_row_is_active(array $row): bool {
+        if (array_key_exists('is_active', $row)) {
+            $value = $row['is_active'];
+            if (is_numeric($value)) {
+                return (int) $value === 1;
+            }
+
+            $text = strtolower(trim((string) $value));
+            if ($text === 'aktif' || $text === 'active' || $text === 'yes' || $text === 'true') {
+                return true;
+            }
+            if ($text === 'nonaktif' || $text === 'inactive' || $text === 'no' || $text === 'false') {
+                return false;
+            }
+        }
+
+        if (array_key_exists('status', $row)) {
+            return strtolower(trim((string) $row['status'])) === 'aktif';
+        }
+
+        return true;
+    }
+}
+
 // Get all active jadwal ibadah
 $jadwal_list = [];
 $error_message = '';
 
-$stmt = $conn->prepare("SELECT id, nama_ibadah, hari, jam, ruangan, keterangan, image, image_fit, image_pos_y FROM jadwal_ibadah WHERE is_active = 1 ORDER BY urutan ASC, id ASC");
+$stmt = $conn->prepare("SELECT * FROM jadwal_ibadah ORDER BY COALESCE(urutan, id) ASC, id ASC");
+
+if (!$stmt) {
+    // Fallback for legacy schema that may not yet have urutan.
+    $stmt = $conn->prepare("SELECT * FROM jadwal_ibadah ORDER BY id ASC");
+}
 
 if ($stmt) {
     $stmt->execute();
     $result = $stmt->get_result();
-    $jadwal_list = $result->fetch_all(MYSQLI_ASSOC);
+    $rows = $result->fetch_all(MYSQLI_ASSOC);
+    foreach ($rows as $row) {
+        if (jadwal_row_is_active($row)) {
+            $jadwal_list[] = $row;
+        }
+    }
     $stmt->close();
 } else {
     $error_message = 'Gagal mengambil data jadwal. Silakan coba lagi nanti.';
 }
 
-$jadwal_required = [
-    'ibadah_raya' => [
-        'nama_ibadah' => 'Ibadah Raya',
-        'hari' => 'Minggu',
-        'jam' => '08:00 WIB, 10:30 WIB, & 17:00 WIB',
-        'ruangan' => 'Stars Community Hall',
-        'keterangan' => 'Ibadah Minggu GBI Salemba'
-    ],
-    'ibadah_starskids' => [
-        'nama_ibadah' => 'Ibadah StarsKids',
-        'hari' => 'Minggu',
-        'jam' => '08:00 WIB, 10:30 WIB, & 17:00 WIB',
-        'ruangan' => 'Ruangan StarsKids',
-        'keterangan' => 'Ibadah Anak'
-    ],
-    'ibadah_starsjc' => [
-        'nama_ibadah' => 'Ibadah StarsJC',
-        'hari' => 'Setiap Minggu ke 1, 3, & 5',
-        'jam' => '10:30 WIB',
-        'ruangan' => 'Ruangan StarsJC',
-        'keterangan' => 'Usia 12-18 tahun'
-    ],
-    'ibadah_stars_community' => [
-        'nama_ibadah' => 'Ibadah Stars Community',
-        'hari' => 'Setiap Jumat minggu ke-4',
-        'jam' => '19:00 WIB',
-        'ruangan' => 'Stars Community Hall',
-        'keterangan' => 'Usia 18-25 tahun'
-    ],
-    'rumah_doa' => [
-        'nama_ibadah' => 'Rumah Doa',
-        'hari' => 'Selasa & Kamis',
-        'jam' => '09:00 WIB',
-        'ruangan' => 'Ruangan StarsKids',
-        'keterangan' => 'Ibadah doa bersama'
-    ]
-];
-
-$jadwal_lookup = [];
-foreach ($jadwal_list as $row) {
-    $key = jadwal_resolve_key($row['nama_ibadah'] ?? '');
-    if ($key && !isset($jadwal_lookup[$key])) {
-        $jadwal_lookup[$key] = $row;
-    }
-}
-
-$ordered_jadwal = [];
-$fallback_id = 10000;
-foreach ($jadwal_required as $key => $preset) {
-    $existing = $jadwal_lookup[$key] ?? null;
-    $ordered_jadwal[] = [
-        'id' => $existing ? (int) $existing['id'] : $fallback_id++,
-        'nama_ibadah' => $preset['nama_ibadah'],
-        'hari' => $preset['hari'],
-        'jam' => $preset['jam'],
-        'ruangan' => $preset['ruangan'],
-        'keterangan' => $preset['keterangan']
-    ];
-}
-
-$jadwal_list = $ordered_jadwal;
-
 $jadwal_gallery_images = jadwal_collect_images([
+    'uploads/jadwal',
     'uploads/slider',
     'uploads/pelayanan',
     'uploads/whatsnew'
@@ -158,11 +133,21 @@ if (count($jadwal_gallery_images) === 0) {
 }
 
 $jadwal_hero_photo = $jadwal_gallery_images[count($jadwal_gallery_images) - 1];
+
+headline_ensure_table($conn);
+$jadwal_headline_setting = headline_get_setting($conn, 'jadwal', ['pos_y' => 30, 'zoom' => 100]);
+$jadwal_headline_custom = headline_resolve_public_image($jadwal_headline_setting['image']);
+if ($jadwal_headline_custom !== '') {
+    $jadwal_hero_photo = $jadwal_headline_custom;
+}
+$jadwal_hero_pos_y = (int) ($jadwal_headline_setting['pos_y'] ?? 30);
+$jadwal_hero_zoom = (int) ($jadwal_headline_setting['zoom'] ?? 100);
+$jadwal_hero_scale = number_format($jadwal_hero_zoom / 100, 2, '.', '');
 ?>
 
 <div class="jadwal-page">
     <section class="jadwal-hero">
-        <img src="<?php echo htmlspecialchars($jadwal_hero_photo); ?>" alt="Jadwal Ibadah GBI Salemba" class="jadwal-hero-image">
+        <img src="<?php echo htmlspecialchars($jadwal_hero_photo); ?>" alt="Jadwal Ibadah GBI Salemba" class="jadwal-hero-image" style="object-position:center <?php echo $jadwal_hero_pos_y; ?>%; transform:scale(<?php echo htmlspecialchars($jadwal_hero_scale); ?>);">
         <div class="jadwal-hero-overlay"></div>
         <div class="jadwal-hero-container">
             <h1 class="jadwal-hero-title">Jadwal Ibadah</h1>
@@ -215,7 +200,22 @@ $jadwal_hero_photo = $jadwal_gallery_images[count($jadwal_gallery_images) - 1];
 
                     <div class="jadwal-selector-content">
                         <?php foreach ($jadwal_list as $index => $jadwal): ?>
-                            <?php $panel_image = $jadwal_gallery_images[$index % count($jadwal_gallery_images)]; ?>
+                            <?php
+                                $panel_image = $panel_image_fit = '';
+                                if (!empty($jadwal['image']) && file_exists('uploads/jadwal/' . $jadwal['image'])) {
+                                    $panel_image = 'uploads/jadwal/' . $jadwal['image'];
+                                    $panel_image_fit = (string) ($jadwal['image_fit'] ?? 'cover');
+                                } else {
+                                    $panel_image = $jadwal_gallery_images[$index % count($jadwal_gallery_images)];
+                                    $panel_image_fit = 'cover';
+                                }
+                                $panel_image_pos_y = isset($jadwal['image_pos_y']) ? (int) $jadwal['image_pos_y'] : 50;
+                                if ($panel_image_pos_y < 0) {
+                                    $panel_image_pos_y = 0;
+                                } elseif ($panel_image_pos_y > 100) {
+                                    $panel_image_pos_y = 100;
+                                }
+                            ?>
                             <article
                                 id="jadwal-panel-<?php echo (int) $jadwal['id']; ?>"
                                 class="jadwal-detail-panel<?php echo $index === 0 ? ' is-active' : ''; ?>"
@@ -264,7 +264,7 @@ $jadwal_hero_photo = $jadwal_gallery_images[count($jadwal_gallery_images) - 1];
 
                                     <aside class="jadwal-detail-thumb">
                                         <div class="jadwal-detail-thumb-frame">
-                                            <img src="<?php echo htmlspecialchars($panel_image); ?>" alt="<?php echo htmlspecialchars($jadwal['nama_ibadah']); ?>">
+                                            <img src="<?php echo htmlspecialchars($panel_image); ?>" alt="<?php echo htmlspecialchars($jadwal['nama_ibadah']); ?>" style="object-fit: <?php echo htmlspecialchars($panel_image_fit); ?>; object-position: center <?php echo $panel_image_pos_y; ?>%;">
                                         </div>
                                     </aside>
                                 </div>

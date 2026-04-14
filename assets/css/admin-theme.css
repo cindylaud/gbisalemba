@@ -335,6 +335,51 @@ body.admin-theme .h4 {
   resize: vertical;
 }
 
+.renungan-editor-wrap {
+  border: 1.5px solid rgba(30, 58, 95, 0.22);
+  border-radius: 12px;
+  overflow: hidden;
+  background: #fff;
+}
+
+.renungan-editor-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  padding: 10px;
+  border-bottom: 1px solid rgba(30, 58, 95, 0.14);
+  background: #f7fafe;
+}
+
+.renungan-editor-toolbar .btn {
+  border-radius: 8px;
+  border: 1px solid rgba(30, 58, 95, 0.18);
+  min-width: 38px;
+}
+
+.renungan-editor {
+  min-height: 250px;
+  padding: 12px;
+  font-size: 14px;
+  line-height: 1.6;
+  outline: none;
+}
+
+.renungan-editor:empty::before {
+  content: attr(data-placeholder);
+  color: rgba(16, 44, 87, 0.45);
+}
+
+.renungan-editor p,
+.renungan-editor ul,
+.renungan-editor ol,
+.renungan-editor blockquote,
+.renungan-editor h2,
+.renungan-editor h3,
+.renungan-editor h4 {
+  margin-bottom: 8px;
+}
+
 .admin-container .form > .btn-primary,
 .admin-container .form > .btn-secondary {
   margin-top: 4px;

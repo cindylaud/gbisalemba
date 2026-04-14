@@ -1,5 +1,6 @@
 <?php
 require_once __DIR__ . '/config/database.php';
+require_once __DIR__ . '/includes/headline-helper.php';
 include __DIR__ . '/includes/header.php';
 
 if (!function_exists('pelayanan_find_first_image')) {
@@ -28,6 +29,20 @@ if (!function_exists('pelayanan_find_first_image')) {
         }
 
         return $fallback;
+    }
+}
+
+if (!function_exists('pelayanan_is_active_row')) {
+    function pelayanan_is_active_row(array $row): bool {
+        if (array_key_exists('status', $row)) {
+            return strtolower(trim((string) $row['status'])) === 'aktif';
+        }
+
+        if (array_key_exists('is_active', $row)) {
+            return (int) $row['is_active'] === 1;
+        }
+
+        return true;
     }
 }
 
@@ -64,13 +79,15 @@ if (!function_exists('pelayanan_get_image_meta')) {
 }
 
 // Get all active pelayanan, ordered by urutan
-$query = "SELECT * FROM pelayanan WHERE status = 'aktif' ORDER BY urutan ASC";
+$query = "SELECT * FROM pelayanan ORDER BY COALESCE(urutan, id) ASC, id ASC";
 $result = $conn->query($query);
 
 $pelayanan_items = [];
 if ($result instanceof mysqli_result) {
     while ($row = $result->fetch_assoc()) {
-        $pelayanan_items[] = $row;
+        if (pelayanan_is_active_row($row)) {
+            $pelayanan_items[] = $row;
+        }
     }
 }
 
@@ -80,15 +97,16 @@ $pelayanan_hero_photo = pelayanan_find_first_image([
     'assets/images/gembala'
 ]);
 
-$pelayanan_description_map = [
-    'pernikahan' => 'Awal yang baru membangun rumah tangga bersama Kristus',
-    'penyerahan anak' => 'Keluarga bersatu dan berkomitmen membesarkan anak dalam kasih Kristus',
-    'baptisan selam' => 'Disempurnakan menjadi seperti Kristus',
-    'kedukaan' => 'Melayani dengan kasih dan penghiburan kepada keluarga yang ditinggalkan',
-    'kematian' => 'Melayani dengan kasih dan penghiburan kepada keluarga yang ditinggalkan',
-    'pengajaran' => 'Melalui kelas KOM (Kehidupan Orientasi Melayani) kami rindu setiap jemaat Tuhan bertumbuh dalam Kristus',
-    'kom' => 'Melalui kelas KOM (Kehidupan Orientasi Melayani) kami rindu setiap jemaat Tuhan bertumbuh dalam Kristus'
-];
+headline_ensure_table($conn);
+$pelayanan_headline_setting = headline_get_setting($conn, 'pelayanan', ['pos_y' => 28, 'zoom' => 102]);
+$pelayanan_headline_custom = headline_resolve_public_image($pelayanan_headline_setting['image']);
+if ($pelayanan_headline_custom !== '') {
+    $pelayanan_hero_photo = $pelayanan_headline_custom;
+}
+$pelayanan_hero_pos_y = (int) ($pelayanan_headline_setting['pos_y'] ?? 28);
+$pelayanan_hero_zoom = (int) ($pelayanan_headline_setting['zoom'] ?? 102);
+$pelayanan_hero_scale = number_format($pelayanan_hero_zoom / 100, 2, '.', '');
+
 ?>
 
 <main class="main-content pelayanan-page">
@@ -97,7 +115,7 @@ $pelayanan_description_map = [
 <section class="pelayanan-hero-section">
     <div class="container-large">
         <div class="pelayanan-hero-banner">
-            <img src="<?php echo htmlspecialchars($pelayanan_hero_photo); ?>" alt="Pelayanan GBI Salemba" class="pelayanan-hero-image">
+            <img src="<?php echo htmlspecialchars($pelayanan_hero_photo); ?>" alt="Pelayanan GBI Salemba" class="pelayanan-hero-image" style="object-position:center <?php echo $pelayanan_hero_pos_y; ?>%; transform:scale(<?php echo htmlspecialchars($pelayanan_hero_scale); ?>);">
             <div class="pelayanan-hero-overlay"></div>
             <div class="pelayanan-hero-content">
                 <div class="pelayanan-hero-copy">
@@ -131,15 +149,7 @@ $pelayanan_description_map = [
                 : '';
             $image_meta = pelayanan_get_image_meta($foto_path);
             $judul_text = isset($row['judul']) ? trim((string) $row['judul']) : '';
-            $judul_lower = strtolower($judul_text);
             $deskripsi_text = isset($row['deskripsi']) ? trim((string) $row['deskripsi']) : '';
-
-            foreach ($pelayanan_description_map as $keyword => $description_override) {
-                if (strpos($judul_lower, $keyword) !== false) {
-                    $deskripsi_text = $description_override;
-                    break;
-                }
-            }
 
             $foto_posisi_y = isset($row['foto_posisi_y']) ? (int) $row['foto_posisi_y'] : 50;
             if ($foto_posisi_y < 0) {

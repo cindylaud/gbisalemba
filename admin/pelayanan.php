@@ -268,25 +268,6 @@ if (!isset($error) && isset($_GET['error']) && $_GET['error'] !== '') {
             margin: 0;
         }
 
-        .alert {
-            padding: 13px 16px;
-            margin-bottom: 16px;
-            border-radius: 12px;
-            font-weight: 600;
-        }
-
-        .alert-success {
-            background-color: #d4edda;
-            color: #155724;
-            border: 1px solid #c3e6cb;
-        }
-
-        .alert-danger {
-            background-color: #f8d7da;
-            color: #721c24;
-            border: 1px solid #f5c6cb;
-        }
-
         .layout {
             display: grid;
             grid-template-columns: minmax(0, 1.55fr) minmax(260px, 0.45fr);
@@ -993,19 +974,6 @@ if (!isset($error) && isset($_GET['error']) && $_GET['error'] !== '') {
         <div class="admin-content">
 
 <div class="container">
-    <!-- ALERTS -->
-    <?php if (isset($success)): ?>
-        <div class="alert alert-success">
-            <i class="fas fa-check-circle"></i> <?php echo htmlspecialchars($success); ?>
-        </div>
-    <?php endif; ?>
-    
-    <?php if (isset($error)): ?>
-        <div class="alert alert-danger">
-            <i class="fas fa-exclamation-circle"></i> <?php echo htmlspecialchars($error); ?>
-        </div>
-    <?php endif; ?>
-
     <div class="layout">
     <div class="panel panel-list">
         <div class="panel-title list-title">Daftar Pelayanan</div>

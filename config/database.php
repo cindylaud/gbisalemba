@@ -13,15 +13,65 @@
  * =====================================================================
  */
 
-// Konfigurasi Database
-define('DB_HOST', 'localhost');
-define('DB_USER', 'root');
-define('DB_PASS', '');
-define('DB_NAME', 'gbi_salemba');
-define('DB_CHARSET', 'utf8mb4');
+if (!function_exists('gbi_env')) {
+    function gbi_env($key, $default = null) {
+        $value = getenv($key);
+        if ($value !== false && $value !== '') {
+            return $value;
+        }
+
+        if (isset($_ENV[$key]) && $_ENV[$key] !== '') {
+            return $_ENV[$key];
+        }
+
+        if (isset($_SERVER[$key]) && $_SERVER[$key] !== '') {
+            return $_SERVER[$key];
+        }
+
+        return $default;
+    }
+}
+
+// Konfigurasi Database (default lokal, bisa dioverride via environment hosting)
+$dbHost = (string) gbi_env('DB_HOST', 'localhost');
+$dbUser = (string) gbi_env('DB_USER', 'root');
+$dbPass = (string) gbi_env('DB_PASS', '');
+$dbName = (string) gbi_env('DB_NAME', 'gbi_salemba');
+$dbCharset = (string) gbi_env('DB_CHARSET', 'utf8mb4');
+$dbPort = (int) gbi_env('DB_PORT', 3306);
+
+// Opsi tambahan: DATABASE_URL (contoh: mysql://user:pass@host:3306/dbname)
+$databaseUrl = (string) gbi_env('DATABASE_URL', '');
+if ($databaseUrl !== '') {
+    $parsedUrl = @parse_url($databaseUrl);
+    if (is_array($parsedUrl)) {
+        if (!empty($parsedUrl['host'])) {
+            $dbHost = (string) $parsedUrl['host'];
+        }
+        if (!empty($parsedUrl['user'])) {
+            $dbUser = (string) $parsedUrl['user'];
+        }
+        if (isset($parsedUrl['pass'])) {
+            $dbPass = (string) $parsedUrl['pass'];
+        }
+        if (!empty($parsedUrl['path'])) {
+            $dbName = ltrim((string) $parsedUrl['path'], '/');
+        }
+        if (!empty($parsedUrl['port'])) {
+            $dbPort = (int) $parsedUrl['port'];
+        }
+    }
+}
+
+define('DB_HOST', $dbHost);
+define('DB_USER', $dbUser);
+define('DB_PASS', $dbPass);
+define('DB_NAME', $dbName);
+define('DB_CHARSET', $dbCharset);
+define('DB_PORT', $dbPort);
 
 // Sambungkan ke database menggunakan MySQLi OOP
-$conn = new mysqli(DB_HOST, DB_USER, DB_PASS, DB_NAME);
+$conn = new mysqli(DB_HOST, DB_USER, DB_PASS, DB_NAME, DB_PORT);
 
 // Cek koneksi
 if ($conn->connect_error) {
@@ -35,8 +85,12 @@ if ($conn->connect_error) {
 // Set charset ke UTF-8 MB4 untuk mendukung emoji dan karakter spesial
 $conn->set_charset(DB_CHARSET);
 
-// Set timezone ke UTC (opsional, bisa disesuaikan)
-date_default_timezone_set('UTC');
+// Set timezone (default Asia/Jakarta, bisa dioverride di environment APP_TIMEZONE)
+$appTimezone = (string) gbi_env('APP_TIMEZONE', 'Asia/Jakarta');
+if ($appTimezone === '') {
+    $appTimezone = 'Asia/Jakarta';
+}
+date_default_timezone_set($appTimezone);
 
 /**
  * Helper function untuk escape string (backup untuk persiapan)

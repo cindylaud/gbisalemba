@@ -4,8 +4,11 @@ require_once __DIR__ . '/../../config/database.php';
 require_once __DIR__ . '/_table_bootstrap.php';
 require_once __DIR__ . '/../../includes/image-helper.php';
 
+header('Location: index.php?error=Fitur tambah jadwal dinonaktifkan sementara. Silakan edit jadwal yang sudah ada.');
+exit;
+
 define('JADWAL_UPLOAD_DIR', __DIR__ . '/../../uploads/jadwal/');
-define('JADWAL_MAX_SIZE', 12 * 1024 * 1024); // 12MB
+define('JADWAL_MAX_SIZE', 50 * 1024 * 1024); // 50MB
 define('JADWAL_MAX_WIDTH', 1920);
 define('JADWAL_QUALITY', 80);
 

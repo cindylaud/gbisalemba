@@ -1,5 +1,8 @@
 <?php
 require_once __DIR__ . '/config/database.php';
+require_once __DIR__ . '/includes/renungan-richtext.php';
+
+$pageBodyClass = 'renungan-detail-page';
 include __DIR__ . '/includes/header.php';
 
 $id = (int) ($_GET['id'] ?? 0);
@@ -18,7 +21,7 @@ if ($id > 0) {
 ?>
 
 <main class="main-content renungan-detail-main">
-	<section class="section glass-default renungan-detail-section">
+	<section class="section renungan-detail-section">
 		<div class="container-large">
 			<?php if (!$renungan): ?>
 				<div class="renungan-empty-state">
@@ -29,15 +32,22 @@ if ($id > 0) {
 				<?php
 				$imageUrl = !empty($renungan['gambar']) ? 'uploads/renungan/' . $renungan['gambar'] : '';
 				$hasImage = $imageUrl !== '' && is_file(__DIR__ . '/' . $imageUrl);
+				$displayDate = date('d F Y', strtotime((string) $renungan['tanggal']));
+				$ayat = trim((string) ($renungan['ayat'] ?? ''));
 				?>
 				<article class="renungan-detail-card">
-					<p class="renungan-kicker">Daily Bread</p>
-					<h1 class="renungan-detail-title"><?php echo htmlspecialchars($renungan['judul']); ?></h1>
-
-					<div class="renungan-meta-row">
-						<span class="renungan-verse"><?php echo htmlspecialchars($renungan['ayat']); ?></span>
-						<span class="renungan-date"><?php echo htmlspecialchars(date('d F Y', strtotime((string) $renungan['tanggal']))); ?></span>
+					<div class="renungan-detail-header">
+						<p class="renungan-kicker">Renungan Harian</p>
+						<h1 class="renungan-detail-title"><?php echo htmlspecialchars($renungan['judul']); ?></h1>
+						<p class="renungan-date renungan-detail-date"><?php echo htmlspecialchars($displayDate); ?></p>
 					</div>
+
+					<?php if ($ayat !== ''): ?>
+						<div class="renungan-meta-row">
+							<span class="renungan-verse"><?php echo htmlspecialchars($ayat); ?></span>
+							<span class="renungan-detail-meta-sep" aria-hidden="true"></span>
+						</div>
+					<?php endif; ?>
 
 					<?php if ($hasImage): ?>
 						<div class="renungan-detail-cover-wrap">
@@ -46,10 +56,12 @@ if ($id > 0) {
 					<?php endif; ?>
 
 					<div class="renungan-detail-body">
-						<?php echo nl2br(htmlspecialchars((string) $renungan['isi'])); ?>
+						<?php echo gbi_render_renungan_body($renungan['isi']); ?>
 					</div>
 
-					<a href="renungan.php" class="renungan-read-more">Kembali ke daftar renungan</a>
+					<div class="renungan-detail-footer">
+						<a href="renungan.php" class="renungan-read-more">Kembali ke daftar renungan</a>
+					</div>
 				</article>
 			<?php endif; ?>
 		</div>

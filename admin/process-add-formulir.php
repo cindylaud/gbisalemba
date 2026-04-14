@@ -37,6 +37,18 @@ define('MAX_UPLOAD_SIZE', 10 * 1024 * 1024); // 10MB
 define('UPLOAD_DIR', '../uploads/formulir/');
 define('ALLOWED_MIME_TYPES', ['application/pdf']);
 
+function formulirTableColumns(mysqli $conn): array {
+    $columns = [];
+    $result = $conn->query('SHOW COLUMNS FROM formulir');
+    if ($result instanceof mysqli_result) {
+        while ($row = $result->fetch_assoc()) {
+            $columns[$row['Field']] = true;
+        }
+    }
+
+    return $columns;
+}
+
 // Pastikan folder upload ada
 if (!is_dir(UPLOAD_DIR)) {
     if (!mkdir(UPLOAD_DIR, 0755, true)) {
@@ -211,10 +223,34 @@ if (!file_exists($upload_path)) {
 // =====================================================================
 // INSERT KE DATABASE (PREPARED STATEMENT)
 // =====================================================================
-// Query: INSERT INTO formulir (nama_formulir, file, deskripsi, is_active) VALUES (?, ?, ?, ?)
-// Note: id dan created_at auto-generate di database
+// Query dibuat adaptif agar cocok dengan schema status/is_active yang berbeda antar install.
+$columns = formulirTableColumns($conn);
+$useStatus = isset($columns['status']);
+$useIsActive = isset($columns['is_active']);
+$status_value = $is_active ? 'aktif' : 'nonaktif';
 
-$stmt = $conn->prepare("INSERT INTO formulir (nama_formulir, file, deskripsi, is_active) VALUES (?, ?, ?, ?)");
+$fields = ['nama_formulir', 'file', 'deskripsi'];
+$placeholders = ['?', '?', '?'];
+$values = [$nama_formulir, $file_name, $deskripsi];
+$types = 'sss';
+
+if ($useStatus) {
+    $fields[] = 'status';
+    $placeholders[] = '?';
+    $values[] = $status_value;
+    $types .= 's';
+}
+
+if ($useIsActive) {
+    $fields[] = 'is_active';
+    $placeholders[] = '?';
+    $values[] = $is_active;
+    $types .= 'i';
+}
+
+$stmt = $conn->prepare(
+    'INSERT INTO formulir (' . implode(', ', $fields) . ') VALUES (' . implode(', ', $placeholders) . ')'
+);
 
 if ($stmt === false) {
     // Rollback: hapus file yang sudah terupload
@@ -226,7 +262,7 @@ if ($stmt === false) {
 
 // Bind parameters
 // s = string, i = integer
-$stmt->bind_param("sssi", $nama_formulir, $file_name, $deskripsi, $is_active);
+$stmt->bind_param($types, ...$values);
 
 // Execute query
 if (!$stmt->execute()) {

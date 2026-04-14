@@ -11,6 +11,8 @@
   var serverClockEl = document.getElementById('heroServerClock');
   var valuesEl = document.getElementById('heroCountdownValues');
   var liveActionsEl = document.getElementById('heroLiveActions');
+  var livePrimaryEl = document.getElementById('heroLivePrimary');
+  var liveSecondaryEl = document.getElementById('heroLiveSecondary');
 
   var liveWindowMinutes = Number(root.getAttribute('data-live-window') || 120);
   var serviceSlots = [
@@ -51,6 +53,15 @@
 
   function pad(value) {
     return String(value).padStart(2, '0');
+  }
+
+  function isMobileView() {
+    return window.matchMedia('(max-width: 768px)').matches;
+  }
+
+  function serviceTitleForView(title) {
+    if (!title) return '';
+    return isMobileView() ? title.replace('Ibadah Raya ', '') : title;
   }
 
   function formatServerClock(timestamp) {
@@ -160,17 +171,21 @@
 
     if (state.isLive) {
       root.classList.add('is-live');
-      if (labelEl) labelEl.textContent = 'Service Is Live Now';
-      if (serviceEl) serviceEl.textContent = state.liveSlot ? state.liveSlot.title : 'Ibadah Raya Sedang Berlangsung';
+      if (labelEl) labelEl.textContent = isMobileView() ? 'Live Sekarang' : 'Ibadah Sedang Berlangsung';
+      if (serviceEl) serviceEl.textContent = state.liveSlot ? serviceTitleForView(state.liveSlot.title) : 'Ibadah Sedang Berlangsung';
       if (valuesEl) valuesEl.style.display = 'none';
       if (liveActionsEl) liveActionsEl.hidden = false;
+      if (livePrimaryEl) livePrimaryEl.textContent = 'Gabung Online';
+      if (liveSecondaryEl) liveSecondaryEl.textContent = 'Lokasi Gereja';
       return;
     }
 
     root.classList.remove('is-live');
-    if (labelEl) labelEl.textContent = 'Next Service Starts In';
+    if (labelEl) labelEl.textContent = isMobileView() ? 'Ibadah Lagi Dalam' : 'Ibadah Berikutnya Dimulai Dalam';
     if (valuesEl) valuesEl.style.display = '';
-    if (liveActionsEl) liveActionsEl.hidden = true;
+    if (liveActionsEl) liveActionsEl.hidden = false;
+    if (livePrimaryEl) livePrimaryEl.textContent = 'Ke YouTube';
+    if (liveSecondaryEl) liveSecondaryEl.textContent = isMobileView() ? 'Lokasi' : 'Lokasi Gereja';
 
     if (!state.nextSlot) {
       renderCountdown(0);
@@ -186,7 +201,7 @@
     var dayDiff = Math.max(0, Math.round((nextDayStart - currentDayStart) / (24 * 60 * 60 * 1000)));
     var dayText = dayDiff === 0 ? 'Hari ini' : dayDiff === 1 ? '1 hari lagi' : dayDiff + ' hari lagi';
 
-    if (serviceEl) serviceEl.textContent = dayText + ' • ' + state.nextSlot.title;
+    if (serviceEl) serviceEl.textContent = dayText + ' • ' + serviceTitleForView(state.nextSlot.title);
   }
 
   updateHeroCountdown();

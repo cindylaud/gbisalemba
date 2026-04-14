@@ -24,6 +24,15 @@ define('SLIDER_UPLOAD_DIR', __DIR__ . '/../uploads/slider/');
 define('SLIDER_MAX_WIDTH', 2000); // pixels
 define('SLIDER_JPEG_QUALITY', 80); // 0-100
 
+function ensureSliderZoomColumn($conn) {
+    $check = $conn->query("SHOW COLUMNS FROM slider LIKE 'image_zoom'");
+    if ($check && $check->num_rows === 0) {
+        $conn->query("ALTER TABLE slider ADD COLUMN image_zoom TINYINT UNSIGNED NOT NULL DEFAULT 100 AFTER image");
+    }
+}
+
+ensureSliderZoomColumn($conn);
+
 $message = '';
 $error = '';
 
@@ -66,6 +75,12 @@ for ($i = 1; $i <= 4; $i++) {
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['urutan'])) {
     $urutan = intval($_POST['urutan']);
     $is_active = isset($_POST['is_active']) ? 1 : 0;
+    $image_zoom = intval($_POST['image_zoom'] ?? 100);
+    if ($image_zoom < 50) {
+        $image_zoom = 50;
+    } elseif ($image_zoom > 150) {
+        $image_zoom = 150;
+    }
     
     // Validasi urutan 1-4
     if ($urutan < 1 || $urutan > 4) {
@@ -134,12 +149,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['urutan'])) {
                 // Update existing record
                 if ($update_image) {
                     // Update dengan gambar baru
-                    $stmt = $conn->prepare("UPDATE slider SET image = ?, is_active = ?, updated_at = NOW() WHERE urutan = ?");
-                    $stmt->bind_param("sii", $new_filename, $is_active, $urutan);
+                    $stmt = $conn->prepare("UPDATE slider SET image = ?, image_zoom = ?, is_active = ?, updated_at = NOW() WHERE urutan = ?");
+                    $stmt->bind_param("siii", $new_filename, $image_zoom, $is_active, $urutan);
                 } else {
-                    // Hanya update is_active (tidak ubah image)
-                    $stmt = $conn->prepare("UPDATE slider SET is_active = ?, updated_at = NOW() WHERE urutan = ?");
-                    $stmt->bind_param("ii", $is_active, $urutan);
+                    // Update zoom + is_active (tanpa ubah image)
+                    $stmt = $conn->prepare("UPDATE slider SET image_zoom = ?, is_active = ?, updated_at = NOW() WHERE urutan = ?");
+                    $stmt->bind_param("iii", $image_zoom, $is_active, $urutan);
                 }
                 
                 if ($stmt->execute()) {
@@ -154,8 +169,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['urutan'])) {
             } else {
                 // Insert new (seharusnya tidak pernah sampai sini karena auto-seed)
                 $img = $update_image ? $new_filename : 'default.png';
-                $stmt = $conn->prepare("INSERT INTO slider (urutan, title, subtitle, image, is_active, created_at) VALUES (?, NULL, NULL, ?, ?, NOW())");
-                $stmt->bind_param("isi", $urutan, $img, $is_active);
+                $stmt = $conn->prepare("INSERT INTO slider (urutan, title, subtitle, image, image_zoom, is_active, created_at) VALUES (?, NULL, NULL, ?, ?, ?, NOW())");
+                $stmt->bind_param("isii", $urutan, $img, $image_zoom, $is_active);
                 
                 if ($stmt->execute()) {
                     $message = 'Foto ' . $urutan . ' berhasil disimpan';
@@ -172,7 +187,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['urutan'])) {
 }
 
 // Get data untuk 4 card (urutan 1-4)
-$query = "SELECT id, urutan, image, is_active FROM slider WHERE urutan IN (1,2,3,4) ORDER BY urutan ASC";
+$query = "SELECT id, urutan, image, COALESCE(image_zoom, 100) AS image_zoom, is_active FROM slider WHERE urutan IN (1,2,3,4) ORDER BY urutan ASC";
 $result = $conn->query($query);
 if ($result === false) {
     $error = 'Query error: ' . $conn->error;
@@ -203,6 +218,7 @@ $selected_card = $cards[$selected_slot] ?? null;
 $selected_has_image = false;
 $selected_image_path = '';
 $selected_is_active = false;
+$selected_zoom = 100;
 
 if ($selected_card && !empty($selected_card['image']) && $selected_card['image'] !== 'default.png') {
     $selected_file_path = __DIR__ . '/../uploads/slider/' . $selected_card['image'];
@@ -214,6 +230,15 @@ if ($selected_card && !empty($selected_card['image']) && $selected_card['image']
 
 if ($selected_card && !empty($selected_card['is_active'])) {
     $selected_is_active = true;
+}
+
+if ($selected_card) {
+    $selected_zoom = (int) ($selected_card['image_zoom'] ?? 100);
+    if ($selected_zoom < 50) {
+        $selected_zoom = 50;
+    } elseif ($selected_zoom > 150) {
+        $selected_zoom = 150;
+    }
 }
 ?>
 
@@ -527,7 +552,29 @@ if ($selected_card && !empty($selected_card['is_active'])) {
             width: 100%;
             height: 100%;
             object-fit: cover;
+            transform-origin: center center;
             display: block;
+        }
+
+        .range-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+            margin-bottom: 6px;
+        }
+
+        .range-row .range-value {
+            min-width: 44px;
+            text-align: right;
+            font-weight: 800;
+            color: #1e3a5f;
+            font-size: 12px;
+        }
+
+        input[type="range"] {
+            width: 100%;
+            accent-color: #146C94;
         }
 
         .preview-box .placeholder {
@@ -760,10 +807,6 @@ if ($selected_card && !empty($selected_card['is_active'])) {
             </header>
             <div class="admin-content">
     <div class="container">
-        <?php if ($message): ?>
-            <div class="alert alert-success">✓ <?php echo htmlspecialchars($message); ?></div>
-        <?php endif; ?>
-        
         <?php if ($error): ?>
             <div class="alert alert-danger">✗ <?php echo htmlspecialchars($error); ?></div>
         <?php endif; ?>
@@ -830,12 +873,13 @@ if ($selected_card && !empty($selected_card['is_active'])) {
 
                 <div class="preview-box">
                     <?php if ($selected_has_image): ?>
-                        <img src="<?php echo htmlspecialchars($selected_image_path); ?>" alt="Slider <?php echo $selected_slot; ?>" title="Slider <?php echo $selected_slot; ?>">
+                        <img id="slider_preview_img" src="<?php echo htmlspecialchars($selected_image_path); ?>" alt="Slider <?php echo $selected_slot; ?>" title="Slider <?php echo $selected_slot; ?>" style="transform:scale(<?php echo htmlspecialchars(number_format($selected_zoom / 100, 2, '.', '')); ?>);">
                     <?php else: ?>
                         <div class="placeholder">
                             <div class="icon"><i class="fas fa-camera"></i></div>
                             <div class="text">Belum ada gambar</div>
                         </div>
+                        <img id="slider_preview_img" src="" alt="Preview Slider <?php echo $selected_slot; ?>" style="display:none;">
                     <?php endif; ?>
                 </div>
 
@@ -852,6 +896,15 @@ if ($selected_card && !empty($selected_card['is_active'])) {
                         <p class="info-text">JPG, JPEG, PNG, WEBP • Maksimal 30MB • Auto resize & optimize</p>
                     </div>
 
+                    <div class="form-group">
+                        <div class="range-row">
+                            <label for="image_zoom">Ukuran Foto</label>
+                            <span class="range-value" id="image_zoom_value"><?php echo (int) $selected_zoom; ?>%</span>
+                        </div>
+                        <input type="range" id="image_zoom" name="image_zoom" min="50" max="150" value="<?php echo (int) $selected_zoom; ?>">
+                        <p class="info-text">Atur skala foto untuk tampilan slider di website jemaat.</p>
+                    </div>
+
                     <div class="checkbox-group">
                         <input type="checkbox" id="active_selected" name="is_active" value="1" <?php echo $selected_is_active ? 'checked' : ''; ?>>
                         <label for="active_selected">Tampilkan di Frontend</label>
@@ -865,6 +918,55 @@ if ($selected_card && !empty($selected_card['is_active'])) {
             </div>
         </main>
     </div>
+
+<script>
+(function () {
+    const input = document.getElementById('image_selected');
+    const previewImg = document.getElementById('slider_preview_img');
+    const zoomInput = document.getElementById('image_zoom');
+    const zoomValue = document.getElementById('image_zoom_value');
+
+    if (!zoomInput || !zoomValue || !previewImg) {
+        return;
+    }
+
+    let objectUrl = null;
+
+    function applyZoom() {
+        const zoom = parseInt(zoomInput.value || '100', 10);
+        const safeZoom = Number.isFinite(zoom) ? Math.max(50, Math.min(150, zoom)) : 100;
+        zoomValue.textContent = safeZoom + '%';
+        previewImg.style.transform = 'scale(' + (safeZoom / 100).toFixed(2) + ')';
+    }
+
+    if (input) {
+        input.addEventListener('change', function () {
+            const file = input.files && input.files[0] ? input.files[0] : null;
+            if (!file) {
+                return;
+            }
+
+            if (objectUrl) {
+                URL.revokeObjectURL(objectUrl);
+            }
+
+            objectUrl = URL.createObjectURL(file);
+            previewImg.src = objectUrl;
+            previewImg.style.display = '';
+
+            const placeholder = previewImg.parentElement.querySelector('.placeholder');
+            if (placeholder) {
+                placeholder.style.display = 'none';
+            }
+
+            applyZoom();
+        });
+    }
+
+    zoomInput.addEventListener('input', applyZoom);
+    applyZoom();
+})();
+</script>
 </body>
 </html>
 

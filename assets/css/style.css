@@ -404,6 +404,8 @@ header{
   background-size: cover !important;
   background-position: center 28% !important;
   background-repeat: no-repeat !important;
+  transform: scale(var(--hero-bg-scale, 1)) !important;
+  transform-origin: center center !important;
 }
 
 /* overlay */
@@ -559,7 +561,7 @@ header{
   display: flex;
   justify-content: center;
   align-items: flex-end;
-  gap: 8px;
+  gap: 14px;
 }
 
 .hero-countdown-item {
@@ -573,6 +575,8 @@ header{
   font-size: clamp(1.55rem, 6.3vw, 3.25rem);
   font-weight: 800;
   line-height: 1;
+  letter-spacing: .08em;
+  padding-left: .08em;
 }
 
 .hero-countdown-item small {
@@ -614,6 +618,10 @@ header{
   justify-content: center;
   flex-wrap: wrap;
   gap: 12px;
+}
+
+.hero-live-actions[hidden] {
+  display: none !important;
 }
 
 .hero-live-btn {
@@ -680,7 +688,7 @@ header{
   .hero-countdown-values {
     display: grid;
     grid-template-columns: repeat(4, minmax(0, 1fr));
-    gap: 6px;
+    gap: 8px;
     align-items: stretch;
     margin-top: 10px;
   }
@@ -695,6 +703,8 @@ header{
 
   .hero-countdown-item span {
     font-size: clamp(1.05rem, 6.8vw, 1.6rem);
+    letter-spacing: .06em;
+    padding-left: .06em;
   }
 
   .hero-countdown-item small {
@@ -1038,86 +1048,249 @@ header{
 
 /* Dedicated layout for renungan.php (no image, date panel on right) */
 .renungan-page-main .renungan-page-section {
+  position: relative;
+  overflow: hidden;
+  padding: 64px 0 92px;
   background:
-    radial-gradient(circle at 18% 8%, rgba(126, 204, 224, 0.25), transparent 38%),
-    radial-gradient(circle at 86% 92%, rgba(26, 58, 99, 0.12), transparent 44%),
-    linear-gradient(180deg, #f3f8ff 0%, #eaf2fb 100%);
-  border-color: rgba(16, 44, 87, 0.1);
-  box-shadow: 0 18px 38px rgba(16, 44, 87, 0.14);
+    radial-gradient(circle at 8% 12%, rgba(102, 173, 216, 0.25), transparent 32%),
+    radial-gradient(circle at 92% 18%, rgba(44, 85, 133, 0.16), transparent 34%),
+    linear-gradient(165deg, #dbe8f6 0%, #edf3fb 52%, #e4edf9 100%);
+  border: 1px solid rgba(16, 44, 87, 0.09);
+  box-shadow: 0 20px 42px rgba(16, 44, 87, 0.13);
 }
 
 .renungan-page-main .renungan-page-section::before,
 .renungan-page-main .renungan-page-section::after {
-  display: none;
+  content: '';
+  position: absolute;
+  pointer-events: none;
+  border-radius: 999px;
+  opacity: 0.6;
+  z-index: 0;
+}
+
+.renungan-page-main .renungan-page-section::before {
+  width: 260px;
+  height: 260px;
+  left: -130px;
+  top: 120px;
+  background: radial-gradient(circle, rgba(55, 123, 174, 0.28), rgba(55, 123, 174, 0));
+}
+
+.renungan-page-main .renungan-page-section::after {
+  width: 320px;
+  height: 320px;
+  right: -170px;
+  bottom: 80px;
+  background: radial-gradient(circle, rgba(49, 99, 151, 0.24), rgba(49, 99, 151, 0));
+}
+
+.renungan-page-main .renungan-page-section .container-large {
+  position: relative;
+  z-index: 1;
+}
+
+.renungan-page-main .renungan-page-section .container-large::before,
+.renungan-page-main .renungan-page-section .container-large::after {
+  content: '';
+  position: absolute;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.renungan-page-main .renungan-page-section .container-large::before {
+  top: 22px;
+  right: 62px;
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  border: 2px solid rgba(44, 95, 146, 0.24);
+}
+
+.renungan-page-main .renungan-page-section .container-large::after {
+  top: 86px;
+  left: 88px;
+  width: 120px;
+  height: 14px;
+  border-radius: 999px;
+  background: repeating-linear-gradient(90deg, rgba(44, 95, 146, 0.32), rgba(44, 95, 146, 0.32) 8px, transparent 8px, transparent 14px);
+}
+
+.renungan-page-main,
+.renungan-page-main h1,
+.renungan-page-main h2,
+.renungan-page-main h3,
+.renungan-page-main p,
+.renungan-page-main a,
+.renungan-page-main span,
+.renungan-page-main strong,
+.renungan-page-main small {
+  font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
 .renungan-page-main .renungan-kicker {
-  color: #2f7da0;
+  color: #2a5888;
+  letter-spacing: 0.28em;
+  font-size: 11px;
+  margin-bottom: 10px;
 }
 
 .renungan-page-main .renungan-page-title {
   color: #102c57;
+  font-size: clamp(2.1rem, 4.5vw, 3.4rem);
+  line-height: 1.12;
+  margin-bottom: 8px;
 }
 
 .renungan-page-main .renungan-page-subtitle {
-  color: rgba(21, 55, 95, 0.8);
+  color: rgba(21, 55, 95, 0.78);
+  max-width: 680px;
+  font-size: clamp(14px, 2vw, 17px);
+}
+
+.renungan-page-main .renungan-heading-wrap {
+  position: relative;
+  z-index: 2;
+  margin-bottom: 42px;
+}
+
+.renungan-page-main .renungan-heading-wrap::after {
+  content: '';
+  display: block;
+  width: 110px;
+  height: 3px;
+  margin: 16px auto 0;
+  border-radius: 999px;
+  background: linear-gradient(90deg, rgba(34, 92, 142, 0.22), rgba(34, 92, 142, 0.72), rgba(34, 92, 142, 0.22));
 }
 
 .renungan-list-layout {
+  position: relative;
+  z-index: 2;
   display: flex;
   flex-direction: column;
-  gap: 18px;
+  gap: 20px;
+}
+
+.renungan-list-layout::before,
+.renungan-list-layout::after {
+  content: '';
+  position: absolute;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.renungan-list-layout::before {
+  right: -42px;
+  top: 18px;
+  width: 220px;
+  height: 220px;
+  border-radius: 50%;
+  border: 1px dashed rgba(44, 95, 146, 0.26);
+}
+
+.renungan-list-layout::after {
+  left: -26px;
+  bottom: -10px;
+  width: 120px;
+  height: 120px;
+  border-radius: 24px;
+  border: 1px solid rgba(44, 95, 146, 0.14);
+  transform: rotate(18deg);
 }
 
 .renungan-list-card {
+  position: relative;
+  z-index: 2;
   display: flex;
   align-items: stretch;
   justify-content: space-between;
   gap: 0;
-  border-radius: 18px;
+  border-radius: 22px;
   overflow: hidden;
-  background: rgba(248, 251, 255, 0.94);
-  border: 1px solid rgba(16, 44, 87, 0.12);
-  box-shadow: 0 12px 24px rgba(16, 44, 87, 0.14);
+  background: rgba(250, 253, 255, 0.95);
+  border: 0;
+  box-shadow: 0 14px 30px rgba(16, 44, 87, 0.16);
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
-  transition: transform .24s ease, box-shadow .24s ease, border-color .24s ease;
+  transition: transform .24s ease, box-shadow .24s ease, border-color .24s ease, background .24s ease;
 }
 
 .renungan-list-card:hover {
-  transform: translateY(-3px);
-  border-color: rgba(47, 125, 160, 0.4);
-  box-shadow: 0 16px 30px rgba(16, 44, 87, 0.2);
+  transform: translateY(-4px);
+  border-color: rgba(47, 125, 160, 0.46);
+  box-shadow: 0 18px 36px rgba(16, 44, 87, 0.22);
+  background: rgba(255, 255, 255, 0.98);
 }
 
 .renungan-list-content {
   flex: 1;
   min-width: 0;
-  padding: 22px 24px;
+  padding: 20px 24px 22px;
   display: flex;
   flex-direction: column;
   gap: 10px;
 }
 
+.renungan-list-meta {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.renungan-list-verse {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  font-weight: 700;
+  color: #27517f;
+  border: 1px solid rgba(39, 81, 127, 0.26);
+  background: rgba(227, 237, 249, 0.95);
+}
+
 .renungan-list-content .renungan-card-title {
   margin: 0;
-  font-size: clamp(1.1rem, 2.2vw, 1.5rem);
-  color: #12335f;
+  font-size: clamp(1.15rem, 2.2vw, 1.54rem);
+  color: #102c57;
+  line-height: 1.3;
+}
+
+.renungan-card-image-wrap {
+  width: 100%;
+  border-radius: 16px;
+  overflow: hidden;
+  border: 1px solid rgba(20, 56, 95, 0.1);
+  background: rgba(227, 237, 249, 0.6);
+}
+
+.renungan-card-image {
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  object-fit: cover;
+  display: block;
 }
 
 .renungan-list-content .renungan-excerpt {
-  color: rgba(30, 60, 96, 0.82);
-  line-height: 1.75;
+  color: rgba(20, 49, 84, 0.82);
+  line-height: 1.72;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
 
 .renungan-list-content .renungan-read-more {
   align-self: flex-start;
-  margin-top: 2px;
-  padding: 0;
-  border: 0;
-  border-radius: 0;
-  background: transparent;
-  color: #1f7cab;
+  margin-top: 5px;
+  padding: 7px 12px;
+  border: 1px solid rgba(31, 124, 171, 0.3);
+  border-radius: 999px;
+  background: rgba(227, 241, 250, 0.9);
+  color: #1b6d99;
   font-size: 10px;
   font-weight: 700;
   letter-spacing: .14em;
@@ -1126,22 +1299,22 @@ header{
 }
 
 .renungan-list-content .renungan-read-more:hover {
-  transform: none;
-  background: transparent;
+  transform: translateY(-1px);
+  background: rgba(212, 232, 247, 1);
   color: #185f88;
 }
 
 .renungan-list-date {
   width: 114px;
   min-width: 114px;
-  background: linear-gradient(180deg, #e6f0fb 0%, #dbe9f8 100%);
+  background: linear-gradient(180deg, #dfeaf7 0%, #cedff3 100%);
   color: #102c57;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   padding: 14px 10px;
-  border-right: 1px solid rgba(16, 44, 87, 0.12);
+  border-right: 1px solid rgba(16, 44, 87, 0.14);
 }
 
 .renungan-list-date strong {
@@ -1159,7 +1332,73 @@ header{
   opacity: .9;
 }
 
+.renungan-cool-page {
+  background:
+    radial-gradient(circle at top left, rgba(93, 143, 197, 0.18), transparent 24%),
+    radial-gradient(circle at right 12%, rgba(73, 120, 175, 0.14), transparent 22%),
+    linear-gradient(180deg, #e9f1fb 0%, #dce7f4 54%, #edf4fb 100%);
+}
+
+.renungan-cool-page .renungan-page-section {
+  background:
+    radial-gradient(circle at 10% 14%, rgba(80, 142, 194, 0.22), transparent 34%),
+    radial-gradient(circle at 90% 20%, rgba(57, 101, 150, 0.16), transparent 36%),
+    linear-gradient(165deg, rgba(229, 238, 249, 0.98) 0%, rgba(241, 246, 253, 0.98) 56%, rgba(231, 239, 250, 0.98) 100%);
+  border-color: rgba(28, 72, 117, 0.12);
+  box-shadow: 0 24px 46px rgba(16, 44, 87, 0.14);
+}
+
+.renungan-cool-page .renungan-page-title {
+  color: #123863;
+  font-size: clamp(2.25rem, 4.8vw, 3.7rem);
+  letter-spacing: -0.015em;
+}
+
+.renungan-cool-page .renungan-list-card {
+  border-radius: 24px;
+  background: rgba(255, 255, 255, 0.9);
+  box-shadow: 0 18px 34px rgba(18, 45, 73, 0.16);
+}
+
+.renungan-cool-page .renungan-list-date {
+  background: linear-gradient(180deg, #d4e3f4 0%, #c5d8ee 100%);
+}
+
+.renungan-cool-page .renungan-list-content .renungan-card-title {
+  color: #143c68;
+}
+
+.renungan-cool-page .renungan-list-content .renungan-excerpt {
+  color: rgba(24, 60, 97, 0.82);
+}
+
+.renungan-cool-page .renungan-list-content .renungan-read-more {
+  background: rgba(206, 226, 244, 0.72);
+  border-color: rgba(45, 111, 164, 0.34);
+  color: #1e6c99;
+}
+
+.renungan-cool-page .renungan-list-content .renungan-read-more:hover {
+  background: rgba(196, 220, 242, 0.95);
+}
+
 @media (max-width: 900px) {
+  .renungan-page-main .renungan-page-section {
+    padding: 52px 0 78px;
+  }
+
+  .renungan-page-main .renungan-page-section::before,
+  .renungan-page-main .renungan-page-section::after {
+    display: none;
+  }
+
+  .renungan-page-main .renungan-page-section .container-large::before,
+  .renungan-page-main .renungan-page-section .container-large::after,
+  .renungan-list-layout::before,
+  .renungan-list-layout::after {
+    display: none;
+  }
+
   .renungan-list-card {
     flex-direction: row;
   }
@@ -1179,12 +1418,18 @@ header{
 
   .renungan-list-content {
     padding: 16px;
+    gap: 8px;
   }
 }
 
 @media (max-width: 560px) {
+  .renungan-page-main .renungan-heading-wrap {
+    margin-bottom: 22px;
+  }
+
   .renungan-list-card {
     flex-direction: column;
+    border-radius: 16px;
   }
 
   .renungan-list-date {
@@ -1199,6 +1444,288 @@ header{
 
   .renungan-list-date small {
     margin-top: 0;
+  }
+
+  .renungan-list-content {
+    padding: 14px;
+  }
+
+  .renungan-card-image-wrap {
+    border-radius: 12px;
+  }
+}
+
+/* Editorial detail layout for renungan-detail.php */
+body.renungan-detail-page {
+  background: #eef3fa;
+}
+
+.renungan-detail-page .renungan-detail-main {
+  position: relative;
+  padding-top: clamp(30px, 5vw, 54px);
+  padding-bottom: clamp(30px, 5vw, 54px);
+}
+
+.renungan-detail-page .renungan-detail-main::before,
+.renungan-detail-page .renungan-detail-main::after {
+  content: '';
+  position: absolute;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.renungan-detail-page .renungan-detail-main::before {
+  top: 54px;
+  left: max(8px, calc(50% - 590px));
+  width: clamp(72px, 9vw, 118px);
+  height: clamp(72px, 9vw, 118px);
+  border-radius: 50%;
+  border: 1px dashed rgba(24, 63, 106, 0.28);
+  background: radial-gradient(circle at 30% 30%, rgba(63, 182, 168, 0.18), rgba(63, 182, 168, 0));
+}
+
+.renungan-detail-page .renungan-detail-main::after {
+  right: max(8px, calc(50% - 590px));
+  bottom: 58px;
+  width: clamp(54px, 7vw, 92px);
+  height: clamp(54px, 7vw, 92px);
+  border-radius: 20px;
+  border: 1px solid rgba(24, 63, 106, 0.2);
+  transform: rotate(18deg);
+  background: linear-gradient(140deg, rgba(113, 161, 208, 0.2), rgba(113, 161, 208, 0));
+}
+
+.renungan-detail-page .renungan-detail-section {
+  position: relative;
+  z-index: 1;
+  padding: 0;
+  max-width: none;
+  margin: 0;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+  background: transparent;
+  overflow: visible;
+}
+
+.renungan-detail-page .renungan-detail-section::before,
+.renungan-detail-page .renungan-detail-section::after {
+  display: none;
+}
+
+.renungan-detail-page .container-large {
+  max-width: 1140px;
+  padding-left: clamp(8px, 1.8vw, 18px);
+  padding-right: clamp(8px, 1.8vw, 18px);
+}
+
+.renungan-detail-page .renungan-detail-card {
+  width: 100%;
+  max-width: 940px;
+  margin: 0 auto;
+  border: 1px solid rgba(16, 44, 87, 0.1);
+  border-radius: 8px;
+  background: #f8fbff;
+  box-shadow: 0 18px 34px rgba(16, 44, 87, 0.12);
+  padding: clamp(18px, 3.2vw, 30px);
+}
+
+.renungan-detail-header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  margin-bottom: 24px;
+}
+
+.renungan-detail-page .renungan-kicker {
+  margin-top: 4px;
+  margin-bottom: 10px;
+  color: rgba(16, 44, 87, 0.58);
+  letter-spacing: 0.34em;
+  font-size: 12px;
+}
+
+.renungan-detail-page .renungan-detail-title {
+  font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  font-size: clamp(2rem, 4.8vw, 3.2rem);
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  line-height: 1.12;
+  color: #102c57;
+  max-width: 20ch;
+}
+
+.renungan-detail-date {
+  margin: 14px 0 0;
+  color: rgba(16, 44, 87, 0.54);
+  letter-spacing: 0.11em;
+  text-transform: uppercase;
+  font-size: 13px;
+}
+
+.renungan-detail-page .renungan-meta-row {
+  margin-top: 0;
+  margin-bottom: 24px;
+  justify-content: center;
+  gap: 14px;
+}
+
+.renungan-detail-page .renungan-verse {
+  border-radius: 999px;
+  padding: 5px 12px;
+  background: #e8eef7;
+  border: 1px solid #ccd7e8;
+  color: #2b4f7b;
+  font-size: clamp(13px, 1.3vw, 15px);
+  letter-spacing: 0.02em;
+}
+
+.renungan-detail-meta-sep {
+  display: none;
+}
+
+.renungan-detail-page .renungan-detail-cover-wrap {
+  margin-top: 0;
+  margin-bottom: 50px;
+  max-width: 760px;
+  margin-left: auto;
+  margin-right: auto;
+  border-radius: 18px;
+  border: 1px solid rgba(17, 37, 63, 0.06);
+  overflow: hidden;
+}
+
+.renungan-detail-page .renungan-detail-cover {
+  width: 100%;
+  max-height: none;
+  aspect-ratio: 16 / 7;
+  object-fit: cover;
+}
+
+.renungan-detail-page .renungan-detail-body {
+  margin-top: 0;
+  width: 100%;
+  max-width: 810px;
+  margin-left: auto;
+  margin-right: auto;
+  color: #173b62;
+  font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  font-size: 17px;
+  line-height: 1.55;
+  font-weight: 400;
+  white-space: normal;
+  text-align: left;
+}
+
+.renungan-detail-page .renungan-detail-body p,
+.renungan-detail-page .renungan-detail-body li {
+  text-align: justify;
+}
+
+.renungan-detail-page .renungan-detail-body p,
+.renungan-detail-page .renungan-detail-body ul,
+.renungan-detail-page .renungan-detail-body ol,
+.renungan-detail-page .renungan-detail-body blockquote,
+.renungan-detail-page .renungan-detail-body h2,
+.renungan-detail-page .renungan-detail-body h3,
+.renungan-detail-page .renungan-detail-body h4 {
+  margin: 0 0 0.75em;
+}
+
+.renungan-detail-page .renungan-detail-body p + p {
+  margin-top: 0.3em;
+}
+
+.renungan-detail-page .renungan-detail-body p:empty {
+  display: none;
+}
+
+.renungan-detail-page .renungan-detail-body br {
+  line-height: 1;
+}
+
+.renungan-detail-page .renungan-detail-body br + br {
+  display: none;
+}
+
+.renungan-detail-page .renungan-detail-body > *:last-child {
+  margin-bottom: 0;
+}
+
+.renungan-detail-page .renungan-detail-body blockquote {
+  margin: 0 0 10px;
+  max-width: none;
+  text-align: left;
+  font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  font-style: normal;
+  font-weight: 700;
+  font-size: 20px;
+  line-height: 1.55;
+  color: #102c57;
+  padding: 14px 18px;
+  border-left: 5px solid #102c57;
+  background: rgba(16, 44, 87, 0.06);
+  border-radius: 0 12px 12px 0;
+}
+
+.renungan-detail-page .renungan-detail-body h2,
+.renungan-detail-page .renungan-detail-body h3,
+.renungan-detail-page .renungan-detail-body h4 {
+  color: #1a355a;
+  line-height: 1.1;
+  text-align: left;
+}
+
+.renungan-detail-footer {
+  margin-top: 32px;
+  text-align: center;
+}
+
+.renungan-detail-footer .renungan-read-more {
+  min-width: 260px;
+  background: #132c4f;
+  color: #fff;
+  border-color: #132c4f;
+}
+
+@media (max-width: 992px) {
+  .renungan-detail-page .renungan-detail-title {
+    font-size: clamp(1.9rem, 7vw, 2.9rem);
+  }
+
+  .renungan-detail-page .renungan-detail-card {
+    padding: clamp(16px, 3.1vw, 24px);
+  }
+}
+
+@media (max-width: 768px) {
+  .renungan-detail-page .container-large {
+    padding: 0 10px;
+  }
+
+  .renungan-detail-page .renungan-detail-main::before,
+  .renungan-detail-page .renungan-detail-main::after {
+    display: none;
+  }
+
+  .renungan-detail-meta-sep {
+    width: 42px;
+  }
+
+  .renungan-detail-page .renungan-detail-body {
+    font-size: 16px;
+    line-height: 1.62;
+  }
+
+  .renungan-detail-page .renungan-detail-card {
+    border-radius: 6px;
+    padding: 18px 14px 20px;
+  }
+
+  .renungan-detail-footer .renungan-read-more {
+    width: 100%;
+    min-width: 0;
   }
 }
 
@@ -1421,8 +1948,7 @@ header{
   text-shadow: 0 8px 30px rgba(1,22,39,0.38);
 }
 
-/* ============================================
-   HOME REVEAL ANIMATION (IBADAH + GEMBALA)
+/* HOME REVEAL ANIMATION (IBADAH + GEMBALA)
    ============================================ */
 .reveal-on-scroll {
   opacity: 1;
@@ -2059,6 +2585,9 @@ header{
   object-fit: cover;
   object-position: center;
   display: block;
+  transform: scale(var(--coming-zoom-scale, 1));
+  transform-origin: center center;
+  transition: transform 0.55s ease;
 }
 
 .whats-new .whats-new-nav {
@@ -2824,42 +3353,80 @@ header{
   .hero-dot{width:10px;height:10px}
 
   .hero-countdown-card {
-    top: 55%;
-    width: calc(100% - 24px);
-    padding: 12px 8px;
+    top: 50%;
+    width: calc(100% - 28px);
+    padding: 8px 6px;
   }
 
   .hero-countdown-kicker {
-    font-size: 9px;
-    letter-spacing: 2px;
+    margin-bottom: 2px;
+    font-size: 8px;
+    letter-spacing: 1.4px;
   }
 
   .hero-countdown-title {
-    font-size: clamp(1.65rem, 10.2vw, 2.3rem);
+    margin-bottom: 4px;
+    font-size: clamp(1.6rem, 9.4vw, 2.15rem);
+    line-height: 1;
   }
 
   .hero-countdown-box {
-    border-radius: 16px;
-    padding: 10px 8px;
+    margin-top: 6px;
+    border-radius: 14px;
+    padding: 7px 6px 6px;
+  }
+
+  .hero-countdown-label {
+    font-size: 7px;
+    letter-spacing: 1.1px;
+  }
+
+  .hero-countdown-values {
+    margin-top: 6px;
+    gap: 4px;
   }
 
   .hero-countdown-item {
     min-width: 0;
-    padding: 7px 3px 6px;
+    padding: 5px 2px 4px;
   }
 
   .hero-countdown-item span {
-    font-size: clamp(1.02rem, 6.8vw, 1.45rem);
+    font-size: clamp(0.92rem, 6.1vw, 1.18rem);
+    letter-spacing: .04em;
+    padding-left: .04em;
   }
 
   .hero-countdown-item small {
-    font-size: 8px;
-    letter-spacing: .9px;
+    font-size: 6px;
+    letter-spacing: .6px;
   }
 
   .hero-countdown-caption {
-    margin-top: 10px;
-    font-size: 11px;
+    margin-top: 4px;
+    font-size: 9px;
+    line-height: 1.2;
+    white-space: nowrap;
+    text-shadow: 0 2px 8px rgba(0, 0, 0, 0.38);
+  }
+
+  .hero-live-actions {
+    margin-top: 6px;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 6px;
+  }
+
+  .hero-live-btn {
+    width: 100%;
+    padding: 7px 6px;
+    font-size: 10px;
+    letter-spacing: .03em;
+  }
+
+  .hero-live-btn-secondary {
+    background: rgba(255, 255, 255, 0.18);
+    border-color: rgba(255, 255, 255, 0.42);
   }
 
   .hero-server-clock {
@@ -3477,6 +4044,20 @@ header{
 @media (max-width: 480px) {
   .hero-vibes-content {
     padding: 92px 18px 28px;
+  }
+
+  .hero-countdown-caption {
+    display: none;
+  }
+
+  .hero-live-actions {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 5px;
+  }
+
+  .hero-live-btn {
+    font-size: 9px;
+    padding: 7px 6px;
   }
 
   .hero-vibes-kicker {

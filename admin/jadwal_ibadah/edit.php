@@ -2,14 +2,47 @@
 require_once __DIR__ . '/../includes/auth.php';
 require_once __DIR__ . '/../../config/database.php';
 require_once __DIR__ . '/_table_bootstrap.php';
+require_once __DIR__ . '/../../includes/image-helper.php';
+
+define('JADWAL_UPLOAD_DIR', __DIR__ . '/../../uploads/jadwal/');
+define('JADWAL_MAX_SIZE', 50 * 1024 * 1024); // 50MB
+define('JADWAL_MAX_WIDTH', 1920);
+define('JADWAL_QUALITY', 80);
+
+if (!is_dir(JADWAL_UPLOAD_DIR)) {
+    @mkdir(JADWAL_UPLOAD_DIR, 0755, true);
+}
 
 $table_state = ensureJadwalIbadahTable($conn);
 $has_urutan_column = (bool) ($table_state['has_urutan_column'] ?? false);
 $has_kategori_column = (bool) ($table_state['has_kategori_column'] ?? false);
+$has_image_columns = (bool) ($table_state['has_image_columns'] ?? false);
 
 $error = '';
 $success = '';
 $jadwal = null;
+
+if (!function_exists('jadwal_parse_ini_size')) {
+    function jadwal_parse_ini_size(string $value): int {
+        $value = trim($value);
+        if ($value === '') {
+            return 0;
+        }
+
+        $unit = strtolower(substr($value, -1));
+        $number = (float) $value;
+        switch ($unit) {
+            case 'g':
+                return (int) round($number * 1024 * 1024 * 1024);
+            case 'm':
+                return (int) round($number * 1024 * 1024);
+            case 'k':
+                return (int) round($number * 1024);
+            default:
+                return (int) round($number);
+        }
+    }
+}
 
 // Get ID from URL
 if (!isset($_GET['id']) || !is_numeric($_GET['id'])) {
@@ -21,6 +54,14 @@ $id = (int)$_GET['id'];
 
 // Handle form submission
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+    $post_max_size = jadwal_parse_ini_size((string) ini_get('post_max_size'));
+    $content_length = isset($_SERVER['CONTENT_LENGTH']) ? (int) $_SERVER['CONTENT_LENGTH'] : 0;
+
+    if ($post_max_size > 0 && $content_length > $post_max_size) {
+        $max_mb = max(1, (int) round($post_max_size / 1024 / 1024));
+        $error = "Upload gagal: ukuran total request melebihi batas server ({$max_mb}MB). Kecilkan ukuran foto lalu coba lagi.";
+    }
+
     $nama_ibadah = trim($_POST['nama_ibadah'] ?? '');
     $kategori = trim($_POST['kategori'] ?? '');
     $hari = trim($_POST['hari'] ?? '');
@@ -28,11 +69,65 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $ruangan = trim($_POST['ruangan'] ?? '');
     $keterangan = trim($_POST['keterangan'] ?? '');
     $is_active = isset($_POST['is_active']) ? 1 : 0;
+    $image_fit = trim($_POST['image_fit'] ?? 'cover');
+    $image_pos_y = intval($_POST['image_pos_y'] ?? 50);
+    $remove_image = isset($_POST['remove_image']) ? 1 : 0;
+    $image_fit = ($image_fit === 'contain') ? 'contain' : 'cover';
+    if ($image_pos_y < 0) {
+        $image_pos_y = 0;
+    } elseif ($image_pos_y > 100) {
+        $image_pos_y = 100;
+    }
 
     // Validation
-    if (empty($nama_ibadah) || empty($hari) || empty($jam)) {
+    if (!empty($error)) {
+        // Stop processing when request body exceeds PHP limit.
+    } elseif (empty($nama_ibadah) || empty($hari) || empty($jam)) {
         $error = 'Nama ibadah, hari, dan jam wajib diisi';
     } else {
+        $current_image = '';
+        if ($has_image_columns) {
+            $stmt_image = $conn->prepare("SELECT image FROM jadwal_ibadah WHERE id = ?");
+            $stmt_image->bind_param("i", $id);
+            $stmt_image->execute();
+            $result_image = $stmt_image->get_result();
+            if ($result_image && $result_image->num_rows > 0) {
+                $image_row = $result_image->fetch_assoc();
+                $current_image = (string) ($image_row['image'] ?? '');
+            }
+            $stmt_image->close();
+        }
+
+        $new_image_filename = '';
+        if ($has_image_columns && isset($_FILES['image'])) {
+            $upload_error = (int) ($_FILES['image']['error'] ?? UPLOAD_ERR_NO_FILE);
+            if ($upload_error !== UPLOAD_ERR_NO_FILE) {
+                if ($upload_error !== UPLOAD_ERR_OK) {
+                    $validation = validateImageUpload($_FILES['image'], JADWAL_MAX_SIZE);
+                    $error = $validation['error'] ?? 'Gagal upload foto jadwal.';
+                } else {
+                    $validation = validateImageUpload($_FILES['image'], JADWAL_MAX_SIZE);
+                    if (!$validation['valid']) {
+                        $error = $validation['error'];
+                    } else {
+                        $new_image_filename = generateUniqueFilename($_FILES['image']['name'], 'jadwal_');
+                        $upload_path = JADWAL_UPLOAD_DIR . $new_image_filename;
+                        $optimize_result = optimizeAndSaveImage(
+                            $_FILES['image']['tmp_name'],
+                            $upload_path,
+                            JADWAL_MAX_WIDTH,
+                            JADWAL_QUALITY
+                        );
+
+                        if (!$optimize_result['success']) {
+                            $error = 'Gagal memproses gambar: ' . ($optimize_result['error'] ?? 'Unknown error');
+                            $new_image_filename = '';
+                        }
+                    }
+                }
+            }
+        }
+
         // Build UPDATE query dynamically based on available columns
         $fields = ['nama_ibadah = ?', 'hari = ?', 'jam = ?', 'ruangan = ?', 'keterangan = ?', 'is_active = ?'];
         $values = [$nama_ibadah, $hari, $jam, $ruangan, $keterangan, $is_active];
@@ -42,6 +137,27 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             $fields[] = 'kategori = ?';
             $values[] = $kategori;
             $types .= 's';
+        }
+
+        $final_image = $current_image;
+        if ($has_image_columns) {
+            if (!empty($new_image_filename)) {
+                $final_image = $new_image_filename;
+            } elseif ($remove_image) {
+                $final_image = '';
+            }
+
+            $fields[] = 'image = ?';
+            $values[] = $final_image;
+            $types .= 's';
+
+            $fields[] = 'image_fit = ?';
+            $values[] = $image_fit;
+            $types .= 's';
+
+            $fields[] = 'image_pos_y = ?';
+            $values[] = $image_pos_y;
+            $types .= 'i';
         }
 
         // Add id at the end
@@ -55,10 +171,30 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $stmt->bind_param($types, ...$values);
         
         if ($stmt->execute()) {
+            if ($has_image_columns && !empty($new_image_filename) && !empty($current_image) && $current_image !== $new_image_filename) {
+                $old_path = JADWAL_UPLOAD_DIR . $current_image;
+                if (is_file($old_path)) {
+                    @unlink($old_path);
+                }
+            }
+
+            if ($has_image_columns && $remove_image && empty($new_image_filename) && !empty($current_image)) {
+                $old_path = JADWAL_UPLOAD_DIR . $current_image;
+                if (is_file($old_path)) {
+                    @unlink($old_path);
+                }
+            }
+
             $stmt->close();
             header("Location: index.php?success=Jadwal ibadah berhasil diperbarui");
             exit;
         } else {
+            if ($has_image_columns && !empty($new_image_filename)) {
+                $failed_path = JADWAL_UPLOAD_DIR . $new_image_filename;
+                if (is_file($failed_path)) {
+                    @unlink($failed_path);
+                }
+            }
             $error = 'Gagal memperbarui jadwal ibadah: ' . $conn->error;
         }
         
@@ -80,6 +216,26 @@ if ($result->num_rows == 0) {
 
 $jadwal = $result->fetch_assoc();
 $stmt->close();
+
+$image_fit_value = $_POST['image_fit'] ?? ($jadwal['image_fit'] ?? 'cover');
+if ($image_fit_value !== 'contain') {
+    $image_fit_value = 'cover';
+}
+
+$image_pos_y_value = intval($_POST['image_pos_y'] ?? ($jadwal['image_pos_y'] ?? 50));
+if ($image_pos_y_value < 0) {
+    $image_pos_y_value = 0;
+} elseif ($image_pos_y_value > 100) {
+    $image_pos_y_value = 100;
+}
+
+$current_image_url = '';
+if ($has_image_columns && !empty($jadwal['image'])) {
+    $current_image_path = JADWAL_UPLOAD_DIR . $jadwal['image'];
+    if (is_file($current_image_path)) {
+        $current_image_url = '../../uploads/jadwal/' . rawurlencode((string) $jadwal['image']);
+    }
+}
 
 $jam_value_for_form = $_POST['jam'] ?? ($jadwal['jam'] ?? '');
 $jam_items_for_form = [];
@@ -288,6 +444,43 @@ include __DIR__ . '/../includes/header.php';
         line-height: 1.45;
     }
 
+    .upload-wrap {
+        border: 1px dashed rgba(20, 108, 148, 0.35);
+        border-radius: 12px;
+        background: linear-gradient(180deg, rgba(255, 255, 255, 0.92) 0%, rgba(240, 247, 252, 0.9) 100%);
+        padding: 12px;
+    }
+
+    .upload-input {
+        display: block;
+        width: 100%;
+        font-size: 12px;
+        color: #405f7b;
+    }
+
+    .image-preview {
+        margin-top: 10px;
+        display: inline-block;
+    }
+
+    .image-preview img {
+        width: 160px;
+        height: 100px;
+        object-fit: cover;
+        border-radius: 10px;
+        border: 1px solid rgba(16, 44, 87, 0.16);
+        background: #eef4f8;
+    }
+
+    .remove-wrap {
+        display: inline-flex;
+        align-items: center;
+        gap: 7px;
+        font-size: 12px;
+        color: #4f5963;
+        margin-top: 8px;
+    }
+
     .active-wrap {
         display: inline-flex;
         align-items: center;
@@ -394,7 +587,7 @@ include __DIR__ . '/../includes/header.php';
                     </a>
                 </div>
             </div>
-            <form method="POST" action="" class="form-grid">
+            <form method="POST" action="" class="form-grid" enctype="multipart/form-data" id="jadwal-edit-form">
                 <div class="field">
                     <label for="nama_ibadah">Nama Ibadah <span class="req">*</span></label>
                     <input type="text" class="input" id="nama_ibadah" name="nama_ibadah"
@@ -460,6 +653,45 @@ include __DIR__ . '/../includes/header.php';
                     <label for="keterangan">Keterangan</label>
                     <textarea class="textarea" id="keterangan" name="keterangan"><?php echo htmlspecialchars($_POST['keterangan'] ?? ($jadwal['keterangan'] ?? '')); ?></textarea>
                 </div>
+
+                <?php if ($has_image_columns): ?>
+                    <div class="field">
+                        <label for="image">Foto Jadwal</label>
+                        <div class="upload-wrap">
+                            <input type="file" class="upload-input" id="image" name="image" accept="image/jpeg,image/png,image/webp">
+                            <p class="hint" style="margin-top:8px;">JPG, PNG, WebP. Maksimal 50 MB. Gambar akan dioptimalkan otomatis.</p>
+
+                            <?php if ($current_image_url !== ''): ?>
+                                <div class="image-preview">
+                                    <img id="current_preview" src="<?php echo htmlspecialchars($current_image_url); ?>" alt="Foto jadwal" style="object-fit: <?php echo htmlspecialchars($image_fit_value); ?>; object-position: center <?php echo $image_pos_y_value; ?>%;">
+                                </div>
+                                <label class="remove-wrap" for="remove_image">
+                                    <input type="checkbox" id="remove_image" name="remove_image" value="1">
+                                    <span>Hapus foto saat simpan</span>
+                                </label>
+                            <?php endif; ?>
+
+                            <div class="image-preview" id="new_preview_wrap" style="display:none;">
+                                <img id="new_preview" alt="Preview foto baru" style="object-fit: <?php echo htmlspecialchars($image_fit_value); ?>; object-position: center <?php echo $image_pos_y_value; ?>%;">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row-grid">
+                        <div class="field">
+                            <label for="image_fit">Fit Gambar</label>
+                            <select class="select" id="image_fit" name="image_fit">
+                                <option value="cover" <?php echo $image_fit_value === 'cover' ? 'selected' : ''; ?>>Cover (crop untuk fill)</option>
+                                <option value="contain" <?php echo $image_fit_value === 'contain' ? 'selected' : ''; ?>>Contain (tampilkan penuh)</option>
+                            </select>
+                        </div>
+                        <div class="field">
+                            <label for="image_pos_y">Posisi Vertikal (<span id="image_pos_y_value"><?php echo $image_pos_y_value; ?></span>%)</label>
+                            <input type="range" class="input" id="image_pos_y" name="image_pos_y" min="0" max="100" step="1" value="<?php echo $image_pos_y_value; ?>">
+                            <p class="hint">0% = atas, 50% = tengah, 100% = bawah</p>
+                        </div>
+                    </div>
+                <?php endif; ?>
 
                 <div class="field">
                     <?php
@@ -556,6 +788,91 @@ include __DIR__ . '/../includes/header.php';
         updateHiddenValue();
     })();
 </script>
+
+<?php if ($has_image_columns): ?>
+<script>
+    (function () {
+        var form = document.getElementById('jadwal-edit-form');
+        var saveButton = form ? form.querySelector('.btn-save') : null;
+        var input = document.getElementById('image');
+        var fit = document.getElementById('image_fit');
+        var pos = document.getElementById('image_pos_y');
+        var posValue = document.getElementById('image_pos_y_value');
+        var current = document.getElementById('current_preview');
+        var nextWrap = document.getElementById('new_preview_wrap');
+        var next = document.getElementById('new_preview');
+        var maxImageSize = <?php echo (int) JADWAL_MAX_SIZE; ?>;
+        var maxImageMb = <?php echo (int) round(JADWAL_MAX_SIZE / 1024 / 1024); ?>;
+
+        function applyImageStyle(img) {
+            if (!img) {
+                return;
+            }
+            var fitValue = fit ? fit.value : 'cover';
+            var posValueNum = pos ? pos.value : '50';
+            img.style.objectFit = fitValue;
+            img.style.objectPosition = 'center ' + posValueNum + '%';
+        }
+
+        function refreshPositionLabel() {
+            if (posValue && pos) {
+                posValue.textContent = pos.value;
+            }
+        }
+
+        if (input && nextWrap && next) {
+            input.addEventListener('change', function (event) {
+                var file = event.target.files && event.target.files[0];
+                if (!file) {
+                    return;
+                }
+
+                if (file.size > maxImageSize) {
+                    alert('Ukuran foto terlalu besar. Maksimal ' + maxImageMb + 'MB.');
+                    input.value = '';
+                    next.removeAttribute('src');
+                    nextWrap.style.display = 'none';
+                    return;
+                }
+
+                var reader = new FileReader();
+                reader.onload = function (e) {
+                    next.src = e.target.result;
+                    nextWrap.style.display = 'inline-block';
+                    applyImageStyle(next);
+                };
+                reader.readAsDataURL(file);
+            });
+        }
+
+        if (form && saveButton) {
+            form.addEventListener('submit', function () {
+                saveButton.disabled = true;
+                saveButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Menyimpan...';
+            });
+        }
+
+        if (fit) {
+            fit.addEventListener('change', function () {
+                applyImageStyle(current);
+                applyImageStyle(next);
+            });
+        }
+
+        if (pos) {
+            pos.addEventListener('input', function () {
+                refreshPositionLabel();
+                applyImageStyle(current);
+                applyImageStyle(next);
+            });
+        }
+
+        refreshPositionLabel();
+        applyImageStyle(current);
+        applyImageStyle(next);
+    })();
+</script>
+<?php endif; ?>
 
 <?php include __DIR__ . '/../includes/footer.php'; ?>
 

@@ -6,6 +6,7 @@ error_reporting(E_ALL);
 
 require_once __DIR__ . '/../config/database.php';
 require_once __DIR__ . '/includes/auth.php';
+require_once __DIR__ . '/../includes/image-helper.php';
 
 // Cek database connection
 if ($conn->connect_error) {
@@ -18,17 +19,84 @@ if ($conn->connect_error) {
 define('MAX_UPLOAD_SIZE', 10 * 1024 * 1024); // 10MB
 define('UPLOAD_DIR', '../uploads/formulir/');
 define('ALLOWED_MIME', 'application/pdf');
+define('FOTO_UPLOAD_DIR', '../uploads/formulir/foto/');
+define('FOTO_MAX_SIZE', 12 * 1024 * 1024); // 12MB
+define('FOTO_MAX_WIDTH', 1600);
+define('FOTO_QUALITY', 80);
 
 // Pastikan folder upload ada
 if (!is_dir(UPLOAD_DIR)) {
     @mkdir(UPLOAD_DIR, 0755, true);
 }
 
+if (!is_dir(FOTO_UPLOAD_DIR)) {
+    @mkdir(FOTO_UPLOAD_DIR, 0755, true);
+}
+
+function ensureFormulirFotoColumn(mysqli $conn): void {
+    $check = $conn->query("SHOW COLUMNS FROM formulir LIKE 'foto'");
+    if ($check instanceof mysqli_result && $check->num_rows === 0) {
+        $conn->query("ALTER TABLE formulir ADD COLUMN foto VARCHAR(255) DEFAULT NULL AFTER file");
+    }
+
+    $checkPosition = $conn->query("SHOW COLUMNS FROM formulir LIKE 'foto_posisi_y'");
+    if ($checkPosition instanceof mysqli_result && $checkPosition->num_rows === 0) {
+        $conn->query("ALTER TABLE formulir ADD COLUMN foto_posisi_y TINYINT UNSIGNED NOT NULL DEFAULT 50 AFTER foto");
+    }
+}
+
+function formulirUploadPhoto(array $file): array {
+    if (!isset($file) || !is_array($file) || (int) ($file['size'] ?? 0) <= 0) {
+        return ['uploaded' => false, 'filename' => null, 'error' => null];
+    }
+
+    $validation = validateImageUpload($file, FOTO_MAX_SIZE);
+    if (!$validation['valid']) {
+        return ['uploaded' => false, 'filename' => null, 'error' => $validation['error']];
+    }
+
+    $filename = 'formulir_foto_' . substr(bin2hex(random_bytes(8)), 0, 8) . '.webp';
+    $destPath = FOTO_UPLOAD_DIR . $filename;
+    $result = optimizeAndSaveImageAsWebp($file['tmp_name'], $destPath, FOTO_MAX_WIDTH, FOTO_QUALITY);
+
+    if (!$result['success']) {
+        return ['uploaded' => false, 'filename' => null, 'error' => $result['error'] ?? 'Gagal memproses foto'];
+    }
+
+    return ['uploaded' => true, 'filename' => $filename, 'error' => null];
+}
+
+function formulirPhotoPath(?string $filename): string {
+    if (!$filename) {
+        return '';
+    }
+
+    $fullPath = __DIR__ . '/../uploads/formulir/foto/' . $filename;
+    if (!is_file($fullPath)) {
+        return '';
+    }
+
+    return '../uploads/formulir/foto/' . rawurlencode($filename);
+}
+
+function formulirPhotoPosition(array $row): int {
+    $value = isset($row['foto_posisi_y']) ? (int) $row['foto_posisi_y'] : 50;
+    if ($value < 0) {
+        $value = 0;
+    } elseif ($value > 100) {
+        $value = 100;
+    }
+
+    return $value;
+}
+
+ensureFormulirFotoColumn($conn);
+
 // =====================================================================
 // AMBIL DATA FORMULIR UNTUK LIST
 // =====================================================================
 $formulir_list = [];
-$stmt = $conn->prepare("SELECT id, nama_formulir, file, deskripsi, status, urutan, created_at 
+$stmt = $conn->prepare("SELECT id, nama_formulir, file, foto, foto_posisi_y, deskripsi, status, urutan, created_at 
                        FROM formulir 
                        ORDER BY urutan ASC");
 if ($stmt) {
@@ -46,7 +114,7 @@ if ($stmt) {
 $edit_data = null;
 if (isset($_GET['edit_id'])) {
     $edit_id = intval($_GET['edit_id']);
-    $stmt = $conn->prepare("SELECT id, nama_formulir, file, deskripsi, status, urutan 
+    $stmt = $conn->prepare("SELECT id, nama_formulir, file, foto, foto_posisi_y, deskripsi, status, urutan 
                            FROM formulir 
                            WHERE id = ?");
     if ($stmt) {
@@ -200,7 +268,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
     $id = intval($_POST['id']);
     
     // Get file name for deletion
-    $stmt = $conn->prepare("SELECT file FROM formulir WHERE id = ?");
+    $stmt = $conn->prepare("SELECT file, foto FROM formulir WHERE id = ?");
     $stmt->bind_param("i", $id);
     $stmt->execute();
     $result = $stmt->get_result();
@@ -208,6 +276,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
     if ($result->num_rows > 0) {
         $row = $result->fetch_assoc();
         $old_file = $row['file'];
+        $old_foto = $row['foto'] ?? null;
         
         // Delete from database
         $stmt_del = $conn->prepare("DELETE FROM formulir WHERE id = ?");
@@ -218,6 +287,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
             $file_path = UPLOAD_DIR . $old_file;
             if (file_exists($file_path)) {
                 @unlink($file_path);
+            }
+            if (!empty($old_foto)) {
+                $foto_path = FOTO_UPLOAD_DIR . $old_foto;
+                if (file_exists($foto_path)) {
+                    @unlink($foto_path);
+                }
             }
             $success = "Formulir berhasil dihapus.";
         } else {
@@ -236,6 +311,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['form_action'])) {
     $nama_formulir = trim($_POST['nama_formulir'] ?? '');
     $deskripsi = trim($_POST['deskripsi'] ?? '');
     $status = trim($_POST['status'] ?? 'aktif');
+    $foto_posisi_y = intval($_POST['foto_posisi_y'] ?? 50);
+    if ($foto_posisi_y < 0) {
+        $foto_posisi_y = 0;
+    } elseif ($foto_posisi_y > 100) {
+        $foto_posisi_y = 100;
+    }
+    $old_foto = null;
     
     // Validasi input
     if (empty($nama_formulir) || empty($deskripsi)) {
@@ -247,15 +329,27 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['form_action'])) {
         // ====== GET OLD FILE NAME (jika edit) ======
         if ($form_action === 'edit') {
             $id_edit = intval($_POST['id'] ?? 0);
-            $stmt = $conn->prepare("SELECT file FROM formulir WHERE id = ?");
+            $stmt = $conn->prepare("SELECT file, foto, foto_posisi_y FROM formulir WHERE id = ?");
             $stmt->bind_param("i", $id_edit);
             $stmt->execute();
             $result = $stmt->get_result();
             if ($result->num_rows > 0) {
                 $row = $result->fetch_assoc();
                 $old_file = $row['file'];
+                $old_foto = $row['foto'] ?? null;
+                $old_foto_posisi_y = isset($row['foto_posisi_y']) ? (int) $row['foto_posisi_y'] : 50;
             }
             $stmt->close();
+        }
+
+        $foto_name = $old_foto;
+        if (isset($_FILES['foto']) && (int) ($_FILES['foto']['size'] ?? 0) > 0) {
+            $photo_result = formulirUploadPhoto($_FILES['foto']);
+            if (!$photo_result['uploaded']) {
+                $error = $photo_result['error'] ?? 'Gagal mengupload foto.';
+            } else {
+                $foto_name = $photo_result['filename'];
+            }
         }
         
         // ====== HANDLE FILE UPLOAD ======
@@ -319,6 +413,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['form_action'])) {
                 $file_name = $old_file;
             }
         }
+
+        if (isset($error)) {
+            if (!empty($file_name) && $file_name !== $old_file && file_exists(UPLOAD_DIR . $file_name)) {
+                @unlink(UPLOAD_DIR . $file_name);
+            }
+            if (!empty($foto_name) && $foto_name !== $old_foto && file_exists(FOTO_UPLOAD_DIR . $foto_name)) {
+                @unlink(FOTO_UPLOAD_DIR . $foto_name);
+            }
+        }
         
         // ====== ADD NEW DATA ======
         if (!isset($error) && $form_action === 'add') {
@@ -329,9 +432,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['form_action'])) {
             
             // Insert dengan urutan baru
             $stmt = $conn->prepare("INSERT INTO formulir 
-                                   (nama_formulir, deskripsi, file, status, urutan) 
-                                   VALUES (?, ?, ?, ?, ?)");
-            $stmt->bind_param("ssssi", $nama_formulir, $deskripsi, $file_name, $status, $next_urutan);
+                                   (nama_formulir, deskripsi, file, foto, foto_posisi_y, status, urutan) 
+                                   VALUES (?, ?, ?, ?, ?, ?, ?)");
+            $stmt->bind_param("ssssisi", $nama_formulir, $deskripsi, $file_name, $foto_name, $foto_posisi_y, $status, $next_urutan);
             
             if ($stmt->execute()) {
                 $success = "Formulir berhasil ditambahkan.";
@@ -342,6 +445,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['form_action'])) {
                 if ($file_name && file_exists(UPLOAD_DIR . $file_name)) {
                     @unlink(UPLOAD_DIR . $file_name);
                 }
+                if (!empty($foto_name) && file_exists(FOTO_UPLOAD_DIR . $foto_name)) {
+                    @unlink(FOTO_UPLOAD_DIR . $foto_name);
+                }
             }
             $stmt->close();
         }
@@ -349,9 +455,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['form_action'])) {
         elseif (!isset($error) && $form_action === 'edit') {
             $id_edit = intval($_POST['id'] ?? 0);
             $stmt = $conn->prepare("UPDATE formulir 
-                                   SET nama_formulir = ?, deskripsi = ?, file = ?, status = ? 
+                                   SET nama_formulir = ?, deskripsi = ?, file = ?, foto = ?, foto_posisi_y = ?, status = ? 
                                    WHERE id = ?");
-            $stmt->bind_param("ssssi", $nama_formulir, $deskripsi, $file_name, $status, $id_edit);
+            $stmt->bind_param("ssssisi", $nama_formulir, $deskripsi, $file_name, $foto_name, $foto_posisi_y, $status, $id_edit);
             
             if ($stmt->execute()) {
                 $success = "Formulir berhasil diperbarui.";
@@ -360,9 +466,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['form_action'])) {
                 if ($file_name !== $old_file && $old_file && file_exists(UPLOAD_DIR . $old_file)) {
                     @unlink(UPLOAD_DIR . $old_file);
                 }
+                if ($foto_name !== $old_foto && $old_foto && file_exists(FOTO_UPLOAD_DIR . $old_foto)) {
+                    @unlink(FOTO_UPLOAD_DIR . $old_foto);
+                }
                 
                 // Reload edit data
-                $stmt_reload = $conn->prepare("SELECT id, nama_formulir, file, deskripsi, status 
+                $stmt_reload = $conn->prepare("SELECT id, nama_formulir, file, foto, foto_posisi_y, deskripsi, status 
                                              FROM formulir 
                                              WHERE id = ?");
                 $stmt_reload->bind_param("i", $id_edit);
@@ -378,13 +487,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['form_action'])) {
                 if ($file_name !== $old_file && $file_name && file_exists(UPLOAD_DIR . $file_name)) {
                     @unlink(UPLOAD_DIR . $file_name);
                 }
+                if ($foto_name !== $old_foto && $foto_name && file_exists(FOTO_UPLOAD_DIR . $foto_name)) {
+                    @unlink(FOTO_UPLOAD_DIR . $foto_name);
+                }
             }
             $stmt->close();
         }
     }
     
     // Reload list data
-    $stmt = $conn->prepare("SELECT id, nama_formulir, file, deskripsi, status, urutan, created_at 
+    $stmt = $conn->prepare("SELECT id, nama_formulir, file, foto, foto_posisi_y, deskripsi, status, urutan, created_at 
                            FROM formulir 
                            ORDER BY urutan ASC");
     $stmt->execute();
@@ -448,30 +560,46 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['form_action'])) {
             font-weight: 500;
         }
 
-        .alert-success {
-            background-color: #d4edda;
-            color: #155724;
-            border: 1px solid #c3e6cb;
+        .button-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 18px;
+            flex-wrap: wrap;
         }
 
-        .alert-danger {
-            background-color: #f8d7da;
-            color: #721c24;
-            border: 1px solid #f5c6cb;
+        .btn-primary {
+            background: linear-gradient(135deg, #1e3a5f 0%, #146C94 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 8px 14px rgba(20, 108, 148, 0.24);
+        }
+
+        .btn-secondary {
+            background: #e8edf3;
+            color: #1e3a5f;
+            border: 1px solid rgba(16, 44, 87, 0.14);
+        }
+
+        .btn-secondary:hover {
+            background: #dbe4ee;
         }
 
         .layout {
             display: grid;
-            grid-template-columns: 1fr 360px;
-            gap: 16px;
+            grid-template-columns: minmax(0, 1.55fr) minmax(0, 0.82fr);
+            gap: 18px;
             align-items: start;
         }
 
         .panel {
-            background: linear-gradient(165deg, #f9f2e8 0%, #efe2d1 100%);
-            border-radius: 12px;
+            background: linear-gradient(180deg, #ffffff 0%, #f8fbfe 100%);
+            border: 1px solid rgba(16, 44, 87, 0.1);
+            border-radius: 22px;
             padding: 18px;
-            box-shadow: 0 4px 12px rgba(16, 44, 87, 0.1);
+            box-shadow: 0 12px 26px rgba(15, 39, 66, 0.08);
         }
 
         .panel-upload {
@@ -513,6 +641,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['form_action'])) {
             background: white;
             border-radius: 10px;
             overflow: hidden;
+        }
+
+        .table-scroll {
+            width: 100%;
+            overflow-x: auto;
+        }
+
+        thead th:nth-child(1),
+        tbody td:nth-child(1),
+        thead th:nth-child(3),
+        tbody td:nth-child(3),
+        thead th:nth-child(4),
+        tbody td:nth-child(4),
+        thead th:nth-child(5),
+        tbody td:nth-child(5),
+        thead th:nth-child(6),
+        tbody td:nth-child(6) {
+            text-align: center;
         }
 
         thead th {
@@ -600,62 +746,49 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['form_action'])) {
 
         .btn-danger:hover { background: #c82333; }
 
-        .sort-form {
-            display: inline-flex;
-            align-items: center;
-            gap: 4px;
-            justify-content: center;
-            flex-wrap: nowrap;
-            white-space: nowrap;
-            margin: 0;
-        }
-
-        tbody td:nth-child(2) {
-            white-space: nowrap;
-        }
-
-        .sort-form input[type="number"] {
-            width: 58px;
-            min-width: 58px;
-            padding: 6px 8px;
-            border: 1px solid rgba(16, 44, 87, 0.2);
-            border-radius: 10px;
-            font-size: 13px;
+        .sort-number {
+            min-width: 30px;
+            padding: 0;
+            border: 0;
+            border-radius: 0;
+            background: transparent;
+            color: #243b5f;
+            font-size: 14px;
+            font-weight: 700;
             text-align: center;
             margin: 0;
-        }
-
-        .sort-form .btn-sort {
-            margin: 0;
-            flex: 0 0 auto;
-            width: 28px;
-            min-width: 28px;
-            height: 28px;
-            padding: 0;
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            border-radius: 9px;
         }
 
-        .sort-actions {
-            display: inline-flex;
-            gap: 4px;
+        .sort-cell {
+            display: flex;
+            justify-content: center;
             align-items: center;
         }
 
-        body.admin-theme .panel-list .sort-form {
-            display: inline-flex !important;
-            flex-wrap: nowrap !important;
-            align-items: center !important;
-            justify-content: center !important;
-            gap: 4px !important;
+        .photo-thumb {
+            width: 56px;
+            height: 56px;
+            object-fit: cover;
+            object-position: center;
+            border-radius: 12px;
+            border: 1px solid rgba(16, 44, 87, 0.12);
+            background: #eef4f8;
         }
 
-        body.admin-theme .panel-list .sort-form input[type='number'] {
-            width: 54px !important;
-            min-width: 54px !important;
-            margin: 0 !important;
+        .photo-thumb-placeholder {
+            width: 56px;
+            height: 56px;
+            border-radius: 12px;
+            border: 1px dashed rgba(16, 44, 87, 0.18);
+            background: #f4f8fc;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            color: #8fa1b4;
+            font-size: 20px;
         }
 
         .form-group { margin-bottom: 16px; }
@@ -663,8 +796,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['form_action'])) {
         .form-group label {
             display: block;
             margin-bottom: 6px;
-            font-weight: 600;
-            font-size: 14px;
+            font-weight: 700;
+            font-size: 13px;
             color: #102C57;
         }
 
@@ -673,14 +806,25 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['form_action'])) {
         .form-group select {
             width: 100%;
             padding: 10px 12px;
-            border: 2px solid #146C94;
-            border-radius: 8px;
-            font-size: 14px;
+            border: 1px solid rgba(16, 44, 87, 0.2);
+            border-radius: 12px;
+            font-size: 13px;
             background: white;
-            transition: border-color 0.3s ease;
+            transition: border-color 0.2s ease, box-shadow 0.2s ease;
         }
 
-        .form-group textarea { min-height: 110px; resize: vertical; }
+        .form-group input:focus,
+        .form-group textarea:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: rgba(63, 182, 168, 0.56);
+            box-shadow: 0 0 0 0.2rem rgba(63, 182, 168, 0.14);
+        }
+
+        .form-group textarea {
+            resize: vertical;
+            min-height: 130px;
+        }
 
         .form-group input:focus,
         .form-group textarea:focus,
@@ -728,6 +872,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['form_action'])) {
             color: #1e3a5f;
         }
 
+
+            .file-upload-wrap.is-highlight {
+                border-color: rgba(20, 108, 148, 0.62);
+                box-shadow: 0 0 0 0.2rem rgba(63, 182, 168, 0.14);
+            }
         .status-option.active {
             background: linear-gradient(135deg, #1e3a5f 0%, #146C94 100%);
             color: #fff;
@@ -807,37 +956,90 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['form_action'])) {
             color: #146C94;
         }
 
-        .info-text {
-            font-size: 12px;
-            color: #666;
-            margin-top: 5px;
-            font-style: italic;
+        .photo-preview-wrap {
+            display: grid;
+            gap: 10px;
+            width: 100%;
         }
 
-        .btn-submit {
-            display: inline-flex;
+        .photo-preview {
+            width: 110px;
+            height: 110px;
+            justify-self: start;
+            border-radius: 10px;
+            border: 1px solid rgba(16, 44, 87, 0.12);
+            background: #eef4f8;
+            overflow: hidden;
+            display: flex;
             align-items: center;
             justify-content: center;
-            gap: 6px;
-            width: fit-content;
-            min-width: 170px;
-            padding: 8px 12px;
-            border: none;
-            border-radius: 10px;
+        }
+
+        .photo-preview img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+
+        .photo-placeholder {
+            text-align: center;
+            color: #6b7c93;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .photo-placeholder i {
+            display: block;
+            font-size: 18px;
+            margin-bottom: 6px;
+            opacity: 0.55;
+        }
+
+        .photo-position-wrap {
+            display: grid;
+            gap: 8px;
+            padding: 12px;
+            border-radius: 12px;
+            background: #f8fbfe;
+            border: 1px solid rgba(16, 44, 87, 0.08);
+        }
+
+        .photo-position-meta {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
             font-size: 12px;
             font-weight: 700;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            background: linear-gradient(135deg, #1e3a5f 0%, #146C94 100%);
-            color: white;
-            letter-spacing: 0.15px;
+            color: #2e4f75;
         }
 
-        .btn-submit:hover {
-            transform: translateY(-1px);
-            box-shadow: 0 8px 14px rgba(20, 108, 148, 0.24);
+        .photo-position-meta span:last-child {
+            color: #146C94;
         }
 
+        .photo-position-slider {
+            width: 100%;
+            accent-color: #146C94;
+        }
+
+        .help-text {
+            font-size: 12px;
+            color: #6b7c93;
+            margin-top: 5px;
+            font-style: italic;
+            line-height: 1.45;
+        }
+
+        .help-text strong {
+            font-weight: 700;
+            color: #102C57;
+        }
+        
+        .help-text em {
+            color: #2f4770;
+        }
         .file-box {
             background: rgba(255, 255, 255, 0.66);
             padding: 12px;
@@ -880,98 +1082,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['form_action'])) {
                 border-radius: 16px;
             }
 
-            .panel-list table,
-            .panel-list thead,
-            .panel-list tbody,
-            .panel-list tr,
-            .panel-list th,
-            .panel-list td {
-                display: block;
-                width: 100%;
+            .table-responsive {
+                overflow-x: auto;
             }
 
-            .panel-list table {
-                border: 0;
-                background: transparent;
-            }
-
-            .panel-list thead {
-                display: none;
-            }
-
-            .panel-list tbody tr {
-                background: #fff;
-                border: 1px solid rgba(16, 44, 87, 0.1);
-                border-radius: 14px;
-                padding: 10px;
-                margin-bottom: 10px;
-                box-shadow: 0 8px 16px rgba(15, 39, 66, 0.05);
-            }
-
-            .panel-list tbody td {
-                display: flex;
-                align-items: center;
-                justify-content: space-between;
-                gap: 10px;
-                padding: 8px 0;
-                border-bottom: 1px solid #edf3f8;
-                font-size: 13px;
-                text-align: left;
-            }
-
-            .panel-list tbody td:last-child {
-                border-bottom: 0;
-                padding-bottom: 0;
-            }
-
-            .panel-list tbody td::before {
-                font-size: 11px;
-                font-weight: 800;
-                text-transform: uppercase;
-                letter-spacing: 0.3px;
-                color: #7388a2;
-            }
-
-            .panel-list tbody td:nth-child(1)::before { content: 'No'; }
-            .panel-list tbody td:nth-child(2)::before { content: 'Urutan'; }
-            .panel-list tbody td:nth-child(3)::before { content: 'Nama Formulir'; }
-            .panel-list tbody td:nth-child(4)::before { content: 'File'; }
-            .panel-list tbody td:nth-child(5)::before { content: 'Status'; }
-            .panel-list tbody td:nth-child(6)::before { content: 'Aksi'; }
-
-            .panel-list tbody td:nth-child(2) .sort-form {
-                width: auto;
-                margin: 0;
-            }
-
-            .panel-list tbody td:nth-child(4) .actions,
-            .panel-list tbody td:nth-child(6) .actions {
-                width: 100%;
-                justify-content: flex-end;
-            }
-
-            .panel-list tbody td:nth-child(6) {
-                display: block;
-            }
-
-            .panel-list tbody td:nth-child(6)::before {
-                display: block;
-                margin-bottom: 8px;
-            }
-
-            .panel-list tbody td:nth-child(6) .actions {
-                display: flex;
-                gap: 8px;
-            }
-
-            .panel-list tbody td:nth-child(6) .actions .btn,
-            .panel-list tbody td:nth-child(6) .actions form {
-                flex: 1;
-                width: 100%;
-            }
-
-            .panel-list tbody td:nth-child(6) .actions .btn {
-                width: 100%;
+            .sort-cell {
+                justify-content: center;
             }
         }
     </style>
@@ -990,29 +1106,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['form_action'])) {
         <div class="admin-content">
 
 <div class="container">
-    <!-- ALERTS -->
-    <?php if (isset($success)): ?>
-        <div class="alert alert-success">
-            ✓ <?php echo htmlspecialchars($success); ?>
-        </div>
-    <?php endif; ?>
-    
-    <?php if (isset($error)): ?>
-        <div class="alert alert-danger">
-            ✗ <?php echo htmlspecialchars($error); ?>
-        </div>
-    <?php endif; ?>
-
     <div class="layout">
     <div class="panel panel-list">
         <div class="panel-title list-title">Daftar Formulir</div>
         <?php if (count($formulir_list) > 0): ?>
+            <div class="table-scroll">
                 <table>
                     <thead>
                         <tr>
-                            <th>No</th>
                             <th>Urutan</th>
                             <th>Nama Formulir</th>
+                            <th>Foto</th>
                             <th>File</th>
                             <th>Status</th>
                             <th>Aksi</th>
@@ -1021,18 +1125,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['form_action'])) {
                     <tbody>
                         <?php foreach ($formulir_list as $index => $item): ?>
                             <tr>
-                                <td><?php echo $index + 1; ?></td>
-                                <td>
-                                    <form method="POST" class="sort-form">
-                                        <input type="hidden" name="id" value="<?php echo $item['id']; ?>">
-                                        <input type="number" value="<?php echo intval($item['urutan']); ?>" min="1" readonly>
-                                        <div class="sort-actions">
-                                            <button type="submit" name="action" value="move_up" class="btn btn-sort" title="Naik"><i class="fas fa-chevron-up"></i></button>
-                                            <button type="submit" name="action" value="move_down" class="btn btn-sort" title="Turun"><i class="fas fa-chevron-down"></i></button>
-                                        </div>
-                                    </form>
+                                <td class="sort-cell">
+                                    <span class="sort-number"><?php echo intval($item['urutan']); ?></span>
                                 </td>
                                 <td><?php echo htmlspecialchars($item['nama_formulir']); ?></td>
+                                <td>
+                                    <?php $foto_url = formulirPhotoPath($item['foto'] ?? null); ?>
+                                    <?php if ($foto_url !== ''): ?>
+                                        <img src="<?php echo htmlspecialchars($foto_url); ?>" alt="Foto <?php echo htmlspecialchars($item['nama_formulir']); ?>" class="photo-thumb" style="object-position:center <?php echo formulirPhotoPosition($item); ?>%;">
+                                    <?php else: ?>
+                                        <span class="photo-thumb-placeholder"><i class="fas fa-image"></i></span>
+                                    <?php endif; ?>
+                                </td>
                                 <td>
                                     <?php if (!empty($item['file']) && file_exists(UPLOAD_DIR . $item['file'])): ?>
                                         <div class="actions">
@@ -1072,6 +1176,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['form_action'])) {
                         <?php endforeach; ?>
                     </tbody>
                 </table>
+            </div>
         <?php else: ?>
             <div class="empty-state">
                 <div class="icon">📄</div>
@@ -1080,7 +1185,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['form_action'])) {
         <?php endif; ?>
     </div>
 
-    <div class="panel panel-upload">
+    <div class="panel panel-upload" id="formulir-form-panel">
         <div class="panel-title upload-title"><?php echo $edit_data ? 'Edit Formulir' : 'Tambah Formulir'; ?></div>
             <form method="POST" enctype="multipart/form-data">
                 <input type="hidden" name="form_action" value="<?php echo $edit_data ? 'edit' : 'add'; ?>">
@@ -1109,6 +1214,52 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['form_action'])) {
                     <label>Deskripsi <span class="required">*</span></label>
                     <textarea name="deskripsi" required><?php echo htmlspecialchars($edit_data['deskripsi'] ?? $_POST['deskripsi'] ?? ''); ?></textarea>
                 </div>
+
+                <div class="form-group">
+                    <label>Foto Formulir</label>
+                    <div class="file-upload-wrap">
+                        <input type="file" id="photo_input" class="file-input-native" name="foto" accept="image/jpeg,image/png,image/webp" onchange="previewPhoto(event)">
+                        <button type="button" id="photo_upload_button" class="file-upload-button">
+                            <i class="fas fa-cloud-upload-alt"></i> Pilih Foto
+                        </button>
+                        <div class="file-upload-name" id="photo_name_text"><?php echo !empty($edit_data['foto']) ? htmlspecialchars($edit_data['foto']) : 'Belum ada foto dipilih'; ?></div>
+                        <div class="file-upload-meta">
+                            <i class="fas fa-file-image"></i>
+                            <span>Upload gambar terbaik untuk thumbnail formulir</span>
+                        </div>
+                    </div>
+                    <p class="help-text">
+                        <strong>Format:</strong> JPG, PNG, WebP | <strong>Max: 10MB</strong><br>
+                        <em>Gambar akan otomatis di-resize dan di-compress untuk optimal loading</em>
+                    </p>
+                </div>
+
+                <div class="form-group">
+                    <label>Posisi Vertikal Foto (<span id="photo_position_value"><?php echo intval($edit_data['foto_posisi_y'] ?? $_POST['foto_posisi_y'] ?? 50); ?></span>%)</label>
+                    <input type="range" id="foto_posisi_y" name="foto_posisi_y" min="0" max="100" value="<?php echo intval($edit_data['foto_posisi_y'] ?? $_POST['foto_posisi_y'] ?? 50); ?>" oninput="updatePhotoPositionPreview()">
+                    <p class="help-text" style="margin-top:8px;">
+                        Geser ke kiri untuk naik (atas), geser ke kanan untuk turun (bawah). Nilai 50% = center.
+                    </p>
+                </div>
+
+                <?php if ($edit_data && !empty($edit_data['foto'])): ?>
+                    <div class="file-preview">
+                        <div>
+                            <p class="preview-label">Foto Saat Ini:</p>
+                            <?php $edit_photo_url = formulirPhotoPath($edit_data['foto'] ?? null); ?>
+                            <img src="<?php echo htmlspecialchars($edit_photo_url); ?>" alt="Current" class="preview-image" id="preview_existing" style="object-position:center <?php echo intval($edit_data['foto_posisi_y'] ?? 50); ?>%;">
+                        </div>
+                    </div>
+                <?php endif; ?>
+
+                <div id="preview_photo_new" style="display:none;">
+                    <div class="file-preview">
+                        <div>
+                            <p class="preview-label">Preview Foto Baru:</p>
+                            <img id="preview_img" class="preview-image" alt="Preview" style="object-position:center <?php echo intval($edit_data['foto_posisi_y'] ?? $_POST['foto_posisi_y'] ?? 50); ?>%;">
+                        </div>
+                    </div>
+                </div>
                 
                 <div class="form-group">
                     <label>File PDF <?php echo !$edit_data ? '<span class="required">*</span>' : ''; ?></label>
@@ -1123,7 +1274,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['form_action'])) {
                             <span>Upload PDF formulir yang siap dibagikan ke jemaat</span>
                         </div>
                     </div>
-                    <p class="info-text">
+                    <p class="help-text">
                         <strong>Format:</strong> PDF | <strong>Max: 10MB</strong><br>
                         <?php echo !$edit_data ? '<em>File PDF wajib diupload saat menambah formulir baru.</em>' : '<em>Jika ingin mengganti file, upload file PDF baru. Jika tidak, file lama akan tetap digunakan.</em>'; ?>
                     </p>
@@ -1152,13 +1303,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['form_action'])) {
                     <div class="file-line" id="preview_filesize"></div>
                 </div>
                 
-                    <button type="submit" class="btn-submit">
+                <div class="button-group">
+                    <button type="submit" class="btn btn-primary">
                         <i class="fas fa-save"></i>
-                        <?php echo $edit_data ? 'Perbarui Formulir' : 'Tambah Formulir'; ?>
+                        <?php echo $edit_data ? 'Perbarui Data' : 'Tambah Data'; ?>
                     </button>
                     <?php if ($edit_data): ?>
-                        <a href="formulir.php" class="back-link" style="display:block; text-align:center; margin-top:12px; margin-bottom:0;">Batal Edit</a>
+                        <a href="formulir.php" class="btn btn-secondary">
+                            <i class="fas fa-times"></i> Batal
+                        </a>
                     <?php endif; ?>
+                </div>
             </form>
     </div>
 </div>
@@ -1178,6 +1333,49 @@ function previewFile(event) {
         document.getElementById('preview_filesize').textContent = 'Ukuran: ' + (file.size / 1024).toFixed(2) + ' KB';
         document.getElementById('preview_new').style.display = 'block';
     }
+}
+
+function previewPhoto(event) {
+    const file = event.target.files[0];
+    const fileNameText = document.getElementById('photo_name_text');
+    const previewNew = document.getElementById('preview_photo_new');
+    const previewImg = document.getElementById('preview_img');
+
+    if (fileNameText) {
+        fileNameText.textContent = file ? file.name : 'Belum ada foto dipilih';
+    }
+
+    if (file && previewImg) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            previewImg.style.display = 'block';
+            previewImg.src = e.target.result;
+            if (previewNew) {
+                previewNew.style.display = 'block';
+            }
+            updatePhotoPositionPreview();
+        };
+        reader.readAsDataURL(file);
+    }
+}
+
+function updatePhotoPositionPreview() {
+    const slider = document.getElementById('foto_posisi_y');
+    const valueEl = document.getElementById('photo_position_value');
+    const previewTargets = [document.getElementById('preview_existing'), document.getElementById('preview_img')].filter(Boolean);
+
+    if (!slider) {
+        return;
+    }
+
+    const value = slider.value;
+    if (valueEl) {
+        valueEl.textContent = value + '%';
+    }
+
+    previewTargets.forEach(function(previewImg) {
+        previewImg.style.objectPosition = 'center ' + value + '%';
+    });
 }
 
 function initStatusToggle() {
@@ -1210,7 +1408,29 @@ function initStatusToggle() {
 function initFileUploadButton() {
     const input = document.getElementById('file_input');
     const button = document.getElementById('file_upload_button');
-    const wrap = document.querySelector('.file-upload-wrap');
+    const wrap = button ? button.closest('.file-upload-wrap') : null;
+
+    if (!input || !button || !wrap) {
+        return;
+    }
+
+    button.addEventListener('click', function() {
+        input.click();
+    });
+
+    wrap.addEventListener('dragenter', function() {
+        wrap.classList.add('is-highlight');
+    });
+
+    wrap.addEventListener('dragleave', function() {
+        wrap.classList.remove('is-highlight');
+    });
+}
+
+function initPhotoUploadButton() {
+    const input = document.getElementById('photo_input');
+    const button = document.getElementById('photo_upload_button');
+    const wrap = button ? button.closest('.file-upload-wrap') : null;
 
     if (!input || !button || !wrap) {
         return;
@@ -1231,6 +1451,12 @@ function initFileUploadButton() {
 
 initStatusToggle();
 initFileUploadButton();
+initPhotoUploadButton();
+updatePhotoPositionPreview();
+
+<?php if ($edit_data): ?>
+document.getElementById('formulir-form-panel').scrollIntoView({ behavior: 'smooth', block: 'start' });
+<?php endif; ?>
 </script>
 
         </div>
