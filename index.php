@@ -158,7 +158,7 @@ $cta_photo = gbi_find_first_image([
 
         <p class="hero-countdown-caption" id="heroServiceLabel">Menuju Ibadah Raya Minggu 08:00 WIB</p>
         <div class="hero-live-actions" id="heroLiveActions">
-            <a id="heroLivePrimary" href="https://www.youtube.com/@gbisalemba/live" target="_blank" rel="noopener noreferrer" class="hero-live-btn hero-live-btn-primary">Ke YouTube</a>
+            <a id="heroLivePrimary" href="https://www.youtube.com/@gbisalemba" target="_blank" rel="noopener noreferrer" class="hero-live-btn hero-live-btn-primary">Ke YouTube</a>
             <a id="heroLiveSecondary" href="https://maps.app.goo.gl/6duXhZBcrC26enUPA" target="_blank" rel="noopener noreferrer" class="hero-live-btn hero-live-btn-secondary">Lokasi Gereja</a>
         </div>
     </div>
@@ -234,7 +234,7 @@ $cta_photo = gbi_find_first_image([
                     <div class="ibadah-showcase-media">
                         <iframe
                             class="ibadah-showcase-video"
-                            data-src="https://drive.google.com/file/d/1R_OgbpPHwG8nmrOxOx33nd4e-wFhlfrQ/preview"
+                            data-src="https://www.youtube.com/@gbisalemba"
                             title="Video Ibadah Minggu GBI Salemba"
                             allow="autoplay; encrypted-media; picture-in-picture"
                             allowfullscreen>
@@ -297,6 +297,7 @@ $cta_photo = gbi_find_first_image([
             </div>
         </div>
     </div>
+
 </section>
 
 <!-- 5. CTA HUBUNGI KAMI SECTION -->

@@ -119,7 +119,25 @@ if (!function_exists('formulir_is_active_row')) {
     }
 }
 
-$query = "SELECT * FROM formulir ORDER BY COALESCE(urutan, id) ASC, id ASC";
+if (!function_exists('formulir_table_has_column')) {
+    function formulir_table_has_column(mysqli $conn, string $table, string $column): bool {
+        $table_safe = preg_replace('/[^a-zA-Z0-9_]/', '', $table);
+        $column_safe = preg_replace('/[^a-zA-Z0-9_]/', '', $column);
+        if ($table_safe === '' || $column_safe === '') {
+            return false;
+        }
+
+        $query = "SHOW COLUMNS FROM `{$table_safe}` LIKE '" . $conn->real_escape_string($column_safe) . "'";
+        $result = $conn->query($query);
+
+        return $result instanceof mysqli_result && $result->num_rows > 0;
+    }
+}
+
+$order_by = formulir_table_has_column($conn, 'formulir', 'urutan')
+    ? 'COALESCE(urutan, id) ASC, id ASC'
+    : 'id ASC';
+$query = "SELECT * FROM formulir ORDER BY {$order_by}";
 $result = $conn->query($query);
 
 $formulir_items = [];
@@ -682,10 +700,35 @@ $formulir_card_images = formulir_collect_images([
         grid-template-columns: repeat(2, 1fr);
         gap: 25px;
     }
+
+    .formulir-header-section .container-large,
+    .formulir-divider-section .container-large {
+        padding-left: 24px;
+        padding-right: 24px;
+    }
+
+    .formulir-card {
+        min-height: 338px;
+    }
+
+    .formulir-card-media {
+        height: 180px;
+    }
+
+    .formulir-title {
+        max-width: none;
+    }
 }
 
 /* Mobile: < 768px */
 @media (max-width: 767px) {
+    .formulir-header-section .container-large,
+    .formulir-divider-section .container-large,
+    .formulir-section .container-large {
+        padding-left: 14px;
+        padding-right: 14px;
+    }
+
     .formulir-section {
         padding: 0 0 10px !important;
     }
@@ -719,6 +762,11 @@ $formulir_card_images = formulir_collect_images([
 
     .formulir-card-content {
         padding: 12px 12px 14px;
+    }
+
+    .btn-download-formulir {
+        width: 100%;
+        min-width: 0;
     }
 
     .formulir-process-section {
@@ -769,6 +817,30 @@ $formulir_card_images = formulir_collect_images([
         line-height: 1.25;
     }
 
+    .formulir-title {
+        max-width: none;
+        font-size: clamp(18px, 5.7vw, 24px);
+    }
+
+    .formulir-description {
+        min-height: 0;
+        max-width: none;
+    }
+
+
+@media (max-width: 420px) {
+    .formulir-header-title {
+        font-size: clamp(26px, 10vw, 36px);
+    }
+
+    .formulir-card {
+        min-height: 290px;
+    }
+
+    .formulir-card-media {
+        height: 138px;
+    }
+}
     .formulir-title {
         font-size: clamp(20px, 7vw, 26px);
     }

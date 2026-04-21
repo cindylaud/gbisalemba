@@ -19,7 +19,7 @@ if (!file_exists(__DIR__ . '/../includes/image-helper.php')) {
 require_once __DIR__ . '/../includes/image-helper.php';
 
 // Define constants untuk slider
-define('SLIDER_MAX_UPLOAD_SIZE', 30 * 1024 * 1024); // 30MB
+define('SLIDER_MAX_UPLOAD_SIZE', 50 * 1024 * 1024); // 50MB
 define('SLIDER_UPLOAD_DIR', __DIR__ . '/../uploads/slider/');
 define('SLIDER_MAX_WIDTH', 2000); // pixels
 define('SLIDER_JPEG_QUALITY', 80); // 0-100

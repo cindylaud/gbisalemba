@@ -52,7 +52,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if ((int) $_FILES['gambar']['error'] !== UPLOAD_ERR_OK) {
             $error = 'Upload gambar gagal. Silakan coba lagi.';
         } elseif ((int) $_FILES['gambar']['size'] > $maxSize) {
-            $error = 'Ukuran gambar maksimal 25MB.';
+            $error = 'Ukuran gambar maksimal 8MB.';
         } else {
             $ext = strtolower(pathinfo((string) $_FILES['gambar']['name'], PATHINFO_EXTENSION));
             if (!in_array($ext, $allowedExt, true)) {
@@ -133,7 +133,7 @@ include __DIR__ . '/includes/header.php';
         <div class="form-group">
             <label for="gambar">Gambar (Opsional)</label>
             <input type="file" id="gambar" name="gambar" class="form-control-file" accept=".jpg,.jpeg,.png,.webp">
-            <small class="form-text text-muted">Format: JPG/JPEG/PNG/WEBP, maksimal 25MB.</small>
+            <small class="form-text text-muted">Format: JPG/JPEG/PNG/WEBP, maksimal 8MB.</small>
 
             <?php if (!empty($renungan['gambar'])): ?>
                 <div class="mt-2">

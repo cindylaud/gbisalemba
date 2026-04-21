@@ -19,11 +19,16 @@ if (!function_exists('gbi_excerpt')) {
 }
 
 $renunganItems = [];
+$renunganLoadError = false;
 $query = $conn->query('SELECT id, judul, isi, ayat, tanggal FROM renungan ORDER BY tanggal DESC, id DESC');
 if ($query) {
 	while ($row = $query->fetch_assoc()) {
 		$renunganItems[] = $row;
 	}
+	$query->free();
+} else {
+	$renunganLoadError = true;
+	error_log('Renungan query failed: ' . $conn->error);
 }
 ?>
 
@@ -34,7 +39,11 @@ if ($query) {
 				<h1 class="renungan-page-title">Renungan Harian</h1>
 			</div>
 
-			<?php if (empty($renunganItems)): ?>
+			<?php if ($renunganLoadError): ?>
+				<div class="renungan-empty-state">
+					<p>Data renungan belum bisa dimuat. Silakan hubungi admin.</p>
+				</div>
+			<?php elseif (empty($renunganItems)): ?>
 				<div class="renungan-empty-state">
 					<p>Belum ada renungan tersedia saat ini.</p>
 				</div>

@@ -32,10 +32,10 @@ require_once __DIR__ . '/includes/header.php';
                 <span class="cool-floating-tag cool-floating-tag-right">Tumbuh Bersama</span>
                 <div class="cool-hero-photo-stack">
                     <div class="cool-hero-photo-main">
-                        <img src="uploads/slider/slider_2__1771686884_240050.jpg" alt="Kebersamaan jemaat COOL GBI Salemba">
+                           <img src="/uploads/slider/slider_2__1771686884_240050.jpg" alt="Kebersamaan jemaat COOL GBI Salemba">
                     </div>
                     <div class="cool-hero-photo-card">
-                        <img src="uploads/slider/slider_1__1771686869_4ba458.jpg" alt="Pertumbuhan iman dalam COOL">
+                           <img src="/uploads/slider/slider_1__1771686869_4ba458.jpg" alt="Pertumbuhan iman dalam COOL">
                         <div class="cool-hero-card-copy">
                             <p class="cool-card-label">Prinsip COOL</p>
                             <h2>Cari - Gembalakan - Utus</h2>
@@ -58,7 +58,7 @@ require_once __DIR__ . '/includes/header.php';
             <div class="cool-pillars">
                 <article class="cool-pillar-card">
                     <div class="cool-pillar-photo">
-                        <img src="uploads/slider/slider_1__1771686869_4ba458.jpg" alt="Kesatuan hati dalam COOL">
+                           <img src="/uploads/slider/slider_1__1771686869_4ba458.jpg" alt="Kesatuan hati dalam COOL">
                     </div>
                     <h3>Kesatuan Hati</h3>
                     <p>Dalam kasih mempersiapkan umat yang layak menjadi seperti Kristus.</p>
@@ -66,7 +66,7 @@ require_once __DIR__ . '/includes/header.php';
 
                 <article class="cool-pillar-card">
                     <div class="cool-pillar-photo">
-                        <img src="uploads/slider/slider_2__1771686884_240050.jpg" alt="Tumbuh bersama dalam COOL">
+                           <img src="/uploads/slider/slider_2__1771686884_240050.jpg" alt="Tumbuh bersama dalam COOL">
                     </div>
                     <h3>Tumbuh Bersama</h3>
                     <p>COOL merupakan kelompok kecil yang bersepakat untuk bertumbuh bersama.</p>
@@ -74,7 +74,7 @@ require_once __DIR__ . '/includes/header.php';
 
                 <article class="cool-pillar-card">
                     <div class="cool-pillar-photo">
-                        <img src="uploads/whatsnew/img_2780b3.webp" alt="Memenangkan jiwa melalui komunitas COOL">
+                           <img src="/uploads/whatsnew/img_2780b3.webp" alt="Memenangkan jiwa melalui komunitas COOL">
                     </div>
                     <h3>Memenangkan Jiwa</h3>
                     <p>Komunitas ini akan dipakai Tuhan untuk membawa dampak bagi lingkungannya.</p>
@@ -168,7 +168,7 @@ require_once __DIR__ . '/includes/header.php';
                 </div>
 
                 <div class="cool-category-photo">
-                    <img src="uploads/slider/slider_1__1771686869_4ba458.jpg" alt="Komunitas COOL GBI Salemba">
+                       <img src="/uploads/slider/slider_1__1771686869_4ba458.jpg" alt="Komunitas COOL GBI Salemba">
                 </div>
             </article>
         </div>

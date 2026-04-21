@@ -55,7 +55,7 @@ $file = $_FILES['file'];
 
 // Validasi ukuran file
 if ($file['size'] > MAX_UPLOAD_SIZE) {
-    die('ERROR: Ukuran file terlalu besar. Maksimal 10MB.');
+    die('ERROR: Ukuran file terlalu besar. Maksimal 8MB.');
 }
 
 // Validasi MIME type (method 1: check $_FILES['type'])

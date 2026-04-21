@@ -181,7 +181,7 @@
     }
 
     root.classList.remove('is-live');
-    if (labelEl) labelEl.textContent = isMobileView() ? 'Ibadah Lagi Dalam' : 'Ibadah Berikutnya Dimulai Dalam';
+    if (labelEl) labelEl.textContent = 'Ibadah Berikutnya Dimulai Dalam';
     if (valuesEl) valuesEl.style.display = '';
     if (liveActionsEl) liveActionsEl.hidden = false;
     if (livePrimaryEl) livePrimaryEl.textContent = 'Ke YouTube';

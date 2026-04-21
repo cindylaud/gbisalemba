@@ -24,7 +24,7 @@ $defaults = [
     'formulir' => ['pos_y' => 28, 'zoom' => 102],
 ];
 
-const HEADLINE_MAX_SIZE = 50 * 1024 * 1024;
+const HEADLINE_MAX_SIZE = 8 * 1024 * 1024; // 8MB
 const HEADLINE_MAX_WIDTH = 2400;
 const HEADLINE_WEBP_QUALITY = 82;
 
@@ -93,6 +93,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'save_
                 if ($stmt->execute()) {
                     $stmt->close();
 
+                    // Only delete old image after database succeeds
                     if ($hasNewUpload && $currentImage !== '' && $currentImage !== $newImage) {
                         headline_delete_image_file($currentImage);
                     }
@@ -102,17 +103,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'save_
                 }
 
                 $stmt->close();
+                // Database failed - delete the new file we just created
                 if ($hasNewUpload && $newImage !== '' && $newImage !== $currentImage) {
                     headline_delete_image_file($newImage);
                 }
                 $error = 'Gagal menyimpan data headline.';
             } else {
+                // Prepare failed - delete the new file we just created
                 if ($hasNewUpload && $newImage !== '' && $newImage !== $currentImage) {
                     headline_delete_image_file($newImage);
                 }
                 $error = 'Gagal memproses query headline.';
             }
         } else {
+            // Validation error - delete the new file if it was created
             if ($hasNewUpload && $newImage !== '' && $newImage !== $currentImage) {
                 headline_delete_image_file($newImage);
             }
@@ -540,7 +544,7 @@ include __DIR__ . '/includes/header.php';
                     <div class="file-upload-name" id="headline_file_name">Belum ada file dipilih</div>
                     <div class="file-upload-meta">
                         <i class="fas fa-file-image"></i>
-                        <span>JPG, PNG, WebP. Maksimal 50 MB. Gambar otomatis dioptimalkan.</span>
+                        <span>JPG, PNG, WebP. Maksimal 8 MB. Gambar otomatis dioptimalkan.</span>
                     </div>
                 </div>
             </div>

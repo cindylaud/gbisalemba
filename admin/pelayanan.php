@@ -19,7 +19,7 @@ if (!file_exists(__DIR__ . '/../includes/image-helper.php')) {
 require_once __DIR__ . '/../includes/image-helper.php';
 
 // Define constants
-define('MAX_UPLOAD_SIZE', 10 * 1024 * 1024); // 10MB
+define('MAX_UPLOAD_SIZE', 50 * 1024 * 1024); // 50MB
 define('UPLOAD_DIR', '../uploads/pelayanan/');
 define('MAX_IMAGE_WIDTH', 1600); // pixels
 define('JPEG_QUALITY', 80); // 0-100

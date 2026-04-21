@@ -16,11 +16,11 @@
  * Validasi file upload dengan keamanan tinggi
  * 
  * @param array $file - $_FILES array element
- * @param int $max_size - Max file size in bytes (default 10MB)
+ * @param int $max_size - Max file size in bytes (default 50MB)
  * @param array $allowed_types - Allowed MIME types
  * @return array ['valid' => bool, 'error' => string|null]
  */
-function validateImageUpload($file, $max_size = 10485760, $allowed_types = ['image/jpeg', 'image/png', 'image/webp']) {
+function validateImageUpload($file, $max_size = 52428800, $allowed_types = ['image/jpeg', 'image/png', 'image/webp']) {
     // Check if file exists
     if (!isset($file) || !is_array($file)) {
         return ['valid' => false, 'error' => 'File tidak ditemukan.'];
@@ -40,8 +40,8 @@ function validateImageUpload($file, $max_size = 10485760, $allowed_types = ['ima
         return ['valid' => false, 'error' => $upload_errors[$file['error']] ?? 'Error upload tidak diketahui'];
     }
     
-    // Check file size
-    if ($file['size'] > $max_size) {
+    // Check file size (only if max_size is reasonable, not PHP_INT_MAX)
+    if ($max_size < PHP_INT_MAX && $file['size'] > $max_size) {
         $max_mb = round($max_size / 1024 / 1024);
         return ['valid' => false, 'error' => "Ukuran file terlalu besar (max {$max_mb}MB)."];
     }

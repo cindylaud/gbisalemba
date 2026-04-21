@@ -11,6 +11,8 @@ CREATE TABLE IF NOT EXISTS `formulir` (
     `id` INT AUTO_INCREMENT PRIMARY KEY,
     `nama_formulir` VARCHAR(100) NOT NULL,
     `file` VARCHAR(255),
+    `foto` VARCHAR(255),
+    `foto_posisi_y` TINYINT UNSIGNED NOT NULL DEFAULT 50,
     `deskripsi` TEXT,
     `urutan` INT DEFAULT 0,
     `status` ENUM('aktif','nonaktif') DEFAULT 'aktif',

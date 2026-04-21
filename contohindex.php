@@ -1202,7 +1202,7 @@ document.addEventListener('touchstart', handleInitialClick);
         © 2026 GILBERT. ALL RIGHTS RESERVED.
     </p>
 
-    <a href="http://localhost/gereja/admin/login.php" class="admin-btn" style="
+    <a href="admin/login.php" class="admin-btn" style="
         display: inline-flex;
         align-items: center;
         gap: 10px;
