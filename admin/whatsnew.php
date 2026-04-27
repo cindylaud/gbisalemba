@@ -9,7 +9,7 @@ require_once __DIR__ . '/../includes/image-helper.php';
 
 define('COMING_SOON_TABLE', 'coming_soon');
 define('WN_UPLOAD_DIR', __DIR__ . '/../uploads/whatsnew/');
-define('WN_MAX_SIZE', 50 * 1024 * 1024);
+define('WN_MAX_SIZE', 30 * 1024 * 1024);
 define('WN_ALLOWED', ['jpg', 'jpeg', 'png', 'webp']);
 define('WN_MAX_WIDTH', 1920);
 define('WN_WEBP_QUALITY', 80);
@@ -79,10 +79,24 @@ function ensureComingSoonZoomColumn($conn) {
 
 ensureComingSoonZoomColumn($conn);
 
+$wnServerLimit = getServerUploadLimit();
+$wnEffectiveMaxSize = WN_MAX_SIZE;
+if ($wnServerLimit > 0 && $wnServerLimit < $wnEffectiveMaxSize) {
+    $wnEffectiveMaxSize = $wnServerLimit;
+}
+$wnEffectiveMaxMb = max(1, (int) floor($wnEffectiveMaxSize / 1024 / 1024));
+
 $error = '';
 if (!empty($_SESSION['error'])) {
     $error = $_SESSION['error'];
     unset($_SESSION['error']);
+}
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $contentLength = isset($_SERVER['CONTENT_LENGTH']) ? (int) $_SERVER['CONTENT_LENGTH'] : 0;
+    if ($wnServerLimit > 0 && $contentLength > $wnServerLimit) {
+        $error = 'Upload gagal: ukuran request melebihi batas server (' . $wnEffectiveMaxMb . 'MB). Kecilkan ukuran gambar lalu coba lagi.';
+    }
 }
 
 // Delete
@@ -136,7 +150,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'uploa
     } else {
         $file = $_FILES['image'];
         $ext = strtolower(pathinfo($file['name'], PATHINFO_EXTENSION));
-        $validation = validateImageUpload($file, WN_MAX_SIZE);
+        $validation = validateImageUpload($file, $wnEffectiveMaxSize);
 
         if (!in_array($ext, WN_ALLOWED, true)) {
             $error = 'Format file tidak diizinkan. Gunakan: JPG, JPEG, PNG, WEBP';
@@ -204,7 +218,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'updat
         } else {
             $file = $_FILES['image'];
             $ext = strtolower(pathinfo($file['name'], PATHINFO_EXTENSION));
-            $validation = validateImageUpload($file, WN_MAX_SIZE);
+            $validation = validateImageUpload($file, $wnEffectiveMaxSize);
 
             if (!in_array($ext, WN_ALLOWED, true)) {
                 $error = 'Format file tidak diizinkan. Gunakan: JPG, JPEG, PNG, WEBP';
@@ -557,7 +571,7 @@ if ($panelZoom < 50) {
                             <div class="form-group">
                                 <label for="image">Upload Gambar Baru</label>
                                 <input type="file" id="image" name="image" accept=".jpg,.jpeg,.png,.webp" <?php echo $selectedItem ? '' : 'required'; ?>>
-                                <p class="info-text">Format: JPG, JPEG, PNG, WEBP • Maksimal 50MB • Auto resize & optimize</p>
+                                <p class="info-text">Format: JPG, JPEG, PNG, WEBP • Maksimal <?php echo (int) $wnEffectiveMaxMb; ?>MB • Auto resize & optimize</p>
                             </div>
 
                             <div class="form-group">

@@ -2,11 +2,18 @@
 require_once __DIR__ . '/../config/database.php';
 require_once __DIR__ . '/includes/auth.php';
 require_once __DIR__ . '/../includes/renungan-richtext.php';
+require_once __DIR__ . '/../includes/image-helper.php';
 
 $admin_page_title = 'Tambah Renungan';
 $uploadDir = __DIR__ . '/../uploads/renungan/';
 $allowedExt = ['jpg', 'jpeg', 'png', 'webp'];
-$maxSize = 25 * 1024 * 1024;
+$maxSize = 8 * 1024 * 1024;
+$serverLimit = getServerUploadLimit();
+$effectiveMaxSize = $maxSize;
+if ($serverLimit > 0 && $serverLimit < $effectiveMaxSize) {
+    $effectiveMaxSize = $serverLimit;
+}
+$effectiveMaxMb = max(1, (int) floor($effectiveMaxSize / 1024 / 1024));
 
 if (!is_dir($uploadDir)) {
     @mkdir($uploadDir, 0755, true);
@@ -19,12 +26,17 @@ $isi = '';
 $tanggal = date('Y-m-d');
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $contentLength = isset($_SERVER['CONTENT_LENGTH']) ? (int) $_SERVER['CONTENT_LENGTH'] : 0;
+    if ($serverLimit > 0 && $contentLength > $serverLimit) {
+        $error = 'Upload gagal: ukuran request melebihi batas server (' . $effectiveMaxMb . 'MB). Kecilkan ukuran gambar lalu coba lagi.';
+    }
+
     $judul = trim($_POST['judul'] ?? '');
     $ayat = trim($_POST['ayat'] ?? '');
     $isi = gbi_sanitize_renungan_html($_POST['isi'] ?? '');
     $tanggal = trim($_POST['tanggal'] ?? '');
 
-    if ($judul === '' || $isi === '' || $tanggal === '') {
+    if ($error === '' && ($judul === '' || $isi === '' || $tanggal === '')) {
         $error = 'Judul, isi, dan tanggal wajib diisi. Ayat boleh dikosongkan.';
     }
 
@@ -33,12 +45,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if ($error === '' && isset($_FILES['gambar']) && (int) $_FILES['gambar']['error'] !== UPLOAD_ERR_NO_FILE) {
         if ((int) $_FILES['gambar']['error'] !== UPLOAD_ERR_OK) {
             $error = 'Upload gambar gagal. Silakan coba lagi.';
-        } elseif ((int) $_FILES['gambar']['size'] > $maxSize) {
-            $error = 'Ukuran gambar maksimal 25MB.';
         } else {
             $ext = strtolower(pathinfo((string) $_FILES['gambar']['name'], PATHINFO_EXTENSION));
+            $validation = validateImageUpload($_FILES['gambar'], $effectiveMaxSize);
             if (!in_array($ext, $allowedExt, true)) {
                 $error = 'Format gambar harus JPG, JPEG, PNG, atau WEBP.';
+            } elseif (!$validation['valid']) {
+                $error = (string) ($validation['error'] ?? 'Upload gambar gagal.');
             } else {
                 $gambarName = 'renungan_' . date('Ymd_His') . '_' . bin2hex(random_bytes(4)) . '.' . $ext;
                 $targetPath = $uploadDir . $gambarName;
@@ -100,7 +113,7 @@ include __DIR__ . '/includes/header.php';
         <div class="form-group">
             <label for="gambar">Gambar (Opsional)</label>
             <input type="file" id="gambar" name="gambar" class="form-control-file" accept=".jpg,.jpeg,.png,.webp">
-            <small class="form-text text-muted">Format: JPG/JPEG/PNG/WEBP, maksimal 25MB.</small>
+            <small class="form-text text-muted">Format: JPG/JPEG/PNG/WEBP. Max upload: <?php echo (int) $effectiveMaxMb; ?>MB.</small>
         </div>
 
         <div class="form-group">

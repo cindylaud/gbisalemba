@@ -19,10 +19,17 @@ if (!file_exists(__DIR__ . '/../includes/image-helper.php')) {
 require_once __DIR__ . '/../includes/image-helper.php';
 
 // Define constants untuk slider
-define('SLIDER_MAX_UPLOAD_SIZE', 50 * 1024 * 1024); // 50MB
+define('SLIDER_MAX_UPLOAD_SIZE', 30 * 1024 * 1024); // 8MB
 define('SLIDER_UPLOAD_DIR', __DIR__ . '/../uploads/slider/');
 define('SLIDER_MAX_WIDTH', 2000); // pixels
 define('SLIDER_JPEG_QUALITY', 80); // 0-100
+
+$slider_server_limit = getServerUploadLimit();
+$slider_effective_limit = SLIDER_MAX_UPLOAD_SIZE;
+if ($slider_server_limit > 0 && $slider_server_limit < $slider_effective_limit) {
+    $slider_effective_limit = $slider_server_limit;
+}
+$slider_effective_mb = max(1, (int) floor($slider_effective_limit / 1024 / 1024));
 
 function ensureSliderZoomColumn($conn) {
     $check = $conn->query("SHOW COLUMNS FROM slider LIKE 'image_zoom'");
@@ -35,6 +42,13 @@ ensureSliderZoomColumn($conn);
 
 $message = '';
 $error = '';
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $slider_content_length = isset($_SERVER['CONTENT_LENGTH']) ? (int) $_SERVER['CONTENT_LENGTH'] : 0;
+    if ($slider_server_limit > 0 && $slider_content_length > $slider_server_limit) {
+        $error = 'Upload gagal: ukuran request melebihi batas server (' . $slider_effective_mb . 'MB). Kecilkan ukuran gambar lalu coba lagi.';
+    }
+}
 
 // Auto-seed: Pastikan record urutan 1-4 selalu ada (image 'default.png' karena NOT NULL)
 for ($i = 1; $i <= 4; $i++) {
@@ -72,7 +86,7 @@ for ($i = 1; $i <= 4; $i++) {
 }
 
 // Handle POST: Upload & Simpan
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['urutan'])) {
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['urutan']) && $error === '') {
     $urutan = intval($_POST['urutan']);
     $is_active = isset($_POST['is_active']) ? 1 : 0;
     $image_zoom = intval($_POST['image_zoom'] ?? 100);
@@ -103,7 +117,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['urutan'])) {
             $file = $_FILES['image'];
             
             // Validasi file menggunakan helper
-            $validation = validateImageUpload($file, SLIDER_MAX_UPLOAD_SIZE);
+            $validation = validateImageUpload($file, $slider_effective_limit);
             
             if (!$validation['valid']) {
                 $error = $validation['error'];

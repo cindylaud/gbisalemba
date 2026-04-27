@@ -248,7 +248,7 @@ $jadwal_hero_scale = number_format($jadwal_hero_zoom / 100, 2, '.', '');
                                                 <span class="jadwal-info-icon-wrap"><i class="fas fa-map-marker-alt jadwal-icon"></i></span>
                                                 <div>
                                                     <span class="jadwal-row-label">Ruangan</span>
-                                                    <span class="jadwal-info-text"><?php echo !empty($jadwal['ruangan']) ? htmlspecialchars($jadwal['ruangan']) : 'Akan diinformasikan'; ?></span>
+                                                    <span class="jadwal-info-text"><?php echo !empty($jadwal['ruangan']) ? htmlspecialchars($jadwal['ruangan']) : '-'; ?></span>
                                                 </div>
                                             </div>
 
@@ -256,7 +256,7 @@ $jadwal_hero_scale = number_format($jadwal_hero_zoom / 100, 2, '.', '');
                                                 <span class="jadwal-info-icon-wrap"><i class="fas fa-info-circle jadwal-icon"></i></span>
                                                 <div>
                                                     <span class="jadwal-row-label">Keterangan</span>
-                                                    <span class="jadwal-keterangan-text"><?php echo !empty($jadwal['keterangan']) ? htmlspecialchars($jadwal['keterangan']) : 'Datang lebih awal untuk mempersiapkan hati dalam ibadah.'; ?></span>
+                                                    <span class="jadwal-keterangan-text"><?php echo !empty($jadwal['keterangan']) ? htmlspecialchars($jadwal['keterangan']) : '-'; ?></span>
                                                 </div>
                                             </div>
                                         </div>

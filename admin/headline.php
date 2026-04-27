@@ -24,14 +24,28 @@ $defaults = [
     'formulir' => ['pos_y' => 28, 'zoom' => 102],
 ];
 
-const HEADLINE_MAX_SIZE = 8 * 1024 * 1024; // 8MB
+const HEADLINE_MAX_SIZE = 30 * 1024 * 1024; // 8MB
 const HEADLINE_MAX_WIDTH = 2400;
 const HEADLINE_WEBP_QUALITY = 82;
 
 $error = '';
 $success = '';
 
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'save_headline') {
+$headlineServerLimit = getServerUploadLimit();
+$headlineEffectiveLimit = HEADLINE_MAX_SIZE;
+if ($headlineServerLimit > 0 && $headlineServerLimit < $headlineEffectiveLimit) {
+    $headlineEffectiveLimit = $headlineServerLimit;
+}
+$headlineEffectiveMb = max(1, (int) floor($headlineEffectiveLimit / 1024 / 1024));
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $contentLength = isset($_SERVER['CONTENT_LENGTH']) ? (int) $_SERVER['CONTENT_LENGTH'] : 0;
+    if ($headlineServerLimit > 0 && $contentLength > $headlineServerLimit) {
+        $error = 'Upload gagal: ukuran request melebihi batas server (' . $headlineEffectiveMb . 'MB). Kecilkan ukuran gambar lalu coba lagi.';
+    }
+}
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'save_headline' && $error === '') {
     $section = (string) ($_POST['section'] ?? '');
     $allowedSections = array_keys($sections);
 
@@ -544,7 +558,7 @@ include __DIR__ . '/includes/header.php';
                     <div class="file-upload-name" id="headline_file_name">Belum ada file dipilih</div>
                     <div class="file-upload-meta">
                         <i class="fas fa-file-image"></i>
-                        <span>JPG, PNG, WebP. Maksimal 8 MB. Gambar otomatis dioptimalkan.</span>
+                        <span>JPG, PNG, WebP. Maksimal <?php echo (int) $headlineEffectiveMb; ?> MB. Gambar otomatis dioptimalkan.</span>
                     </div>
                 </div>
             </div>

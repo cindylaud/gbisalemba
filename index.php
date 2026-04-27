@@ -64,6 +64,67 @@ if (!function_exists('gbi_table_has_column')) {
     }
 }
 
+if (!function_exists('gbi_extract_times_from_jam')) {
+    function gbi_extract_times_from_jam($jamText)
+    {
+        $times = [];
+        $parts = preg_split('/[,;\n\r]+/', (string) $jamText);
+        if (!is_array($parts)) {
+            return $times;
+        }
+
+        foreach ($parts as $part) {
+            $time = trim((string) $part);
+            if ($time === '') {
+                continue;
+            }
+
+            if (!in_array($time, $times, true)) {
+                $times[] = $time;
+            }
+        }
+
+        return $times;
+    }
+}
+
+$ibadah_minggu_times = ['08:00 WIB', '10:30 WIB', '17:00 WIB'];
+$jadwal_stmt = $conn->prepare("SELECT nama_ibadah, jam, is_active FROM jadwal_ibadah ORDER BY COALESCE(urutan, id) ASC, id ASC");
+if (!$jadwal_stmt) {
+    $jadwal_stmt = $conn->prepare("SELECT nama_ibadah, jam, is_active FROM jadwal_ibadah ORDER BY id ASC");
+}
+
+if ($jadwal_stmt) {
+    $jadwal_stmt->execute();
+    $jadwal_result = $jadwal_stmt->get_result();
+    $dynamic_times = [];
+
+    while ($jadwal_row = $jadwal_result->fetch_assoc()) {
+        $isActive = (int) ($jadwal_row['is_active'] ?? 0) === 1;
+        if (!$isActive) {
+            continue;
+        }
+
+        $namaIbadah = strtolower(trim((string) ($jadwal_row['nama_ibadah'] ?? '')));
+        if ($namaIbadah !== '' && strpos($namaIbadah, 'raya') === false && strpos($namaIbadah, 'minggu') === false) {
+            continue;
+        }
+
+        $rowTimes = gbi_extract_times_from_jam($jadwal_row['jam'] ?? '');
+        foreach ($rowTimes as $rowTime) {
+            if (!in_array($rowTime, $dynamic_times, true)) {
+                $dynamic_times[] = $rowTime;
+            }
+        }
+    }
+
+    if (!empty($dynamic_times)) {
+        $ibadah_minggu_times = $dynamic_times;
+    }
+
+    $jadwal_stmt->close();
+}
+
 $ibadah_photo = gbi_find_first_image([
     'assets/images/umum',
     'uploads/slider',
@@ -234,7 +295,8 @@ $cta_photo = gbi_find_first_image([
                     <div class="ibadah-showcase-media">
                         <iframe
                             class="ibadah-showcase-video"
-                            data-src="https://www.youtube.com/@gbisalemba"
+                            src="https://www.youtube.com/embed/D2JMjs73K_g?rel=0"
+                            loading="lazy"
                             title="Video Ibadah Minggu GBI Salemba"
                             allow="autoplay; encrypted-media; picture-in-picture"
                             allowfullscreen>
@@ -249,9 +311,9 @@ $cta_photo = gbi_find_first_image([
                 <article class="ibadah-showcase-panel reveal-on-scroll" data-reveal="left" data-delay="140">
                     <h2 class="ibadah-showcase-title">Ibadah Minggu</h2>
                     <div class="ibadah-showcase-times">
-                        <span>08:00 WIB</span>
-                        <span>10:30 WIB</span>
-                        <span>17:00 WIB</span>
+                        <?php foreach ($ibadah_minggu_times as $ibadah_time): ?>
+                            <span><?php echo htmlspecialchars($ibadah_time); ?></span>
+                        <?php endforeach; ?>
                     </div>
                     <p class="ibadah-showcase-note">Disertai ibadah Starskids dan disiarkan secara online.</p>
                 </article>

@@ -4,313 +4,278 @@ require_once __DIR__ . '/../../config/database.php';
 require_once __DIR__ . '/_table_bootstrap.php';
 require_once __DIR__ . '/../../includes/image-helper.php';
 
-header('Location: index.php?error=Fitur tambah jadwal dinonaktifkan sementara. Silakan edit jadwal yang sudah ada.');
-exit;
-
 define('JADWAL_UPLOAD_DIR', __DIR__ . '/../../uploads/jadwal/');
-define('JADWAL_MAX_SIZE', 50 * 1024 * 1024); // 50MB
+define('JADWAL_MAX_SIZE', 30 * 1024 * 1024);
 define('JADWAL_MAX_WIDTH', 1920);
 define('JADWAL_QUALITY', 80);
 
-// Ensure upload directory exists
 if (!is_dir(JADWAL_UPLOAD_DIR)) {
     @mkdir(JADWAL_UPLOAD_DIR, 0755, true);
 }
 
 $table_state = ensureJadwalIbadahTable($conn);
-$has_urutan_column = (bool) ($table_state['has_urutan_column'] ?? false);
 $has_kategori_column = (bool) ($table_state['has_kategori_column'] ?? false);
 $has_image_columns = (bool) ($table_state['has_image_columns'] ?? false);
 
 $error = '';
-$success = '';
 
-// Handle form submission
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+
     $nama_ibadah = trim($_POST['nama_ibadah'] ?? '');
     $kategori = trim($_POST['kategori'] ?? '');
     $hari = trim($_POST['hari'] ?? '');
-    $jam = trim($_POST['jam'] ?? '');
     $ruangan = trim($_POST['ruangan'] ?? '');
     $keterangan = trim($_POST['keterangan'] ?? '');
     $is_active = isset($_POST['is_active']) ? 1 : 0;
+
+    // JAM MULTI INPUT
+    $jam_array = $_POST['jam'] ?? [];
+    $jam_array = array_filter(array_map('trim', $jam_array));
+    $jam = implode(', ', $jam_array);
+
     $image_filename = '';
-    $image_fit = trim($_POST['image_fit'] ?? 'cover');
-    $image_pos_y = intval($_POST['image_pos_y'] ?? 50);
 
-    // Validation
     if (empty($nama_ibadah) || empty($hari) || empty($jam)) {
-        $error = 'Nama ibadah, hari, dan jam wajib diisi';
-    } else {
-        // Handle image upload if file provided
-        if ($has_image_columns && isset($_FILES['image']) && $_FILES['image']['error'] === UPLOAD_ERR_OK) {
-            $validation = validateImageUpload($_FILES['image'], JADWAL_MAX_SIZE);
-            if (!$validation['valid']) {
-                $error = $validation['error'];
-            } else {
-                // Generate unique filename and process image
-                $new_filename = generateUniqueFilename($_FILES['image']['name'], 'jadwal_');
-                $upload_path = JADWAL_UPLOAD_DIR . $new_filename;
-                
-                $optimize_result = optimizeAndSaveImage(
-                    $_FILES['image']['tmp_name'],
-                    $upload_path,
-                    JADWAL_MAX_WIDTH,
-                    JADWAL_QUALITY
-                );
-                
-                if (!$optimize_result['success']) {
-                    $error = "Gagal memproses gambar: " . $optimize_result['error'];
-                } else {
-                    $image_filename = $new_filename;
-                }
+        $error = "Nama ibadah, hari, dan jam wajib diisi";
+    }
+
+    // IMAGE UPLOAD
+    if (empty($error) && $has_image_columns && isset($_FILES['image']) && $_FILES['image']['error'] === UPLOAD_ERR_OK) {
+
+        $validation = validateImageUpload($_FILES['image'], JADWAL_MAX_SIZE);
+
+        if (!$validation['valid']) {
+            $error = $validation['error'];
+        } else {
+
+            $image_filename = generateUniqueFilename($_FILES['image']['name'], 'jadwal_');
+            $upload_path = JADWAL_UPLOAD_DIR . $image_filename;
+
+            $result = optimizeAndSaveImage(
+                $_FILES['image']['tmp_name'],
+                $upload_path,
+                JADWAL_MAX_WIDTH,
+                JADWAL_QUALITY
+            );
+
+            if (!$result['success']) {
+                $error = "Gagal upload gambar";
             }
         }
+    }
 
-        // If no image upload error, proceed with database insert
-        if (empty($error)) {
-            // Get next urutan if column exists
-            $next_urutan = 0;
-            if ($has_urutan_column) {
-                $stmt_urutan = $conn->prepare("SELECT COALESCE(MAX(urutan), 0) + 1 AS next_urutan FROM jadwal_ibadah");
-                $stmt_urutan->execute();
-                $result_urutan = $stmt_urutan->get_result();
-                $row_urutan = $result_urutan->fetch_assoc();
-                $next_urutan = $row_urutan['next_urutan'];
-                $stmt_urutan->close();
-            }
+    // INSERT DATABASE
+    if (empty($error)) {
 
-            // Build INSERT query dynamically based on available columns
-            $fields = ['nama_ibadah', 'hari', 'jam', 'ruangan', 'keterangan', 'is_active'];
-            $values = [$nama_ibadah, $hari, $jam, $ruangan, $keterangan, $is_active];
-            $types = 'sssssi';
+        $fields = ['nama_ibadah', 'hari', 'jam', 'ruangan', 'keterangan', 'is_active'];
+        $values = [$nama_ibadah, $hari, $jam, $ruangan, $keterangan, $is_active];
+        $types = 'sssssi';
 
-            if ($has_kategori_column) {
-                $fields[] = 'kategori';
-                $values[] = $kategori;
-                $types .= 's';
-            }
-
-            if ($has_image_columns) {
-                $fields[] = 'image';
-                $values[] = $image_filename; // Can be empty string
-                $types .= 's';
-                
-                if (!empty($image_filename)) {
-                    $fields[] = 'image_fit';
-                    $values[] = $image_fit;
-                    $types .= 's';
-                    
-                    $fields[] = 'image_pos_y';
-                    $values[] = $image_pos_y;
-                    $types .= 'i';
-                }
-            }
-
-            if ($has_urutan_column) {
-                $fields[] = 'urutan';
-                $values[] = $next_urutan;
-                $types .= 'i';
-            }
-
-            $fields_str = implode(', ', $fields);
-            $placeholders = implode(', ', array_fill(0, count($fields), '?'));
-            
-            $query = "INSERT INTO jadwal_ibadah ({$fields_str}) VALUES ({$placeholders})";
-            $stmt = $conn->prepare($query);
-            $stmt->bind_param($types, ...$values);
-            
-            if ($stmt->execute()) {
-                $stmt->close();
-                header("Location: index.php?success=Jadwal ibadah berhasil ditambahkan");
-                exit;
-            } else {
-                // Delete image if database insert failed
-                if (!empty($image_filename)) {
-                    @unlink(JADWAL_UPLOAD_DIR . $image_filename);
-                }
-                $error = 'Gagal menambahkan jadwal ibadah: ' . $conn->error;
-            }
-            
-            $stmt->close();
+        if ($has_kategori_column) {
+            $fields[] = 'kategori';
+            $values[] = $kategori;
+            $types .= 's';
         }
+
+        if ($has_image_columns) {
+            $fields[] = 'image';
+            $values[] = $image_filename;
+            $types .= 's';
+        }
+
+        $sql = "INSERT INTO jadwal_ibadah (" . implode(',', $fields) . ")
+                VALUES (" . implode(',', array_fill(0, count($fields), '?')) . ")";
+
+        $stmt = $conn->prepare($sql);
+        $stmt->bind_param($types, ...$values);
+
+        if ($stmt->execute()) {
+            header("Location: index.php?success=Jadwal berhasil ditambahkan");
+            exit;
+        } else {
+            $error = "Gagal menyimpan data";
+        }
+
+        $stmt->close();
     }
 }
 
 include __DIR__ . '/../includes/header.php';
 ?>
 
-<div class="container-fluid">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <h1 class="h3 mb-0 text-gray-800">Tambah Jadwal Ibadah</h1>
-        <a href="index.php" class="btn btn-secondary">
-            <i class="fas fa-arrow-left"></i> Kembali
-        </a>
-    </div>
+<style>
+    .panel {
+        background: #fff;
+        border-radius: 18px;
+        padding: 18px;
+        box-shadow: 0 10px 25px rgba(0,0,0,0.08);
+    }
+
+    .panel-title {
+        font-size: 20px;
+        font-weight: 700;
+        margin-bottom: 15px;
+    }
+
+    .form-grid {
+        display: grid;
+        gap: 14px;
+    }
+
+    .field label {
+        font-weight: 600;
+        font-size: 13px;
+        margin-bottom: 5px;
+        display: block;
+    }
+
+    .input, .select, .textarea {
+        width: 100%;
+        padding: 10px;
+        border-radius: 10px;
+        border: 1px solid #ddd;
+    }
+
+    .textarea {
+        min-height: 80px;
+    }
+
+    .time-row {
+        display: flex;
+        gap: 8px;
+        margin-bottom: 8px;
+    }
+
+    .time-row .input {
+        flex: 1;
+    }
+
+    .btn-small {
+        width: 36px;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+    }
+
+    .btn-add { background: #e6f4ea; }
+    .btn-remove { background: #fdecea; }
+
+    .btn-action {
+        padding: 10px 16px;
+        border-radius: 10px;
+        border: none;
+        cursor: pointer;
+        font-weight: 600;
+    }
+
+    .btn-save {
+        background: #1e3a5f;
+        color: #fff;
+    }
+
+    .btn-cancel {
+        background: #eee;
+        color: #333;
+        text-decoration: none;
+        display: inline-block;
+    }
+
+    .error {
+        background: #ffe5e5;
+        padding: 10px;
+        border-radius: 10px;
+        margin-bottom: 10px;
+    }
+</style>
+
+<div class="panel">
+    <div class="panel-title">Tambah Jadwal Ibadah</div>
 
     <?php if (!empty($error)): ?>
-        <div class="alert alert-danger alert-dismissible fade show" role="alert">
-            <?php echo htmlspecialchars($error); ?>
-            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                <span aria-hidden="true">&times;</span>
-            </button>
-        </div>
+        <div class="error"><?= htmlspecialchars($error) ?></div>
     <?php endif; ?>
 
-    <div class="row">
-        <div class="col-lg-8">
-            <div class="card shadow mb-4">
-                <div class="card-body">
-                    <form method="POST" action="" enctype="multipart/form-data">
-                        <div class="form-group">
-                            <label for="nama_ibadah">Nama Ibadah <span class="text-danger">*</span></label>
-                            <input type="text" class="form-control" id="nama_ibadah" name="nama_ibadah" 
-                                   value="<?php echo htmlspecialchars($_POST['nama_ibadah'] ?? ''); ?>" 
-                                   required>
-                        </div>
+    <form method="POST" enctype="multipart/form-data" class="form-grid">
 
-                        <?php if ($has_kategori_column): ?>
-                            <div class="form-group">
-                                <label for="kategori">Kategori</label>
-                                <select class="form-control" id="kategori" name="kategori">
-                                    <option value="">-- Pilih Kategori (Opsional) --</option>
-                                    <option value="Ibadah Umum" <?php echo (($_POST['kategori'] ?? '') == 'Ibadah Umum') ? 'selected' : ''; ?>>Ibadah Umum</option>
-                                    <option value="Ibadah Anak" <?php echo (($_POST['kategori'] ?? '') == 'Ibadah Anak') ? 'selected' : ''; ?>>Ibadah Anak</option>
-                                    <option value="Ibadah Pemuda" <?php echo (($_POST['kategori'] ?? '') == 'Ibadah Pemuda') ? 'selected' : ''; ?>>Ibadah Pemuda</option>
-                                    <option value="Ibadah Khusus" <?php echo (($_POST['kategori'] ?? '') == 'Ibadah Khusus') ? 'selected' : ''; ?>>Ibadah Khusus</option>
-                                    <option value="Persekutuan Doa" <?php echo (($_POST['kategori'] ?? '') == 'Persekutuan Doa') ? 'selected' : ''; ?>>Persekutuan Doa</option>
-                                </select>
-                            </div>
-                        <?php endif; ?>
+        <div class="field">
+            <label>Nama Ibadah *</label>
+            <input type="text" name="nama_ibadah" class="input" required>
+        </div>
 
-                        <div class="row">
-                            <div class="col-md-6">
-                                <div class="form-group">
-                                    <label for="hari">Hari <span class="text-danger">*</span></label>
-                                    <select class="form-control" id="hari" name="hari" required>
-                                        <option value="">-- Pilih Hari --</option>
-                                        <?php
-                                        $selected_hari = $_POST['hari'] ?? '';
-                                        $hari_list = ['Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu', 'Minggu'];
-                                        foreach ($hari_list as $h) {
-                                            $selected = ($selected_hari == $h) ? 'selected' : '';
-                                            echo "<option value=\"{$h}\" {$selected}>{$h}</option>";
-                                        }
-                                        ?>
-                                    </select>
-                                </div>
-                            </div>
+        <?php if ($has_kategori_column): ?>
+        <div class="field">
+            <label>Kategori</label>
+            <select name="kategori" class="select">
+                <option value="">-- Pilih --</option>
+                <option>Ibadah Umum</option>
+                <option>Ibadah Anak</option>
+                <option>Ibadah Pemuda</option>
+                <option>Ibadah Khusus</option>
+            </select>
+        </div>
+        <?php endif; ?>
 
-                            <div class="col-md-6">
-                                <div class="form-group">
-                                    <label for="jam">Jam <span class="text-danger">*</span></label>
-                                    <input type="text" class="form-control" id="jam" name="jam" 
-                                           value="<?php echo htmlspecialchars($_POST['jam'] ?? ''); ?>" 
-                                           placeholder="Contoh: 08:00 WIB, 10:30 WIB"
-                                           required>
-                                    <small class="form-text text-muted">Contoh: 08:00 WIB atau 08:00 WIB, 10:30 WIB</small>
-                                </div>
-                            </div>
-                        </div>
+        <div class="field">
+            <label>Hari *</label>
+            <input type="text" name="hari" class="input" placeholder="Contoh: Minggu" required>
+        </div>
 
-                        <div class="form-group">
-                            <label for="ruangan">Ruangan</label>
-                            <input type="text" class="form-control" id="ruangan" name="ruangan" 
-                                   value="<?php echo htmlspecialchars($_POST['ruangan'] ?? ''); ?>">
-                        </div>
+        <div class="field">
+            <label>Jam *</label>
 
-                        <div class="form-group">
-                            <label for="keterangan">Keterangan</label>
-                            <textarea class="form-control" id="keterangan" name="keterangan" rows="4"><?php echo htmlspecialchars($_POST['keterangan'] ?? ''); ?></textarea>
-                        </div>
-
-                        <div class="form-group">
-                            <div class="custom-control custom-checkbox">
-                                <input type="checkbox" class="custom-control-input" id="is_active" name="is_active" 
-                                       <?php echo (isset($_POST['is_active']) || !isset($_POST['nama_ibadah'])) ? 'checked' : ''; ?>>
-                                <label class="custom-control-label" for="is_active">Aktif</label>
-                            </div>
-                        </div>
-
-                        <?php if ($has_image_columns): ?>
-                            <hr>
-                            <h5 class="font-weight-bold mb-3">Gambar Jadwal (Opsional)</h5>
-                            
-                            <div class="form-group">
-                                <label for="image">Upload Gambar</label>
-                                <div class="custom-file">
-                                    <input type="file" class="custom-file-input" id="image" name="image" 
-                                           accept="image/jpeg,image/png,image/webp">
-                                    <label class="custom-file-label" for="image">Pilih gambar...</label>
-                                </div>
-                                <small class="form-text text-muted">JPG, PNG, WebP. Maksimal 12 MB. Akan dioptimalkan otomatis.</small>
-                            </div>
-
-                            <div class="row">
-                                <div class="col-md-6">
-                                    <div class="form-group">
-                                        <label for="image_fit">Fit Gambar</label>
-                                        <select class="form-control" id="image_fit" name="image_fit">
-                                            <option value="cover" selected>Cover (crop untuk fill)</option>
-                                            <option value="contain">Contain (tampilkan penuh)</option>
-                                        </select>
-                                    </div>
-                                </div>
-                                <div class="col-md-6">
-                                    <div class="form-group">
-                                        <label for="image_pos_y">Posisi Vertikal (%)</label>
-                                        <input type="range" class="form-control-range" id="image_pos_y" name="image_pos_y" 
-                                               min="0" max="100" value="50" step="5">
-                                        <small class="form-text text-muted">0% = atas, 50% = tengah, 100% = bawah</small>
-                                    </div>
-                                </div>
-                            </div>
-                        <?php endif; ?>
-
-                        <hr>
-
-                        <div class="d-flex justify-content-between">
-                            <a href="index.php" class="btn btn-secondary">
-                                <i class="fas fa-times"></i> Batal
-                            </a>
-                            <button type="submit" class="btn btn-primary">
-                                <i class="fas fa-save"></i> Simpan Jadwal Ibadah
-                            </button>
-                        </div>
-                    </form>
+            <div id="jam-wrapper">
+                <div class="time-row">
+                    <input type="text" name="jam[]" class="input" placeholder="08:00 WIB" required>
+                    <button type="button" class="btn-small btn-add" onclick="addJam()">+</button>
                 </div>
             </div>
         </div>
 
-        <div class="col-lg-4">
-            <div class="card shadow mb-4">
-                <div class="card-header py-3">
-                    <h6 class="m-0 font-weight-bold text-primary">Informasi</h6>
-                </div>
-                <div class="card-body">
-                    <p class="mb-2"><i class="fas fa-info-circle text-info"></i> <strong>Field wajib diisi:</strong></p>
-                    <ul class="small">
-                        <li>Nama Ibadah</li>
-                        <li>Hari</li>
-                        <li>Jam</li>
-                    </ul>
-                    <hr>
-                    <p class="mb-2"><i class="fas fa-lightbulb text-warning"></i> <strong>Tips:</strong></p>
-                    <ul class="small">
-                        <li>Format jam bisa satu atau lebih (pisahkan dengan koma)</li>
-                        <?php if ($has_urutan_column): ?>
-                            <li>Urutan akan otomatis ditempatkan di bawah</li>
-                        <?php endif; ?>
-                        <li>Centang "Aktif" agar muncul di website</li>
-                    </ul>
-                </div>
-            </div>
+        <div class="field">
+            <label>Ruangan</label>
+            <input type="text" name="ruangan" class="input">
         </div>
-    </div>
+
+        <div class="field">
+            <label>Keterangan</label>
+            <textarea name="keterangan" class="textarea"></textarea>
+        </div>
+
+        <?php if ($has_image_columns): ?>
+        <div class="field">
+            <label>Foto</label>
+            <input type="file" name="image" class="input">
+        </div>
+        <?php endif; ?>
+
+        <div class="field">
+            <label>
+                <input type="checkbox" name="is_active" checked>
+                Aktif
+            </label>
+        </div>
+
+        <div>
+            <button type="submit" class="btn-action btn-save">Simpan</button>
+            <a href="index.php" class="btn-action btn-cancel">Batal</a>
+        </div>
+
+    </form>
 </div>
 
+<script>
+function addJam() {
+    const wrapper = document.getElementById('jam-wrapper');
+
+    const row = document.createElement('div');
+    row.className = 'time-row';
+    row.innerHTML = `
+        <input type="text" name="jam[]" class="input" placeholder="10:00 WIB">
+        <button type="button" class="btn-small btn-remove" onclick="this.parentElement.remove()">x</button>
+    `;
+
+    wrapper.appendChild(row);
+}
+</script>
+
 <?php include __DIR__ . '/../includes/footer.php'; ?>
-
-
-
-

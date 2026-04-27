@@ -1050,11 +1050,11 @@ header{
 .renungan-page-main .renungan-page-section {
   position: relative;
   overflow: hidden;
-  padding: 64px 0 92px;
+  padding: 72px 0 100px;
   background:
-    radial-gradient(circle at 8% 12%, rgba(102, 173, 216, 0.25), transparent 32%),
-    radial-gradient(circle at 92% 18%, rgba(44, 85, 133, 0.16), transparent 34%),
-    linear-gradient(165deg, #dbe8f6 0%, #edf3fb 52%, #e4edf9 100%);
+    radial-gradient(circle at 8% 12%, rgba(198, 170, 124, 0.18), transparent 34%),
+    radial-gradient(circle at 92% 18%, rgba(120, 150, 186, 0.18), transparent 36%),
+    linear-gradient(170deg, #f8f2e9 0%, #f2f6fb 50%, #ecf3fa 100%);
   border: 1px solid rgba(16, 44, 87, 0.09);
   box-shadow: 0 20px 42px rgba(16, 44, 87, 0.13);
 }
@@ -1226,10 +1226,10 @@ header{
 .renungan-list-content {
   flex: 1;
   min-width: 0;
-  padding: 20px 24px 22px;
+  padding: 24px 28px 26px;
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 12px;
 }
 
 .renungan-list-meta {
@@ -1275,7 +1275,7 @@ header{
 
 .renungan-list-content .renungan-excerpt {
   color: rgba(20, 49, 84, 0.82);
-  line-height: 1.72;
+  line-height: 1.84;
   display: -webkit-box;
   -webkit-line-clamp: 3;
   line-clamp: 3;
@@ -1457,7 +1457,10 @@ header{
 
 /* Editorial detail layout for renungan-detail.php */
 body.renungan-detail-page {
-  background: #eef3fa;
+  background:
+    radial-gradient(circle at top left, rgba(95, 149, 199, 0.18), transparent 30%),
+    radial-gradient(circle at bottom right, rgba(53, 107, 162, 0.12), transparent 35%),
+    linear-gradient(180deg, #f4f8ff 0%, #e9f1fb 50%, #f7fbff 100%);
 }
 
 .renungan-detail-page .renungan-detail-main {
@@ -1523,9 +1526,11 @@ body.renungan-detail-page {
   width: 100%;
   max-width: 940px;
   margin: 0 auto;
-  border: 1px solid rgba(16, 44, 87, 0.1);
-  border-radius: 8px;
-  background: #f8fbff;
+  background: rgba(248, 251, 255, 0.85);
+border-radius: 18px;
+backdrop-filter: blur(14px);
+border: 1px solid rgba(18, 56, 95, 0.06);
+box-shadow: 0 18px 50px rgba(18, 45, 73, 0.10);
   box-shadow: 0 18px 34px rgba(16, 44, 87, 0.12);
   padding: clamp(18px, 3.2vw, 30px);
 }
@@ -1613,6 +1618,7 @@ body.renungan-detail-page {
   font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   font-size: 17px;
   line-height: 1.55;
+  letter-spacing: -0.2px;
   font-weight: 400;
   white-space: normal;
   text-align: left;
@@ -1662,6 +1668,7 @@ body.renungan-detail-page {
   font-weight: 700;
   font-size: 20px;
   line-height: 1.55;
+  letter-spacing: -0.2px;
   color: #102c57;
   padding: 14px 18px;
   border-left: 5px solid #102c57;
@@ -2480,7 +2487,7 @@ body.renungan-detail-page {
   text-align: center;
   margin-bottom: 22px;
   letter-spacing: 0.02em;
-  font-family: 'Comic Sans MS', 'Comic Sans', cursive;
+  font-family: 'Brillotus', 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   font-size: clamp(44px, 5vw, 64px);
   font-weight: 700;
   text-transform: none;
@@ -4047,7 +4054,7 @@ body.renungan-detail-page {
   }
 
   .hero-countdown-caption {
-    display: none;
+    display: block;
   }
 
   .hero-live-actions {
@@ -4210,5 +4217,22 @@ body.home-cinematic .navbar a {
 
   body.home-cinematic .navbar {
     background: rgba(238, 245, 252, 0.97);
+  }
+}
+
+.whats-new .section-title-big,
+.ibadah-showcase-title,
+.hero-countdown-caption {
+  font-family: 'Brillotus', 'Plus Jakarta Sans', serif !important;
+}
+
+@media (max-width: 768px) {
+  .hero-countdown-caption {
+    font-size: clamp(10px, 3.4vw, 13px);
+    line-height: 1.35;
+    white-space: normal;
+    max-width: 32ch;
+    margin-left: auto;
+    margin-right: auto;
   }
 }

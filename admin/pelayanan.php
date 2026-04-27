@@ -19,7 +19,7 @@ if (!file_exists(__DIR__ . '/../includes/image-helper.php')) {
 require_once __DIR__ . '/../includes/image-helper.php';
 
 // Define constants
-define('MAX_UPLOAD_SIZE', 50 * 1024 * 1024); // 50MB
+define('MAX_UPLOAD_SIZE', 30 * 1024 * 1024); // 8MB
 define('UPLOAD_DIR', '../uploads/pelayanan/');
 define('MAX_IMAGE_WIDTH', 1600); // pixels
 define('JPEG_QUALITY', 80); // 0-100
@@ -1084,7 +1084,7 @@ if (!isset($error) && isset($_GET['error']) && $_GET['error'] !== '') {
                         </div>
                     </div>
                     <p class="help-text">
-                        <strong>Format:</strong> JPG, PNG, WebP | <strong>Max: 10MB</strong><br>
+                        <strong>Format:</strong> JPG, PNG, WebP | <strong>Max: 8MB</strong><br>
                         <em>Gambar akan otomatis di-resize dan di-compress untuk optimal loading</em>
                     </p>
                 </div>

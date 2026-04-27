@@ -5,7 +5,7 @@ require_once __DIR__ . '/_table_bootstrap.php';
 require_once __DIR__ . '/../../includes/image-helper.php';
 
 define('JADWAL_UPLOAD_DIR', __DIR__ . '/../../uploads/jadwal/');
-define('JADWAL_MAX_SIZE', 8 * 1024 * 1024); // 8MB
+define('JADWAL_MAX_SIZE', 30 * 1024 * 1024); // 8MB
 define('JADWAL_MAX_WIDTH', 1920);
 define('JADWAL_QUALITY', 80);
 
@@ -659,7 +659,7 @@ include __DIR__ . '/../includes/header.php';
                         <label for="image">Foto Jadwal</label>
                         <div class="upload-wrap">
                             <input type="file" class="upload-input" id="image" name="image" accept="image/jpeg,image/png,image/webp">
-                            <p class="hint" style="margin-top:8px;">JPG, PNG, WebP. Maksimal 8 MB. Gambar akan dioptimalkan otomatis.</p>
+                            <p class="hint" style="margin-top:8px;">JPG, PNG, WebP. Maksimal 30 MB. Gambar akan dioptimalkan otomatis.</p>
 
                             <?php if ($current_image_url !== ''): ?>
                                 <div class="image-preview">

@@ -2,110 +2,31 @@
 require_once __DIR__ . '/config/database.php';
 include __DIR__ . '/includes/header.php';
 
-if (!function_exists('about_find_first_image')) {
-    function about_find_first_image(array $directories, $fallback = 'uploads/slider/slider_1__1771686869_4ba458.jpg') {
-        $supported_extensions = ['jpg', 'jpeg', 'png', 'webp'];
+// BASE PATH
+$about_base = 'assets/images/about/';
 
-        foreach ($directories as $directory) {
-            if (!is_dir($directory)) {
-                continue;
-            }
+// HERO (FIXED)
+$about_hero_image = $about_base . 'about-hero.jpg';
 
-            $files = scandir($directory);
-            foreach ($files as $file) {
-                if ($file === '.' || $file === '..') {
-                    continue;
-                }
+// GALLERY (FIXED)
+$about_images = [
+    $about_base . 'about-1.jpg',
+    $about_base . 'about-2.jpg',
+    $about_base . 'about-3.jpg',
+    $about_base . 'about-4.jpg'
+];
 
-                $extension = strtolower(pathinfo($file, PATHINFO_EXTENSION));
-                if (!in_array($extension, $supported_extensions, true)) {
-                    continue;
-                }
-
-                $candidate = rtrim($directory, '/\\') . '/' . $file;
-                if (file_exists($candidate)) {
-                    return $candidate;
-                }
-            }
-        }
-
-        return $fallback;
+// OPTIONAL: fallback kalau file hilang
+foreach ($about_images as &$img) {
+    if (!file_exists(__DIR__ . '/' . $img)) {
+        $img = $about_base . 'default.jpg';
     }
 }
+unset($img);
 
-if (!function_exists('about_collect_images')) {
-    function about_collect_images(array $directories, $limit = 4) {
-        $images = [];
-        $supported_extensions = ['jpg', 'jpeg', 'png', 'webp'];
-
-        foreach ($directories as $directory) {
-            if (!is_dir($directory)) {
-                continue;
-            }
-
-            $files = scandir($directory);
-            foreach ($files as $file) {
-                if ($file === '.' || $file === '..') {
-                    continue;
-                }
-
-                $extension = strtolower(pathinfo($file, PATHINFO_EXTENSION));
-                if (!in_array($extension, $supported_extensions, true)) {
-                    continue;
-                }
-
-                $path = rtrim($directory, '/\\') . '/' . $file;
-                if (!file_exists($path)) {
-                    continue;
-                }
-
-                $images[] = $path;
-                if (count($images) >= $limit) {
-                    return $images;
-                }
-            }
-        }
-
-        return $images;
-    }
+if (!file_exists(__DIR__ . '/' . $about_hero_image)) {
+    $about_hero_image = $about_base . 'default.jpg';
 }
-
-$about_hero_image = 'assets/images/umum/about-hero-client.jpg';
-if (!file_exists($about_hero_image)) {
-    $about_hero_image = about_find_first_image([
-        'uploads/whatsnew',
-        'uploads/slider',
-        'assets/images/gembala'
-    ]);
-}
-
-$about_gallery_images = about_collect_images([
-    'uploads/whatsnew',
-    'uploads/slider',
-    'uploads/pelayanan'
-], 4);
-
-while (count($about_gallery_images) < 4) {
-    $about_gallery_images[] = $about_hero_image;
-}
-
-$about_photo_1 = about_find_first_image([
-    'uploads/gembala',
-    'assets/images/gembala',
-    'uploads/slider'
-]);
-
-$about_photo_2 = about_find_first_image([
-    'uploads/gembala',
-    'assets/images/gembala',
-    'uploads/slider'
-], $about_photo_1);
-
-$about_photo_3 = about_find_first_image([
-    'uploads/gembala',
-    'assets/images/gembala',
-    'uploads/slider'
-], $about_photo_1);
 ?>
 
 <main class="main-content about-gbi-wrap">
@@ -130,7 +51,7 @@ $about_photo_3 = about_find_first_image([
 
         <section class="about-gbi-gallery" aria-label="Dokumentasi Kegiatan">
             <div class="about-gbi-gallery-grid">
-                <?php foreach ($about_gallery_images as $index => $gallery_image): ?>
+                <?php foreach ($about_images as $index => $gallery_image): ?>
                     <figure class="about-gbi-gallery-card" data-order="<?php echo (int) ($index + 1); ?>">
                         <img src="<?php echo htmlspecialchars($gallery_image); ?>" alt="Dokumentasi pelayanan GBI Salemba <?php echo (int) ($index + 1); ?>">
                     </figure>

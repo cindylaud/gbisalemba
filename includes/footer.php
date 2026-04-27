@@ -14,9 +14,10 @@
           </span>
         </a>
         <a href="https://maps.app.goo.gl/6duXhZBcrC26enUPA" target="_blank" rel="noopener noreferrer" class="footer-address-text">
-          Plaza Kenari Mas lantai 7A, Samping lapangan bulutangkis<br>
-          Jl. Kramat Raya No.101, Paseban, Kota Jakarta Pusat<br>
-          Daerah Khusus Ibukota Jakarta 10440
+          GBI Salemba:<br>
+          Plaza Kenari Mas lantai 7A (Top Floor)<br>
+          Samping lapangan bulutangkis<br>
+          Jl. Kramat Raya No.101, Paseban, Jakarta Pusat 10440
         </a>
       </div>
 

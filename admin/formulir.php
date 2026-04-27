@@ -20,7 +20,7 @@ define('MAX_UPLOAD_SIZE', 10 * 1024 * 1024); // 10MB
 define('UPLOAD_DIR', '../uploads/formulir/');
 define('ALLOWED_MIME', 'application/pdf');
 define('FOTO_UPLOAD_DIR', '../uploads/formulir/foto/');
-define('FOTO_MAX_SIZE', 8 * 1024 * 1024); // 8MB
+define('FOTO_MAX_SIZE', 30 * 1024 * 1024); // 8MB
 define('FOTO_MAX_WIDTH', 1600);
 define('FOTO_QUALITY', 80);
 
@@ -280,7 +280,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['form_action'])) {
             }
             // Validasi ukuran
             elseif ($file['size'] > MAX_UPLOAD_SIZE) {
-                $error = "Ukuran file terlalu besar. Maksimal 8MB.";
+                $error = "Ukuran file terlalu besar. Maksimal 30MB.";
             }
             // Validasi MIME type menggunakan finfo
             else {
@@ -1360,7 +1360,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['form_action'])) {
                                         </div>
                                     </div>
                                     <p class="help-text">
-                                        <strong>Format:</strong> JPG, PNG, WebP | <strong>Max: 10MB</strong><br>
+                                        <strong>Format:</strong> JPG, PNG, WebP | <strong>Max: 30MB</strong><br>
                                         <em>Gambar akan otomatis di-resize dan di-compress untuk optimal loading</em>
                                     </p>
                                 </div>

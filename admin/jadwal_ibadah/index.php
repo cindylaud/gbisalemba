@@ -92,6 +92,29 @@ include __DIR__ . '/../includes/header.php';
         font-size: 24px;
     }
 
+    .btn-add-jadwal {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 9px 13px;
+        border-radius: 10px;
+        border: 1px solid rgba(20, 108, 148, 0.28);
+        background: linear-gradient(135deg, #1f466f 0%, #175f87 100%);
+        color: #fff;
+        font-size: 12px;
+        font-weight: 700;
+        text-decoration: none;
+        box-shadow: 0 8px 14px rgba(20, 108, 148, 0.2);
+        transition: transform 0.18s ease, box-shadow 0.18s ease;
+    }
+
+    .btn-add-jadwal:hover {
+        color: #fff;
+        text-decoration: none;
+        transform: translateY(-1px);
+        box-shadow: 0 10px 18px rgba(20, 108, 148, 0.26);
+    }
+
     .jadwal-table-wrap {
         border: 1px solid rgba(16, 44, 87, 0.08);
         border-radius: 14px;
@@ -459,12 +482,15 @@ include __DIR__ . '/../includes/header.php';
     <div class="panel-list">
         <div class="panel-head">
             <div class="panel-title"><i class="fas fa-calendar-week"></i> Daftar Jadwal Ibadah</div>
+            <a href="tambah.php" class="btn-add-jadwal">
+                <i class="fas fa-plus"></i> Tambah Jadwal
+            </a>
         </div>
         <?php if (empty($jadwal_list)): ?>
             <div class="empty-state">
                 <i class="fas fa-calendar-alt"></i>
                 <h5>Belum ada jadwal ibadah</h5>
-                <p>Belum ada data jadwal. Silakan hubungi developer jika perlu menambah jadwal baru.</p>
+                <p>Belum ada data jadwal. Gunakan tombol "Tambah Jadwal" untuk membuat jadwal baru.</p>
             </div>
         <?php else: ?>
             <div class="jadwal-table-wrap">

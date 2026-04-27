@@ -16,11 +16,11 @@
  * Validasi file upload dengan keamanan tinggi
  * 
  * @param array $file - $_FILES array element
- * @param int $max_size - Max file size in bytes (default 50MB)
+ * @param int $max_size - Max file size in bytes (default 8MB)
  * @param array $allowed_types - Allowed MIME types
  * @return array ['valid' => bool, 'error' => string|null]
  */
-function validateImageUpload($file, $max_size = 52428800, $allowed_types = ['image/jpeg', 'image/png', 'image/webp']) {
+function validateImageUpload($file, $max_size = 8388608, $allowed_types = ['image/jpeg', 'image/png', 'image/webp']) {
     // Check if file exists
     if (!isset($file) || !is_array($file)) {
         return ['valid' => false, 'error' => 'File tidak ditemukan.'];
@@ -55,12 +55,81 @@ function validateImageUpload($file, $max_size = 52428800, $allowed_types = ['ima
         return ['valid' => false, 'error' => "Tipe file tidak didukung. Gunakan JPG, PNG, atau WebP. (Detected: $mime_type)"];
     }
     
-    // Additional check: verify image is valid
-    if (@getimagesize($file['tmp_name']) === false) {
+    // Additional check: verify image is valid and dimensions are processable
+    $image_meta = @getimagesize($file['tmp_name']);
+    if ($image_meta === false) {
         return ['valid' => false, 'error' => 'File bukan gambar yang valid.'];
+    }
+
+    $image_width = isset($image_meta[0]) ? (int) $image_meta[0] : 0;
+    $image_height = isset($image_meta[1]) ? (int) $image_meta[1] : 0;
+    if (!canSafelyProcessImage($image_width, $image_height)) {
+        return [
+            'valid' => false,
+            'error' => 'Resolusi gambar terlalu besar untuk diproses server. Gunakan gambar dengan resolusi lebih kecil.'
+        ];
     }
     
     return ['valid' => true, 'error' => null];
+}
+
+/**
+ * Parse php.ini size string to bytes.
+ */
+function parsePhpIniBytes($value) {
+    $value = trim((string) $value);
+    if ($value === '') {
+        return 0;
+    }
+
+    $last = strtolower(substr($value, -1));
+    $number = (float) $value;
+
+    switch ($last) {
+        case 't':
+            $number *= 1024;
+            // no break
+        case 'g':
+            $number *= 1024;
+            // no break
+        case 'm':
+            $number *= 1024;
+            // no break
+        case 'k':
+            $number *= 1024;
+            break;
+    }
+
+    return (int) round($number);
+}
+
+/**
+ * Return true when image dimensions are still realistic for GD processing.
+ */
+function canSafelyProcessImage($width, $height) {
+    $width = (int) $width;
+    $height = (int) $height;
+
+    if ($width <= 0 || $height <= 0) {
+        return false;
+    }
+
+    $pixels = $width * $height;
+    if ($pixels > 30000000) {
+        return false;
+    }
+
+    $memory_limit = parsePhpIniBytes((string) ini_get('memory_limit'));
+    if ($memory_limit <= 0) {
+        return true;
+    }
+
+    // Rough upper bound for GD processing: source + target + internal overhead.
+    $estimated_memory = (int) ($pixels * 8);
+    $headroom = max(30 * 1024 * 1024, (int) round($memory_limit * 0.08));
+    $current_usage = function_exists('memory_get_usage') ? (int) memory_get_usage(true) : 0;
+
+    return ($current_usage + $estimated_memory + $headroom) < $memory_limit;
 }
 
 /**
@@ -451,22 +520,18 @@ function formatFileSize($bytes) {
 function getServerUploadLimit() {
     $upload_max = ini_get('upload_max_filesize');
     $post_max = ini_get('post_max_size');
-    
-    $parse_size = function($value) {
-        $value = trim($value);
-        $last = strtolower($value[strlen($value)-1]);
-        $value = (int)$value;
-        
-        switch($last) {
-            case 't': $value *= 1024;
-            case 'g': $value *= 1024;
-            case 'm': $value *= 1024;
-            case 'k': $value *= 1024;
-        }
-        return $value;
-    };
-    
-    return min($parse_size($upload_max), $parse_size($post_max));
+
+    $upload_bytes = parsePhpIniBytes((string) $upload_max);
+    $post_bytes = parsePhpIniBytes((string) $post_max);
+
+    if ($upload_bytes <= 0) {
+        return $post_bytes;
+    }
+    if ($post_bytes <= 0) {
+        return $upload_bytes;
+    }
+
+    return min($upload_bytes, $post_bytes);
 }
 
 ?>
