@@ -354,7 +354,7 @@ $formulir_card_images = formulir_collect_images([
     position: relative;
     border-radius: 0;
     overflow: hidden;
-    height: clamp(300px, 50vh, 460px);
+    min-height: clamp(290px, 45vh, 440px);
     box-shadow: 0 24px 56px rgba(7, 26, 49, 0.18);
 }
 
@@ -396,20 +396,21 @@ $formulir_card_images = formulir_collect_images([
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: clamp(26px, 4.6vw, 54px);
+    padding: 0 20px;
     z-index: 3;
 }
 
 .formulir-hero-copy {
-    max-width: 620px;
+    max-width: 860px;
     text-align: center;
 }
 
 .formulir-header-title {
     margin: 0;
     font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    font-size: clamp(40px, 6vw, 72px);
-    line-height: 0.96;
+    font-size: clamp(40px, 6.2vw, 74px);
+    line-height: 0.98;
+    font-weight: 800;
     color: #ffffff;
     text-transform: uppercase;
     letter-spacing: 0.03em;
@@ -743,7 +744,9 @@ $formulir_card_images = formulir_collect_images([
     }
 
     .formulir-header-title {
-        font-size: clamp(30px, 9.2vw, 42px);
+        font-size: clamp(40px, 6.2vw, 74px);
+        line-height: 0.98;
+        white-space: normal;
     }
 
     .formulir-grid {
@@ -829,10 +832,6 @@ $formulir_card_images = formulir_collect_images([
 
 
 @media (max-width: 420px) {
-    .formulir-header-title {
-        font-size: clamp(26px, 10vw, 36px);
-    }
-
     .formulir-card {
         min-height: 290px;
     }

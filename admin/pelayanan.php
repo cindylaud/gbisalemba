@@ -1084,7 +1084,7 @@ if (!isset($error) && isset($_GET['error']) && $_GET['error'] !== '') {
                         </div>
                     </div>
                     <p class="help-text">
-                        <strong>Format:</strong> JPG, PNG, WebP | <strong>Max: 8MB</strong><br>
+                        <strong>Format:</strong> JPG, PNG, WebP | <strong>Max: 30MB</strong><br>
                         <em>Gambar akan otomatis di-resize dan di-compress untuk optimal loading</em>
                     </p>
                 </div>

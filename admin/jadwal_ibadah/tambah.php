@@ -26,6 +26,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $hari = trim($_POST['hari'] ?? '');
     $ruangan = trim($_POST['ruangan'] ?? '');
     $keterangan = trim($_POST['keterangan'] ?? '');
+    $instagram = trim($_POST['instagram'] ?? '');
     $is_active = isset($_POST['is_active']) ? 1 : 0;
 
     // JAM MULTI INPUT
@@ -67,9 +68,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     // INSERT DATABASE
     if (empty($error)) {
 
-        $fields = ['nama_ibadah', 'hari', 'jam', 'ruangan', 'keterangan', 'is_active'];
-        $values = [$nama_ibadah, $hari, $jam, $ruangan, $keterangan, $is_active];
-        $types = 'sssssi';
+        $fields = ['nama_ibadah', 'hari', 'jam', 'ruangan', 'keterangan', 'instagram', 'is_active'];
+        $values = [$nama_ibadah, $hari, $jam, $ruangan, $keterangan, $instagram, $is_active];
+        $types = 'ssssssi';
 
         if ($has_kategori_column) {
             $fields[] = 'kategori';
@@ -239,6 +240,12 @@ include __DIR__ . '/../includes/header.php';
         <div class="field">
             <label>Keterangan</label>
             <textarea name="keterangan" class="textarea"></textarea>
+        </div>
+
+        <div class="field">
+            <label>Instagram <span style="font-size:12px; color:#999; font-weight:400;">(Opsional)</span></label>
+            <input type="text" name="instagram" class="input" placeholder="Contoh: @gbi.salemba">
+            <p style="font-size:12px; color:#666; margin-top:5px;">Username Instagram atau handle, bisa diisi nama atau link profil.</p>
         </div>
 
         <?php if ($has_image_columns): ?>

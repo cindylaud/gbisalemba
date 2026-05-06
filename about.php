@@ -4,19 +4,26 @@ include __DIR__ . '/includes/header.php';
 
 // BASE PATH
 $about_base = 'assets/images/about/';
+$gembala_base = 'assets/images/gembala/';
 
 // HERO (FIXED)
 $about_hero_image = $about_base . 'about-hero.jpg';
 
-// GALLERY (FIXED)
 $about_images = [
-    $about_base . 'about-1.jpg',
-    $about_base . 'about-2.jpg',
-    $about_base . 'about-3.jpg',
-    $about_base . 'about-4.jpg'
+    $about_base . 'about-1.JPG',
+    $about_base . 'about-2.JPG',
+    $about_base . 'about-3.JPG',
+    $about_base . 'about-4.JPG'
 ];
 
-// OPTIONAL: fallback kalau file hilang
+// FOTO GEMBALA
+$about_photo = [
+    $gembala_base . 'wakilgembala1.jpg',
+    $gembala_base . 'gembala.jpg',
+    $gembala_base . 'wakilgembala2.jpg'
+];
+
+// Fallback kalau file hilang
 foreach ($about_images as &$img) {
     if (!file_exists(__DIR__ . '/' . $img)) {
         $img = $about_base . 'default.jpg';
@@ -99,7 +106,7 @@ if (!file_exists(__DIR__ . '/' . $about_hero_image)) {
             <div class="about-gbi-leaders-grid">
                 <article class="about-gbi-leader-card">
                     <div class="about-gbi-leader-photo-wrap">
-                        <img src="<?php echo htmlspecialchars($about_photo_1); ?>" alt="Wakil Gembala GBI Salemba" class="about-gbi-leader-photo">
+                        <img src="<?php echo htmlspecialchars($about_photo[0]); ?>" alt="Wakil Gembala GBI Salemba" class="about-gbi-leader-photo">
                     </div>
                     <div class="about-gbi-leader-meta">
                         <h4 class="about-gbi-leader-position">Wakil Gembala</h4>
@@ -109,7 +116,7 @@ if (!file_exists(__DIR__ . '/' . $about_hero_image)) {
 
                 <article class="about-gbi-leader-card about-gbi-leader-main">
                     <div class="about-gbi-leader-photo-wrap">
-                        <img src="<?php echo htmlspecialchars($about_photo_2); ?>" alt="Gembala GBI Salemba" class="about-gbi-leader-photo">
+                        <img src="<?php echo htmlspecialchars($about_photo[1]); ?>" alt="Wakil Gembala GBI Salemba" class="about-gbi-leader-photo">
                     </div>
                     <div class="about-gbi-leader-meta">
                         <h4 class="about-gbi-leader-position">Gembala</h4>
@@ -119,7 +126,7 @@ if (!file_exists(__DIR__ . '/' . $about_hero_image)) {
 
                 <article class="about-gbi-leader-card">
                     <div class="about-gbi-leader-photo-wrap">
-                        <img src="<?php echo htmlspecialchars($about_photo_3); ?>" alt="Wakil Gembala GBI Salemba" class="about-gbi-leader-photo">
+                        <img src="<?php echo htmlspecialchars($about_photo[2]); ?>" alt="Wakil Gembala GBI Salemba" class="about-gbi-leader-photo">
                     </div>
                     <div class="about-gbi-leader-meta">
                         <h4 class="about-gbi-leader-position">Wakil Gembala</h4>
@@ -339,12 +346,29 @@ if (!file_exists(__DIR__ . '/' . $about_hero_image)) {
     box-shadow: 0 12px 24px rgba(11, 31, 53, 0.15);
     aspect-ratio: 5 / 4;
     border: 2px solid transparent;
-    transition: all 0.3s ease;
+    transition: transform 0.35s cubic-bezier(0.2, 0.9, 0.3, 1), box-shadow 0.35s ease, border-color 0.35s ease;
+    position: relative;
+    background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(0,0,0,0.02));
+}
+
+.about-gbi-gallery-card::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(180deg, rgba(16,44,87,0) 0%, rgba(16,44,87,0.06) 100%);
+    opacity: 0;
+    transition: opacity 0.35s ease;
+    pointer-events: none;
 }
 
 .about-gbi-gallery-card:hover {
     border-color: var(--gbi-green);
-    box-shadow: 0 12px 32px rgba(16, 44, 87, 0.25);
+    box-shadow: 0 20px 48px rgba(16, 44, 87, 0.28);
+    transform: translateY(-6px) scale(1.03);
+}
+
+.about-gbi-gallery-card:hover::after {
+    opacity: 1;
 }
 
 .about-gbi-gallery-card img {
@@ -352,7 +376,32 @@ if (!file_exists(__DIR__ . '/' . $about_hero_image)) {
     height: 100%;
     object-fit: cover;
     display: block;
+    transition: transform 0.6s cubic-bezier(0.2, 0.9, 0.3, 1), filter 0.35s ease;
+    transform-origin: center center;
 }
+
+.about-gbi-gallery-card:hover img {
+    transform: scale(1.08) translateY(-2%);
+    filter: brightness(1.03);
+}
+
+/* Accessibility: respect reduced motion */
+@media (prefers-reduced-motion: reduce) {
+    .about-gbi-gallery-card,
+    .about-gbi-gallery-card img {
+        transition: none !important;
+        transform: none !important;
+    }
+}
+
+/* Keyboard focus styles for accessibility */
+.about-gbi-gallery-card:focus-visible {
+    outline: 3px solid rgba(63,182,168,0.18);
+    outline-offset: 4px;
+    transform: translateY(-4px) scale(1.02);
+    box-shadow: 0 18px 40px rgba(16,44,87,0.22);
+}
+
 
 .about-gbi-story {
     padding: 44px 40px 30px;
@@ -782,5 +831,3 @@ if (!file_exists(__DIR__ . '/' . $about_hero_image)) {
 </style>
 
 <?php include __DIR__ . '/includes/footer.php'; ?>
-
-

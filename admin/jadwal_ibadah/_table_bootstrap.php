@@ -92,6 +92,11 @@ function ensureJadwalIbadahTable($conn)
         $columns['image_pos_y'] = true;
     }
 
+    if (!isset($columns['instagram'])) {
+        $safe_query($conn, "ALTER TABLE jadwal_ibadah ADD COLUMN instagram VARCHAR(255) DEFAULT NULL AFTER image_pos_y");
+        $columns['instagram'] = true;
+    }
+
     if ($has_jadwal_legacy) {
         $count_result = $safe_query($conn, "SELECT COUNT(*) AS total FROM jadwal_ibadah");
         $current_total = 0;

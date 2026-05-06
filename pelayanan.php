@@ -275,7 +275,7 @@ $pelayanan_hero_scale = number_format($pelayanan_hero_zoom / 100, 2, '.', '');
     position: relative;
     border-radius: 0;
     overflow: hidden;
-    height: clamp(300px, 50vh, 460px);
+    min-height: clamp(290px, 45vh, 440px);
     box-shadow: 0 24px 56px rgba(7, 26, 49, 0.18);
 }
 
@@ -317,20 +317,21 @@ $pelayanan_hero_scale = number_format($pelayanan_hero_zoom / 100, 2, '.', '');
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: clamp(26px, 4.6vw, 54px);
+    padding: 0 20px;
     z-index: 3;
 }
 
 .pelayanan-hero-copy {
-    max-width: 620px;
+    max-width: 860px;
     text-align: center;
 }
 
 .pelayanan-hero-title {
     margin: 0;
     font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    font-size: clamp(40px, 6vw, 72px);
-    line-height: 0.96;
+    font-size: clamp(40px, 6.2vw, 74px);
+    line-height: 0.98;
+    font-weight: 800;
     color: #ffffff;
     text-transform: uppercase;
     letter-spacing: 0.03em;
@@ -840,7 +841,7 @@ $pelayanan_hero_scale = number_format($pelayanan_hero_zoom / 100, 2, '.', '');
     }
 
     .pelayanan-hero-banner {
-        height: clamp(250px, 42vh, 340px);
+        height: clamp(200px, 32vh, 280px);
     }
 
     .pelayanan-alt-row {
@@ -894,11 +895,15 @@ $pelayanan_hero_scale = number_format($pelayanan_hero_zoom / 100, 2, '.', '');
     }
 
     .pelayanan-hero-banner {
-        height: clamp(180px, 31vh, 230px);
+        min-height: clamp(180px, 33vh, 220px);
+        height: clamp(180px, 33vh, 220px);
     }
 
+    /* Keep same heading sizing as desktop for consistency */
     .pelayanan-hero-title {
-        font-size: clamp(30px, 9.4vw, 42px);
+        font-size: clamp(40px, 6.2vw, 74px);
+        line-height: 0.98;
+        white-space: normal;
     }
 
     .pelayanan-grid-box {
@@ -906,28 +911,62 @@ $pelayanan_hero_scale = number_format($pelayanan_hero_zoom / 100, 2, '.', '');
     }
 
     .pelayanan-alt-row {
-        grid-template-columns: 148px minmax(0, 1fr);
         border-radius: 0;
         padding: 0;
-        gap: 10px;
+        gap: 20px;
+        align-items: center;
     }
 
+    /* Grid layout for image-left: image on left (180px), text on right (1fr) */
+    .pelayanan-alt-item.image-left .pelayanan-alt-row {
+        display: grid;
+        grid-template-columns: 180px 1fr;
+    }
+
+    /* Grid layout for image-right: text on left (1fr), image on right (180px) */
+    .pelayanan-alt-item.image-right .pelayanan-alt-row {
+        display: grid;
+        grid-template-columns: 1fr 180px;
+    }
+
+    /* Keep desktop ordering but scale media for small screens */
     .pelayanan-alt-item.image-left .pelayanan-alt-media {
         order: 1;
+        justify-self: auto;
     }
 
     .pelayanan-alt-item.image-left .pelayanan-alt-content {
         order: 2;
-        justify-self: start;
+        justify-self: auto;
+        text-align: left;
+        padding: 0 12px;
     }
 
     .pelayanan-alt-item.image-right .pelayanan-alt-media {
         order: 2;
+        justify-self: auto;
     }
 
     .pelayanan-alt-item.image-right .pelayanan-alt-content {
         order: 1;
-        justify-self: start;
+        justify-self: auto;
+        text-align: left;
+        padding: 0 12px;
+    }
+
+    /* Truncate long descriptions on mobile to keep layout balanced */
+    .pelayanan-card-description {
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+    }
+
+    /* Ensure consistent media size on mobile */
+    .pelayanan-alt-media {
+        width: 180px !important;
+        height: 180px !important;
+        flex-shrink: 0;
     }
 
     .pelayanan-alt-item::before,
@@ -936,26 +975,20 @@ $pelayanan_hero_scale = number_format($pelayanan_hero_zoom / 100, 2, '.', '');
         transform: scale(0.66);
     }
 
-    .pelayanan-alt-media {
-        width: 148px;
-        max-width: 148px;
-        justify-self: start;
-    }
-
     .pelayanan-card-media {
         aspect-ratio: 1 / 1;
         border-radius: 10px;
     }
 
     .pelayanan-card-title {
-        font-size: clamp(22px, 6.2vw, 30px);
-        line-height: 1.02;
+        font-size: clamp(20px, 5.5vw, 28px);
+        line-height: 1.15;
         max-width: 100%;
     }
 
     .pelayanan-card-description {
-        font-size: 14px;
-        line-height: 1.45;
+        font-size: 13px;
+        line-height: 1.5;
         max-width: none;
     }
 

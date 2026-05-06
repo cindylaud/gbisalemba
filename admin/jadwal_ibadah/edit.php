@@ -68,6 +68,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $jam = trim($_POST['jam'] ?? '');
     $ruangan = trim($_POST['ruangan'] ?? '');
     $keterangan = trim($_POST['keterangan'] ?? '');
+    $instagram = trim($_POST['instagram'] ?? '');
     $is_active = isset($_POST['is_active']) ? 1 : 0;
     $image_fit = trim($_POST['image_fit'] ?? 'cover');
     $image_pos_y = intval($_POST['image_pos_y'] ?? 50);
@@ -129,9 +130,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         }
 
         // Build UPDATE query dynamically based on available columns
-        $fields = ['nama_ibadah = ?', 'hari = ?', 'jam = ?', 'ruangan = ?', 'keterangan = ?', 'is_active = ?'];
-        $values = [$nama_ibadah, $hari, $jam, $ruangan, $keterangan, $is_active];
-        $types = 'sssssi';
+        $fields = ['nama_ibadah = ?', 'hari = ?', 'jam = ?', 'ruangan = ?', 'keterangan = ?', 'instagram = ?', 'is_active = ?'];
+        $values = [$nama_ibadah, $hari, $jam, $ruangan, $keterangan, $instagram, $is_active];
+        $types = 'ssssssi';
 
         if ($has_kategori_column) {
             $fields[] = 'kategori = ?';
@@ -654,6 +655,14 @@ include __DIR__ . '/../includes/header.php';
                     <textarea class="textarea" id="keterangan" name="keterangan"><?php echo htmlspecialchars($_POST['keterangan'] ?? ($jadwal['keterangan'] ?? '')); ?></textarea>
                 </div>
 
+                <div class="field">
+                    <label for="instagram">Instagram <span style="font-size:12px; color:#999; font-weight:400;">(Opsional)</span></label>
+                    <input type="text" class="input" id="instagram" name="instagram"
+                           value="<?php echo htmlspecialchars($_POST['instagram'] ?? ($jadwal['instagram'] ?? '')); ?>"
+                           placeholder="Contoh: @gbi.salemba">
+                    <p class="hint">Username Instagram atau handle, bisa diisi nama atau link profil.</p>
+                </div>
+
                 <?php if ($has_image_columns): ?>
                     <div class="field">
                         <label for="image">Foto Jadwal</label>
@@ -720,73 +729,91 @@ include __DIR__ . '/../includes/header.php';
 </div>
 
 <script>
-    (function () {
-        var jamList = document.getElementById('jam-list');
-        var jamHidden = document.getElementById('jam');
-        var form = jamList ? jamList.closest('form') : null;
+(function () {
+    const jamList = document.getElementById('jam-list');
+    const jamHidden = document.getElementById('jam');
+    const form = jamList ? jamList.closest('form') : null;
 
-        if (!jamList || !jamHidden || !form) {
-            return;
-        }
+    if (!jamList || !jamHidden || !form) return;
 
-        function updateHiddenValue() {
-            var values = [];
-            var inputs = jamList.querySelectorAll('.jam-item');
-            inputs.forEach(function (input) {
-                var val = (input.value || '').trim();
-                if (val !== '') {
-                    values.push(val);
-                }
-            });
-            jamHidden.value = values.join(', ');
-        }
+    function updateHiddenValue() {
+        const values = [];
+        jamList.querySelectorAll('.jam-item').forEach(input => {
+            const val = input.value.trim();
+            if (val !== '') values.push(val);
+        });
+        jamHidden.value = values.join(', ');
+    }
 
-        function addRow() {
-            var row = document.createElement('div');
-            row.className = 'time-row';
-            row.innerHTML = '' +
-                '<input type="text" class="input jam-item" placeholder="Contoh: 10:30 WIB">' +
-                '<button type="button" class="time-btn remove" title="Hapus jam">' +
-                '<i class="fas fa-trash"></i>' +
-                '</button>';
-            jamList.appendChild(row);
-        }
+    function refreshButtons() {
+        const rows = jamList.querySelectorAll('.time-row');
 
-        jamList.addEventListener('click', function (event) {
-            var btn = event.target.closest('.time-btn');
-            if (!btn) {
-                return;
-            }
+        rows.forEach((row, index) => {
+            const btn = row.querySelector('.time-btn');
 
-            if (btn.classList.contains('add')) {
-                addRow();
-                return;
-            }
-
-            if (btn.classList.contains('remove')) {
-                var row = btn.closest('.time-row');
-                if (row) {
-                    row.remove();
-                    if (!jamList.querySelector('.time-row')) {
-                        addRow();
-                    }
-                    updateHiddenValue();
-                }
+            if (index === rows.length - 1) {
+                // LAST ROW = ADD
+                btn.className = 'time-btn add';
+                btn.innerHTML = '<i class="fas fa-plus"></i>';
+                btn.title = 'Tambah jam';
+            } else {
+                // OTHER ROWS = REMOVE
+                btn.className = 'time-btn remove';
+                btn.innerHTML = '<i class="fas fa-trash"></i>';
+                btn.title = 'Hapus jam';
             }
         });
+    }
 
-        jamList.addEventListener('input', function (event) {
-            if (event.target.classList.contains('jam-item')) {
-                updateHiddenValue();
-            }
-        });
+    function addRow(value = '') {
+        const row = document.createElement('div');
+        row.className = 'time-row';
 
-        form.addEventListener('submit', function () {
-            updateHiddenValue();
-        });
+        row.innerHTML = `
+            <input type="text" class="input jam-item" placeholder="Contoh: 10:30 WIB" value="${value}">
+            <button type="button" class="time-btn add">
+                <i class="fas fa-plus"></i>
+            </button>
+        `;
 
+        jamList.appendChild(row);
+        refreshButtons();
         updateHiddenValue();
-    })();
+
+        row.querySelector('input').focus();
+    }
+
+    jamList.addEventListener('click', function (e) {
+        const btn = e.target.closest('.time-btn');
+        if (!btn) return;
+
+        if (btn.classList.contains('add')) {
+            addRow();
+        } else {
+            const row = btn.closest('.time-row');
+            if (row) row.remove();
+
+            if (!jamList.querySelector('.time-row')) {
+                addRow();
+            }
+
+            refreshButtons();
+            updateHiddenValue();
+        }
+    });
+
+    jamList.addEventListener('input', function (e) {
+        if (e.target.classList.contains('jam-item')) {
+            updateHiddenValue();
+        }
+    });
+
+    form.addEventListener('submit', updateHiddenValue);
+
+    // INIT (PENTING buat data existing)
+    refreshButtons();
+    updateHiddenValue();
+})();
 </script>
 
 <?php if ($has_image_columns): ?>

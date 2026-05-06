@@ -1,6 +1,22 @@
 <?php
 $cool_base = 'assets/images/cool/';
 require_once __DIR__ . '/includes/header.php';
+
+$cool_images = [
+    'hero' => $cool_base . 'cool-hero.JPG',
+    'hero2' => $cool_base . 'cool-hero-2.JPG',
+    'visi1' => $cool_base . 'cool-visi-1.JPG',
+    'visi2' => $cool_base . 'cool-visi-2.JPG',
+    'visi3' => $cool_base . 'cool-visi-3.JPG',
+    'community' => $cool_base . 'cool-community.JPG',
+];
+
+// fallback default
+foreach ($cool_images as $key => $img) {
+    if (!file_exists(__DIR__ . '/' . $img)) {
+        $cool_images[$key] = $cool_base . 'default.JPG';
+    }
+}
 ?>
 
 <div class="cool-page">
@@ -12,11 +28,44 @@ require_once __DIR__ . '/includes/header.php';
 
     <section class="cool-hero">
         <div class="cool-shell cool-hero-shell">
-            <div class="cool-hero-copy">
+            <!-- 1. Judul (paling atas) -->
+            <div class="cool-hero-heading">
                 <span class="cool-kicker">Community Of Love</span>
                 <p class="cool-overline">Komunitas kecil dengan hati yang besar untuk saling membangun dan saling menguatkan.</p>
                 <h1 class="cool-hero-title">Reviving <em>Faith</em>, Healing Hearts, Growing in <em>Community</em>.</h1>
+            </div>
+
+            <!-- 2. Foto-foto -->
+            <div class="cool-hero-media">
+                <span class="cool-floating-tag cool-floating-tag-left">Kesatuan Hati</span>
+                <span class="cool-floating-tag cool-floating-tag-right">Tumbuh Bersama</span>
+                <div class="cool-hero-photo-stack">
+                    <div class="cool-hero-photo-main">
+                           <img src="<?= htmlspecialchars($cool_images['hero']) ?>" alt="Kebersamaan jemaat COOL GBI Salemba">
+                    </div>
+                    <div class="cool-hero-photo-card">
+                           <img src="<?= htmlspecialchars($cool_images['hero2']) ?>" alt="Pertumbuhan iman dalam COOL">
+                        <div class="cool-hero-card-copy">
+                            <p class="cool-card-label">Prinsip COOL</p>
+                            <h2>Cari - Gembalakan - Utus</h2>
+                            <p>Kelompok kecil yang digembalakan untuk bertumbuh sehat, terbuka, dan saling melayani seperti keluarga.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 3. Penjelasan COOL -->
+            <div class="cool-hero-description">
                 <p class="cool-hero-text">COOL adalah suatu bentuk komunitas dimana anggota-anggotanya saling membangun dan saling menguatkan, serta mengalami kasih dan kuasa Allah. COOL merupakan kelompok kecil yang terdiri dari 3-10 orang yang bersepakat untuk bertumbuh bersama.</p>
+            </div>
+
+            <!-- 4. Quote "Dalam kasih..." -->
+            <div class="cool-hero-quote">
+                Dalam kasih mempersiapkan umat yang layak menjadi seperti Kristus.
+            </div>
+
+            <!-- 5. Tombol dan meta -->
+            <div class="cool-hero-footer">
                 <div class="cool-hero-actions">
                     <a href="#cool-join" class="cool-btn cool-btn-primary">JOIN US</a>
                     <a href="#cool-reasons" class="cool-btn cool-btn-secondary">Mengapa COOL?</a>
@@ -25,27 +74,6 @@ require_once __DIR__ . '/includes/header.php';
                     <span>Cari</span>
                     <span>Gembalakan</span>
                     <span>Utus</span>
-                </div>
-            </div>
-
-            <div class="cool-hero-media">
-                <span class="cool-floating-tag cool-floating-tag-left">Kesatuan Hati</span>
-                <span class="cool-floating-tag cool-floating-tag-right">Tumbuh Bersama</span>
-                <div class="cool-hero-photo-stack">
-                    <div class="cool-hero-photo-main">
-                           <img src="<?= $cool_base ?>cool-hero.jpg" alt="Kebersamaan jemaat COOL GBI Salemba">
-                    </div>
-                    <div class="cool-hero-photo-card">
-                           <img src="<?= $cool_base ?>cool-hero-2.jpg" alt="Pertumbuhan iman dalam COOL">
-                        <div class="cool-hero-card-copy">
-                            <p class="cool-card-label">Prinsip COOL</p>
-                            <h2>Cari - Gembalakan - Utus</h2>
-                            <p>Kelompok kecil yang digembalakan untuk bertumbuh sehat, terbuka, dan saling melayani seperti keluarga.</p>
-                        </div>
-                    </div>
-                </div>
-                <div class="cool-hero-quote">
-                    Dalam kasih mempersiapkan umat yang layak menjadi seperti Kristus.
                 </div>
             </div>
         </div>
@@ -59,7 +87,7 @@ require_once __DIR__ . '/includes/header.php';
             <div class="cool-pillars">
                 <article class="cool-pillar-card">
                     <div class="cool-pillar-photo">
-                           <img src="<?= $cool_base ?>cool-visi-1.jpg" alt="Kesatuan hati dalam COOL">
+                           <img src="<?= htmlspecialchars($cool_images['visi1']) ?>" alt="Kesatuan hati dalam COOL">
                     </div>
                     <h3>Kesatuan Hati</h3>
                     <p>Dalam kasih mempersiapkan umat yang layak menjadi seperti Kristus.</p>
@@ -67,7 +95,7 @@ require_once __DIR__ . '/includes/header.php';
 
                 <article class="cool-pillar-card">
                     <div class="cool-pillar-photo">
-                           <img src="<?= $cool_base ?>cool-visi-2.jpg" alt="Tumbuh bersama dalam COOL">
+                           <img src="<?= htmlspecialchars($cool_images['visi2']) ?>" alt="Tumbuh bersama dalam COOL">
                     </div>
                     <h3>Tumbuh Bersama</h3>
                     <p>COOL merupakan kelompok kecil yang bersepakat untuk bertumbuh bersama.</p>
@@ -75,7 +103,7 @@ require_once __DIR__ . '/includes/header.php';
 
                 <article class="cool-pillar-card">
                     <div class="cool-pillar-photo">
-                           <img src="<?= $cool_base ?>cool-visi-3.jpg" alt="Memenangkan jiwa melalui komunitas COOL">
+                           <img src="<?= htmlspecialchars($cool_images['visi3']) ?>" alt="Memenangkan jiwa melalui komunitas COOL">
                     </div>
                     <h3>Memenangkan Jiwa</h3>
                     <p>Komunitas ini akan dipakai Tuhan untuk membawa dampak bagi lingkungannya.</p>
@@ -169,7 +197,7 @@ require_once __DIR__ . '/includes/header.php';
                 </div>
 
                 <div class="cool-category-photo">
-                       <img src="<?= $cool_base ?>cool-community.jpg" alt="Komunitas COOL GBI Salemba">
+                       <img src="<?= htmlspecialchars($cool_images['community']) ?>" alt="Komunitas COOL GBI Salemba">
                 </div>
             </article>
         </div>
@@ -260,14 +288,48 @@ require_once __DIR__ . '/includes/header.php';
 
 .cool-hero-shell {
     display: grid;
-    grid-template-columns: minmax(0, 1.02fr) minmax(0, 0.98fr);
-    gap: 42px;
-    align-items: center;
+    grid-template-columns: 1fr;
+    gap: 28px;
     padding: 48px;
     border-radius: 36px;
     background: rgba(236, 244, 253, 0.9);
     box-shadow: var(--cool-shadow);
     position: relative;
+}
+
+.cool-hero-heading {
+    /* Judul dan kicker di paling atas - center */
+    text-align: center;
+    max-width: 100%;
+}
+
+.cool-hero-media {
+    /* Foto-foto setelah heading */
+    order: 2;
+}
+
+.cool-hero-description {
+    /* Penjelasan COOL - center vertical dengan space atas/bawah sama */
+    order: 3;
+    text-align: center;
+    padding: 24px 0;
+}
+
+.cool-hero-quote {
+    /* Quote "Dalam kasih..." */
+    order: 4;
+    max-width: 100%;
+    margin: 0;
+    padding: 24px;
+    border-left: 4px solid var(--cool-olive);
+    background: rgba(255, 255, 255, 0.5);
+    border-radius: 12px;
+}
+
+.cool-hero-footer {
+    /* Tombol JOIN US dan Mengapa COOL */
+    order: 5;
+    text-align: center;
 }
 
 .cool-hero-shell::before {
@@ -291,6 +353,7 @@ require_once __DIR__ . '/includes/header.php';
 .cool-kicker {
     display: inline-flex;
     align-items: center;
+    justify-content: center;
     gap: 10px;
     font-size: 12px;
     font-weight: 800;
@@ -338,7 +401,7 @@ require_once __DIR__ . '/includes/header.php';
 
 .cool-hero-text {
     max-width: 600px;
-    margin: 24px 0 0;
+    margin: 12px auto 0;
     font-size: 1rem;
     line-height: 1.9;
     color: rgba(18, 56, 95, 0.86);
@@ -349,6 +412,7 @@ require_once __DIR__ . '/includes/header.php';
     gap: 14px;
     flex-wrap: wrap;
     margin-top: 28px;
+    justify-content: center;
 }
 
 .cool-btn {
@@ -393,6 +457,7 @@ require_once __DIR__ . '/includes/header.php';
     gap: 12px;
     flex-wrap: wrap;
     margin-top: 26px;
+    justify-content: center;
 }
 
 .cool-hero-meta span,
@@ -865,7 +930,7 @@ require_once __DIR__ . '/includes/header.php';
     }
 
     .cool-hero {
-        padding: 20px 0 42px;
+        padding: 16px 0 28px;
     }
 
     .cool-hero-shell,
@@ -874,6 +939,7 @@ require_once __DIR__ . '/includes/header.php';
     .cool-join-card {
         padding: 20px;
         border-radius: 22px;
+        gap: 16px;
     }
 
     .cool-hero-title,
@@ -891,20 +957,34 @@ require_once __DIR__ . '/includes/header.php';
     }
 
     .cool-hero-photo-stack {
-        padding: 18px 0 0;
+        padding: 0;
+        position: relative;
     }
 
+    /* Keep back photo fully visible on mobile and avoid aggressive crop */
     .cool-hero-photo-main {
-        height: 360px;
-        border-radius: 24px;
+        height: auto;
+        min-height: 320px;
+        max-height: none;
+        border-radius: 20px;
+        overflow: hidden;
+        background: #0f2742;
+    }
+
+    .cool-hero-photo-main img {
+        object-fit: cover;
+        object-position: center;
     }
 
     .cool-hero-photo-card {
-        position: relative;
-        width: 100%;
-        margin-top: -40px;
-        left: auto;
-        bottom: auto;
+        position: absolute;
+        left: 12px;
+        bottom: 12px;
+        width: min(250px, 68%);
+        margin-top: 0;
+        box-shadow: 0 18px 36px rgba(11, 31, 55, 0.12);
+        border-radius: 16px;
+        z-index: 3;
     }
 
     .cool-floating-tag {
@@ -924,8 +1004,190 @@ require_once __DIR__ . '/includes/header.php';
     }
 
     .cool-hero-quote {
-        margin: 14px 0 0;
-        max-width: none;
+        margin: 0;
+        max-width: 100%;
+        padding: 18px 20px;
+        border-left: 4px solid var(--cool-olive);
+        background: rgba(255, 255, 255, 0.5);
+        border-radius: 12px;
+    }
+
+    /* Tweak for medium mobile widths (>=420px) */
+    @media (min-width: 420px) and (max-width: 768px) {
+        .cool-hero-shell {
+            padding: 20px 16px;
+            gap: 16px;
+        }
+
+        .cool-hero-heading {
+            order: 1;
+            text-align: center;
+        }
+
+        .cool-hero-title {
+            font-size: clamp(32px, 7.5vw, 48px);
+            line-height: 1.02;
+            max-width: 100%;
+        }
+
+        .cool-hero-media {
+            order: 2;
+        }
+
+        .cool-hero-photo-main {
+            min-height: 340px;
+        }
+
+        .cool-hero-photo-stack {
+            padding: 0;
+            position: relative;
+        }
+
+        .cool-hero-photo-card {
+            position: absolute;
+            left: 16px;
+            bottom: 16px;
+            width: min(260px, 66%);
+            margin-top: 0;
+            border-radius: 16px;
+            background: rgba(236, 244, 253, 0.95);
+            box-shadow: 0 16px 36px rgba(11, 31, 55, 0.18);
+            z-index: 3;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .cool-hero-photo-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 24px 48px rgba(11, 31, 55, 0.24);
+        }
+
+        .cool-hero-photo-card img { height: 120px; }
+
+        .cool-hero-card-copy {
+            padding: 14px 14px 16px;
+        }
+
+        .cool-hero-card-copy h2 {
+            font-size: 22px;
+            line-height: 1.02;
+            margin: 8px 0 6px;
+        }
+
+        .cool-hero-card-copy p {
+            line-height: 1.5;
+        }
+
+        .cool-hero-description {
+            order: 3;
+            text-align: center;
+            padding: 20px 0;
+        }
+
+        .cool-hero-text {
+            font-size: 0.95rem;
+            line-height: 1.7;
+            max-width: 100%;
+        }
+
+        .cool-hero-quote {
+            order: 4;
+            margin: 0;
+            text-align: center;
+        }
+
+        .cool-hero-footer {
+            order: 5;
+        }
+    }
+
+    /* Very small screens: stack vertically and reduce sizes to avoid huge vertical footprint */
+    @media (max-width: 419px) {
+        .cool-hero-shell {
+            padding: 16px 12px;
+            gap: 14px;
+        }
+
+        .cool-hero-heading {
+            order: 1;
+            text-align: center;
+        }
+
+        .cool-hero-title {
+            font-size: clamp(28px, 7.5vw, 36px);
+            line-height: 1.04;
+            margin-bottom: 6px;
+        }
+
+        .cool-hero-kicker {
+            margin-bottom: 12px;
+        }
+
+        .cool-hero-overline {
+            margin-bottom: 12px;
+        }
+
+        .cool-hero-media {
+            order: 2;
+        }
+
+        .cool-hero-photo-stack {
+            padding: 0;
+            position: relative;
+        }
+
+        .cool-hero-photo-main {
+            min-height: 300px;
+        }
+
+        .cool-hero-photo-card {
+            position: absolute;
+            left: 10px;
+            bottom: 10px;
+            width: min(200px, 64%);
+            margin-top: 0;
+            box-shadow: 0 12px 24px rgba(11, 31, 55, 0.1);
+            border-radius: 14px;
+            z-index: 3;
+        }
+
+        .cool-hero-photo-card img { height: 108px; }
+
+        .cool-hero-card-copy {
+            padding: 12px 12px 14px;
+        }
+
+        .cool-hero-card-copy h2 {
+            font-size: 20px;
+            line-height: 1.02;
+            margin: 6px 0;
+        }
+
+        .cool-hero-card-copy p {
+            line-height: 1.45;
+            font-size: 0.8rem;
+        }
+
+        .cool-hero-description {
+            order: 3;
+            text-align: center;
+            padding: 16px 0;
+        }
+
+        .cool-hero-text {
+            font-size: 0.85rem;
+            line-height: 1.6;
+        }
+
+        .cool-hero-quote {
+            order: 4;
+            padding: 16px 16px;
+            font-size: 0.9rem;
+            text-align: center;
+        }
+
+        .cool-hero-footer {
+            order: 5;
+        }
     }
 
     .cool-manifesto,
@@ -956,7 +1218,9 @@ require_once __DIR__ . '/includes/header.php';
     }
 
     .cool-pillar-photo {
-        height: 180px;
+        height: 220px;
+        max-height: none;
+        overflow: hidden;
     }
 
     .cool-panel,
@@ -976,8 +1240,71 @@ require_once __DIR__ . '/includes/header.php';
     }
 
     .cool-category-photo {
-        min-height: 180px;
-        height: 180px;
+        height: 200px;
+        max-height: none;
+        overflow: hidden;
+    }
+
+    .cool-category-photo img {
+        object-fit: contain;
+        background: #173a60;
+    }
+
+    /* Stack COOL pillar cards vertically on mobile for cleaner flow */
+    .cool-pillars {
+        grid-template-columns: 1fr;
+        gap: 12px;
+    }
+
+    .cool-reason-grid {
+        grid-template-columns: 1fr;
+        gap: 12px;
+    }
+
+    /* Keep history layout and join card as single column (intentional)
+       but make other panels more compact */
+    .cool-history-layout {
+        grid-template-columns: 1fr;
+    }
+
+    .cool-join-card {
+        grid-template-columns: 1fr;
+    }
+
+    .cool-pillars .cool-pillar-card,
+    .cool-reason-card,
+    .cool-category-card {
+        padding: 12px;
+        border-radius: 12px;
+    }
+
+    /* Image behaviour and hover effects */
+    .cool-hero-photo-main img,
+    .cool-hero-photo-card img,
+    .cool-pillar-photo img,
+    .cool-category-photo img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        display: block;
+        transition: transform 0.4s ease, filter 0.4s ease;
+        will-change: transform, filter;
+    }
+
+    .cool-hero-photo-main:hover img,
+    .cool-hero-photo-card:hover img,
+    .cool-pillar-photo:hover img,
+    .cool-category-photo:hover img {
+        transform: scale(1.05);
+        filter: brightness(1.08);
+    }
+
+    /* Ensure parent containers clip images */
+    .cool-hero-photo-card,
+    .cool-hero-photo-main,
+    .cool-pillar-photo,
+    .cool-category-photo {
+        overflow: hidden;
     }
 
     .cool-reasons-frame {
@@ -1033,13 +1360,14 @@ require_once __DIR__ . '/includes/header.php';
     }
 
     .cool-contact-item strong {
-        font-size: 12px;
-        line-height: 1.2;
+        font-size: 14px;
+        line-height: 1.25;
+        font-weight: 800;
     }
 
     .cool-contact-item span {
-        font-size: 10px;
-        line-height: 1.2;
+        font-size: 12px;
+        line-height: 1.3;
     }
 
     .cool-btn,

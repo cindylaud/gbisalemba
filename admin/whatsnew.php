@@ -477,7 +477,12 @@ if ($panelZoom < 50) {
             <div>
                 <h1>Kelola Coming Soon</h1>
             </div>
-            <div class="admin-topbar-meta">Halo, <strong><?php echo htmlspecialchars($_SESSION['username'] ?? 'Admin'); ?></strong></div>
+            <div style="display:flex; align-items:center; gap:12px;">
+                <a href="?create=1#coming_form" class="btn btn-primary" style="display:inline-flex; align-items:center; gap:6px;">
+                    <i class="fas fa-plus"></i> Tambah Baru
+                </a>
+                <div class="admin-topbar-meta">Halo, <strong><?php echo htmlspecialchars($_SESSION['username'] ?? 'Admin'); ?></strong></div>
+            </div>
         </header>
         <div class="admin-content">
             <div class="container">
@@ -595,7 +600,6 @@ if ($panelZoom < 50) {
                                         <i class="fas fa-trash-can"></i> Hapus Item
                                     </a>
                                 <?php endif; ?>
-                                <a href="?create=1#coming_form" class="btn btn-add">Tambah Baru</a>
                             </div>
                         </form>
                     </div>

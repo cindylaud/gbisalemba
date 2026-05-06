@@ -137,8 +137,7 @@ $gembala_photo = gbi_find_first_image([
 ], $ibadah_photo);
 
 $cta_photo = gbi_find_first_image([
-    'uploads/whatsnew',
-    'uploads/slider',
+    'uploads/cta',
     'assets/images/gembala'
 ], $ibadah_photo);
 ?>
@@ -146,6 +145,7 @@ $cta_photo = gbi_find_first_image([
 
 <!-- 1. HERO / SLIDER SECTION -->
 <section class="hero-slider" id="sliderSection">
+    <canvas id="fireworksCanvas"></canvas>
     <?php
     $slider_has_zoom = gbi_table_has_column($conn, 'slider', 'image_zoom');
     $slider_zoom_select = $slider_has_zoom ? 'COALESCE(image_zoom, 100) AS image_zoom' : '100 AS image_zoom';
@@ -376,7 +376,7 @@ $cta_photo = gbi_find_first_image([
             </div>
             <div class="cta-photo reveal-on-scroll" data-reveal="right" data-delay="160">
                 <div class="cta-photo-frame">
-                    <img src="<?php echo htmlspecialchars($cta_photo); ?>" alt="Pelayanan GBI Salemba">
+                    <img src="assets/images/umum/hubungi-kami.JPG" alt="Pelayanan GBI Salemba">
                 </div>
             </div>
         </div>
@@ -388,9 +388,29 @@ $cta_photo = gbi_find_first_image([
 <script src="assets/js/slider.js"></script>
 <script src="assets/js/whats-new-slider.js"></script>
 <script src="assets/js/home-reveal.js"></script>
+<!-- Canvas-confetti must load before countdown and fireworks -->
+<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+<!-- Fireworks module: provides window.launchFireworks() -->
+<script src="assets/js/fireworks.js?v=<?php echo urlencode((string) @filemtime(__DIR__ . '/assets/js/fireworks.js')); ?>"></script>
+<!-- Countdown with live service detection and fireworks integration -->
 <script src="assets/js/hero-countdown.js?v=<?php echo urlencode((string) @filemtime(__DIR__ . '/assets/js/hero-countdown.js')); ?>"></script>
 
+<!-- Debug: Verify launchFireworks is available globally -->
 <script>
+// Wait a tick to ensure all scripts loaded
+setTimeout(function() {
+  if (typeof window.launchFireworks === 'function') {
+    console.log('✓ launchFireworks is available globally');
+    console.log('✓ Call it with: launchFireworks()');
+  } else {
+    console.error('✗ launchFireworks is NOT available');
+    console.log('Available on window:', Object.keys(window).filter(k => k.includes('fire') || k.includes('Fire')));
+  }
+}, 100);
+</script>
+
+<script>
+
 (function() {
     const videoIframe = document.querySelector('.ibadah-showcase-video');
     if (!videoIframe || videoIframe.getAttribute('src')) return;

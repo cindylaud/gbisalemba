@@ -42,7 +42,7 @@
                     <li><a href="<?php echo $basePath; ?>/pelayanan.php">Pelayanan</a></li>
                     <li><a href="<?php echo $basePath; ?>/jadwal.php">Jadwal</a></li>
                     <li><a href="<?php echo $basePath; ?>/cool.php">COOL</a></li>
-                    <li><a href="<?php echo $basePath; ?>/renungan.php">Ruang Teduh</a></li>
+                    <li><a href="<?php echo $basePath; ?>/renungan.php">Renungan</a></li>
                     <li><a href="<?php echo $basePath; ?>/formulir.php">Formulir</a></li>
                 </ul>
             </nav>
