@@ -224,7 +224,8 @@ $jadwal_hero_scale = number_format($jadwal_hero_zoom / 100, 2, '.', '');
                                     <div class="jadwal-detail-main">
                                         <header class="jadwal-detail-header">
                                             <h2 class="jadwal-detail-title">
-                                                <?php echo htmlspecialchars($jadwal['nama_ibadah']); ?></h2>
+                                                <?php echo htmlspecialchars($jadwal['nama_ibadah']); ?>
+                                            </h2>
                                         </header>
 
                                         <div class="jadwal-detail-grid">
@@ -293,10 +294,9 @@ $jadwal_hero_scale = number_format($jadwal_hero_zoom / 100, 2, '.', '');
                                                 <div>
                                                     <span class="jadwal-row-label">Instagram</span>
                                                     <?php if ($ig_profile_url !== ''): ?>
-                                                        <a href="<?php echo htmlspecialchars($ig_profile_url); ?>"
-                                                           target="_blank"
-                                                           rel="noopener noreferrer"
-                                                           class="jadwal-info-text jadwal-link-clickable">
+                                                        <a href="<?php echo htmlspecialchars($ig_profile_url); ?>" target="_blank"
+                                                            rel="noopener noreferrer"
+                                                            class="jadwal-info-text jadwal-link-clickable">
                                                             @<?php echo htmlspecialchars($ig_username); ?>
                                                         </a>
                                                     <?php else: ?>
@@ -423,6 +423,15 @@ $jadwal_hero_scale = number_format($jadwal_hero_zoom / 100, 2, '.', '');
         display: flex;
         align-items: center;
         justify-content: center;
+        width: 100%;
+        margin: 0;
+        border-radius: 0;
+    }
+
+    .jadwal-hero .jadwal-hero-container {
+        width: 100%;
+        max-width: 100%;
+        padding: 0;
     }
 
     .jadwal-hero-image {
@@ -577,7 +586,8 @@ $jadwal_hero_scale = number_format($jadwal_hero_zoom / 100, 2, '.', '');
         display: grid;
         grid-template-columns: 210px 1fr;
         gap: 0;
-        padding: 0; /* remove extra shell padding to avoid top/bottom gaps */
+        padding: 0;
+        /* remove extra shell padding to avoid top/bottom gaps */
         border-radius: 24px;
         background:
             linear-gradient(rgba(255, 255, 255, 0.02), rgba(255, 255, 255, 0.02)),
@@ -619,9 +629,11 @@ $jadwal_hero_scale = number_format($jadwal_hero_zoom / 100, 2, '.', '');
         z-index: 1;
         display: flex;
         flex-direction: column;
-        justify-content: space-between; /* distribute buttons so there's no gap top/bottom */
+        justify-content: space-between;
+        /* distribute buttons so there's no gap top/bottom */
         gap: 6px;
-        padding: 6px 12px; /* minimal padding */
+        padding: 6px 12px;
+        /* minimal padding */
         border-right: 1px solid rgba(16, 44, 87, 0.08);
         background: rgba(246, 250, 255, 0.5);
         border-radius: 20px 0 0 20px;
@@ -634,8 +646,9 @@ $jadwal_hero_scale = number_format($jadwal_hero_zoom / 100, 2, '.', '');
         z-index: 1;
         padding: 16px;
         min-width: 0;
-        max-height: 420px; /* sesuaikan feel design kamu */
-    overflow-y: auto;
+        max-height: 420px;
+        /* sesuaikan feel design kamu */
+        overflow-y: auto;
     }
 
     .jadwal-tab-button {
@@ -717,7 +730,8 @@ $jadwal_hero_scale = number_format($jadwal_hero_zoom / 100, 2, '.', '');
         display: grid;
         grid-template-columns: minmax(0, 1fr) 220px;
         gap: 12px;
-        align-items: center; /* vertically center main content and thumb */
+        align-items: center;
+        /* vertically center main content and thumb */
     }
 
     .jadwal-detail-main {
@@ -753,7 +767,8 @@ $jadwal_hero_scale = number_format($jadwal_hero_zoom / 100, 2, '.', '');
     }
 
     .jadwal-detail-item {
-        height: 56px; /* fixed height to match compact Instagram row */
+        height: 56px;
+        /* fixed height to match compact Instagram row */
         display: grid;
         grid-template-columns: auto 1fr;
         align-items: center;
@@ -769,7 +784,8 @@ $jadwal_hero_scale = number_format($jadwal_hero_zoom / 100, 2, '.', '');
 
     .jadwal-detail-item-wide {
         grid-column: 1 / -1;
-        height: 56px; /* make instagram row same height */
+        height: 56px;
+        /* make instagram row same height */
         padding: 6px 10px;
         display: grid;
         grid-template-columns: auto 1fr;
@@ -778,7 +794,8 @@ $jadwal_hero_scale = number_format($jadwal_hero_zoom / 100, 2, '.', '');
 
     .jadwal-detail-thumb {
         display: flex;
-        align-items: center; /* center the image vertically */
+        align-items: center;
+        /* center the image vertically */
         justify-content: center;
         padding: 6px;
     }
@@ -1141,18 +1158,22 @@ $jadwal_hero_scale = number_format($jadwal_hero_zoom / 100, 2, '.', '');
         font-weight: 500;
         margin: 0;
     }
-.jadwal-link-clickable {
-    font-weight: 700; /* bold */
-    color: #146C94; /* sama kayak warna hari biar konsisten */
-    text-decoration: underline;
-    cursor: pointer;
-    transition: 0.2s ease;
-}
 
-.jadwal-link-clickable:hover {
-    color: #0f4f6b;
-    text-decoration: none;
-}
+    .jadwal-link-clickable {
+        font-weight: 700;
+        /* bold */
+        color: #146C94;
+        /* sama kayak warna hari biar konsisten */
+        text-decoration: underline;
+        cursor: pointer;
+        transition: 0.2s ease;
+    }
+
+    .jadwal-link-clickable:hover {
+        color: #0f4f6b;
+        text-decoration: none;
+    }
+
     @keyframes jadwalPanelReveal {
         from {
             opacity: 0;
@@ -1208,10 +1229,31 @@ $jadwal_hero_scale = number_format($jadwal_hero_zoom / 100, 2, '.', '');
     }
 
     @media (max-width: 768px) {
+        /* make hero height match pelayanan on mobile */
+        .jadwal-hero {
+            height: clamp(290px, 45vh, 440px);
+            min-height: 0;
+        }
+
+        .jadwal-hero-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0 16px;
+        }
+
         .jadwal-hero-title {
             font-size: clamp(40px, 6.2vw, 74px);
             line-height: 0.98;
             white-space: normal;
+            margin: 0;
+            font-weight: 800;
+            color: #ffffff;
+            text-transform: uppercase;
+            letter-spacing: 0.03em;
+            text-shadow: 0 16px 38px rgba(0, 0, 0, 0.3);
+            text-align: center;
+            max-width: 100%;
         }
 
         .jadwal-content {
@@ -1254,174 +1296,177 @@ $jadwal_hero_scale = number_format($jadwal_hero_zoom / 100, 2, '.', '');
             justify-content: center;
         }
     }
+
     /* ===== MOBILE ACCORDION ===== */
-.jadwal-mobile-accordion {
-    display: none; /* hidden di desktop */
-    margin-bottom: 24px;
-    border-radius: 20px;
-    overflow: hidden;
-    border: 1px solid rgba(16, 44, 87, 0.1);
-    box-shadow: 0 26px 58px rgba(16, 44, 87, 0.14);
-    background: linear-gradient(145deg, rgba(248,251,255,0.98) 0%, rgba(235,243,251,0.94) 100%);
-}
-
-.jadwal-acc-item {
-    border-bottom: 1px solid rgba(16, 44, 87, 0.08);
-}
-
-.jadwal-acc-item:last-child {
-    border-bottom: none;
-}
-
-.jadwal-acc-trigger {
-    width: 100%;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 14px 18px;
-    background: transparent;
-    border: none;
-    cursor: pointer;
-    font-size: 13px;
-    font-weight: 700;
-    color: rgba(16, 44, 87, 0.7);
-    text-align: left;
-    transition: background 0.2s ease, color 0.2s ease;
-}
-
-.jadwal-acc-trigger:hover {
-    background: rgba(20, 108, 148, 0.06);
-    color: var(--color-text-main);
-}
-
-.jadwal-acc-trigger.is-active {
-    background: rgba(20, 108, 148, 0.1);
-    color: var(--color-primary);
-    border-bottom: 1px solid rgba(16, 44, 87, 0.08);
-}
-
-.jadwal-acc-arrow {
-    font-size: 12px;
-    color: rgba(16, 44, 87, 0.35);
-    transition: transform 0.25s ease, color 0.2s ease;
-    flex-shrink: 0;
-}
-
-.jadwal-acc-item.is-open .jadwal-acc-arrow {
-    transform: rotate(180deg);
-    color: var(--color-primary);
-}
-
-.jadwal-acc-body {
-    padding: 12px 14px 14px;
-    background: rgba(255,255,255,0.5);
-}
-
-/* Sembunyikan shell desktop di mobile, tampilkan accordion */
-@media (max-width: 900px) {
-    .jadwal-selector-shell {
-        display: none !important;
-    }
     .jadwal-mobile-accordion {
-        display: block;
+        display: none;
+        /* hidden di desktop */
+        margin-bottom: 24px;
+        border-radius: 20px;
+        overflow: hidden;
+        border: 1px solid rgba(16, 44, 87, 0.1);
+        box-shadow: 0 26px 58px rgba(16, 44, 87, 0.14);
+        background: linear-gradient(145deg, rgba(248, 251, 255, 0.98) 0%, rgba(235, 243, 251, 0.94) 100%);
     }
-}
+
+    .jadwal-acc-item {
+        border-bottom: 1px solid rgba(16, 44, 87, 0.08);
+    }
+
+    .jadwal-acc-item:last-child {
+        border-bottom: none;
+    }
+
+    .jadwal-acc-trigger {
+        width: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 14px 18px;
+        background: transparent;
+        border: none;
+        cursor: pointer;
+        font-size: 13px;
+        font-weight: 700;
+        color: rgba(16, 44, 87, 0.7);
+        text-align: left;
+        transition: background 0.2s ease, color 0.2s ease;
+    }
+
+    .jadwal-acc-trigger:hover {
+        background: rgba(20, 108, 148, 0.06);
+        color: var(--color-text-main);
+    }
+
+    .jadwal-acc-trigger.is-active {
+        background: rgba(20, 108, 148, 0.1);
+        color: var(--color-primary);
+        border-bottom: 1px solid rgba(16, 44, 87, 0.08);
+    }
+
+    .jadwal-acc-arrow {
+        font-size: 12px;
+        color: rgba(16, 44, 87, 0.35);
+        transition: transform 0.25s ease, color 0.2s ease;
+        flex-shrink: 0;
+    }
+
+    .jadwal-acc-item.is-open .jadwal-acc-arrow {
+        transform: rotate(180deg);
+        color: var(--color-primary);
+    }
+
+    .jadwal-acc-body {
+        padding: 12px 14px 14px;
+        background: rgba(255, 255, 255, 0.5);
+    }
+
+    /* Sembunyikan shell desktop di mobile, tampilkan accordion */
+    @media (max-width: 900px) {
+        .jadwal-selector-shell {
+            display: none !important;
+        }
+
+        .jadwal-mobile-accordion {
+            display: block;
+        }
+    }
 </style>
 
 <script>
-document.addEventListener('DOMContentLoaded', function () {
-    const tabButtons = document.querySelectorAll('.jadwal-tab-button');
-    const panels     = document.querySelectorAll('.jadwal-detail-panel');
-    const sidebar    = document.querySelector('.jadwal-selector-sidebar');
-    const content    = document.querySelector('.jadwal-selector-content');
+    document.addEventListener('DOMContentLoaded', function () {
+        const tabButtons = document.querySelectorAll('.jadwal-tab-button');
+        const panels = document.querySelectorAll('.jadwal-detail-panel');
+        const sidebar = document.querySelector('.jadwal-selector-sidebar');
+        const content = document.querySelector('.jadwal-selector-content');
 
-    // Wrapper mobile yang akan menampung accordion
-    const mobileWrap = document.createElement('div');
-    mobileWrap.className = 'jadwal-mobile-accordion';
+        // Wrapper mobile yang akan menampung accordion
+        const mobileWrap = document.createElement('div');
+        mobileWrap.className = 'jadwal-mobile-accordion';
 
-    // Sisipkan mobileWrap setelah shell (sebagai saudara)
-    const shell = document.querySelector('.jadwal-selector-shell');
-    shell.parentNode.insertBefore(mobileWrap, shell.nextSibling);
+        // Sisipkan mobileWrap setelah shell (sebagai saudara)
+        const shell = document.querySelector('.jadwal-selector-shell');
+        shell.parentNode.insertBefore(mobileWrap, shell.nextSibling);
 
-    // Bangun struktur accordion dari tab + panel yang sudah ada
-    tabButtons.forEach(function (button, i) {
-        const targetId = button.getAttribute('data-target');
-        const panel    = document.getElementById(targetId);
-        if (!panel) return;
-
-        // Buat item accordion
-        const item = document.createElement('div');
-        item.className = 'jadwal-acc-item' + (i === 0 ? ' is-open' : '');
-
-        // Buat trigger
-        const trigger = document.createElement('button');
-        trigger.type  = 'button';
-        trigger.className = 'jadwal-acc-trigger' + (i === 0 ? ' is-active' : '');
-        trigger.setAttribute('aria-expanded', i === 0 ? 'true' : 'false');
-        trigger.innerHTML =
-            '<strong class="jadwal-tab-name">' + button.querySelector('.jadwal-tab-name').textContent + '</strong>' +
-            '<i class="fas fa-chevron-down jadwal-acc-arrow"></i>';
-
-        // Buat body (clone panel agar tidak merusak desktop)
-        const body = document.createElement('div');
-        body.className = 'jadwal-acc-body';
-        if (i === 0) body.style.display = 'block';
-        else body.style.display = 'none';
-
-        // Clone konten panel ke dalam accordion body
-        const clone = panel.cloneNode(true);
-        clone.id = '';                      // hilangkan ID duplikat
-        clone.classList.add('is-active');   // selalu tampil di dalam body
-        clone.style.display = 'block';
-        body.appendChild(clone);
-
-        item.appendChild(trigger);
-        item.appendChild(body);
-        mobileWrap.appendChild(item);
-
-        // Event accordion
-        trigger.addEventListener('click', function () {
-            const isOpen = item.classList.contains('is-open');
-
-            // Tutup semua
-            mobileWrap.querySelectorAll('.jadwal-acc-item').forEach(function (it) {
-                it.classList.remove('is-open');
-                it.querySelector('.jadwal-acc-trigger').classList.remove('is-active');
-                it.querySelector('.jadwal-acc-trigger').setAttribute('aria-expanded', 'false');
-                it.querySelector('.jadwal-acc-body').style.display = 'none';
-            });
-
-            // Buka yang diklik (toggle)
-            if (!isOpen) {
-                item.classList.add('is-open');
-                trigger.classList.add('is-active');
-                trigger.setAttribute('aria-expanded', 'true');
-                body.style.display = 'block';
-            }
-        });
-    });
-
-    // Desktop tab switching (tidak berubah)
-    tabButtons.forEach(function (button) {
-        button.addEventListener('click', function () {
+        // Bangun struktur accordion dari tab + panel yang sudah ada
+        tabButtons.forEach(function (button, i) {
             const targetId = button.getAttribute('data-target');
+            const panel = document.getElementById(targetId);
+            if (!panel) return;
 
-            tabButtons.forEach(function (btn) {
-                btn.classList.remove('is-active');
-                btn.setAttribute('aria-selected', 'false');
+            // Buat item accordion
+            const item = document.createElement('div');
+            item.className = 'jadwal-acc-item' + (i === 0 ? ' is-open' : '');
+
+            // Buat trigger
+            const trigger = document.createElement('button');
+            trigger.type = 'button';
+            trigger.className = 'jadwal-acc-trigger' + (i === 0 ? ' is-active' : '');
+            trigger.setAttribute('aria-expanded', i === 0 ? 'true' : 'false');
+            trigger.innerHTML =
+                '<strong class="jadwal-tab-name">' + button.querySelector('.jadwal-tab-name').textContent + '</strong>' +
+                '<i class="fas fa-chevron-down jadwal-acc-arrow"></i>';
+
+            // Buat body (clone panel agar tidak merusak desktop)
+            const body = document.createElement('div');
+            body.className = 'jadwal-acc-body';
+            if (i === 0) body.style.display = 'block';
+            else body.style.display = 'none';
+
+            // Clone konten panel ke dalam accordion body
+            const clone = panel.cloneNode(true);
+            clone.id = '';                      // hilangkan ID duplikat
+            clone.classList.add('is-active');   // selalu tampil di dalam body
+            clone.style.display = 'block';
+            body.appendChild(clone);
+
+            item.appendChild(trigger);
+            item.appendChild(body);
+            mobileWrap.appendChild(item);
+
+            // Event accordion
+            trigger.addEventListener('click', function () {
+                const isOpen = item.classList.contains('is-open');
+
+                // Tutup semua
+                mobileWrap.querySelectorAll('.jadwal-acc-item').forEach(function (it) {
+                    it.classList.remove('is-open');
+                    it.querySelector('.jadwal-acc-trigger').classList.remove('is-active');
+                    it.querySelector('.jadwal-acc-trigger').setAttribute('aria-expanded', 'false');
+                    it.querySelector('.jadwal-acc-body').style.display = 'none';
+                });
+
+                // Buka yang diklik (toggle)
+                if (!isOpen) {
+                    item.classList.add('is-open');
+                    trigger.classList.add('is-active');
+                    trigger.setAttribute('aria-expanded', 'true');
+                    body.style.display = 'block';
+                }
             });
-            panels.forEach(function (panel) {
-                panel.classList.remove('is-active');
+        });
+
+        // Desktop tab switching (tidak berubah)
+        tabButtons.forEach(function (button) {
+            button.addEventListener('click', function () {
+                const targetId = button.getAttribute('data-target');
+
+                tabButtons.forEach(function (btn) {
+                    btn.classList.remove('is-active');
+                    btn.setAttribute('aria-selected', 'false');
+                });
+                panels.forEach(function (panel) {
+                    panel.classList.remove('is-active');
+                });
+
+                button.classList.add('is-active');
+                button.setAttribute('aria-selected', 'true');
+
+                const activePanel = document.getElementById(targetId);
+                if (activePanel) activePanel.classList.add('is-active');
             });
-
-            button.classList.add('is-active');
-            button.setAttribute('aria-selected', 'true');
-
-            const activePanel = document.getElementById(targetId);
-            if (activePanel) activePanel.classList.add('is-active');
         });
     });
-});
 </script>
 
 <?php require_once __DIR__ . '/includes/footer.php'; ?>

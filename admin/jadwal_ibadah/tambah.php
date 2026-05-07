@@ -14,7 +14,6 @@ if (!is_dir(JADWAL_UPLOAD_DIR)) {
 }
 
 $table_state = ensureJadwalIbadahTable($conn);
-$has_kategori_column = (bool) ($table_state['has_kategori_column'] ?? false);
 $has_image_columns = (bool) ($table_state['has_image_columns'] ?? false);
 
 $error = '';
@@ -22,7 +21,6 @@ $error = '';
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
     $nama_ibadah = trim($_POST['nama_ibadah'] ?? '');
-    $kategori = trim($_POST['kategori'] ?? '');
     $hari = trim($_POST['hari'] ?? '');
     $ruangan = trim($_POST['ruangan'] ?? '');
     $keterangan = trim($_POST['keterangan'] ?? '');
@@ -71,12 +69,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $fields = ['nama_ibadah', 'hari', 'jam', 'ruangan', 'keterangan', 'instagram', 'is_active'];
         $values = [$nama_ibadah, $hari, $jam, $ruangan, $keterangan, $instagram, $is_active];
         $types = 'ssssssi';
-
-        if ($has_kategori_column) {
-            $fields[] = 'kategori';
-            $values[] = $kategori;
-            $types .= 's';
-        }
 
         if ($has_image_columns) {
             $fields[] = 'image';
@@ -332,6 +324,31 @@ include __DIR__ . '/../includes/header.php';
 
     .active-wrap input[type="checkbox"] { width: 16px; height: 16px; }
 
+    .status-actions {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        flex-wrap: wrap;
+    }
+
+    .status-actions .form-actions {
+        display: flex;
+        justify-content: flex-end;
+        align-items: center;
+        gap: 8px;
+        border-top: none;
+        padding-top: 0;
+        margin-top: 0;
+    }
+
+    .status-actions .btn-action {
+        padding: 9px 13px;
+        font-size: 12px;
+        border-radius: 10px;
+        gap: 6px;
+    }
+
     .form-actions {
         display: flex;
         justify-content: space-between;
@@ -421,20 +438,6 @@ include __DIR__ . '/../includes/header.php';
                         <input type="text" class="input" id="nama_ibadah" name="nama_ibadah" required>
                     </div>
 
-                    <?php if ($has_kategori_column): ?>
-                        <div class="field">
-                            <label for="kategori">Kategori</label>
-                            <select class="select" id="kategori" name="kategori">
-                                <option value="">-- Pilih Kategori (Opsional) --</option>
-                                <option>Ibadah Umum</option>
-                                <option>Ibadah Anak</option>
-                                <option>Ibadah Pemuda</option>
-                                <option>Ibadah Khusus</option>
-                                <option>Persekutuan Doa</option>
-                            </select>
-                        </div>
-                    <?php endif; ?>
-
                     <div class="row-grid">
                         <div class="field">
                             <label for="hari">Hari <span class="req">*</span></label>
@@ -505,22 +508,24 @@ include __DIR__ . '/../includes/header.php';
                 <!-- SECTION: STATUS -->
                 <div class="form-section">
                     <h3 class="form-section-title">Status</h3>
-                    
-                    <div class="field">
-                        <label class="active-wrap" for="is_active">
-                            <input type="checkbox" id="is_active" name="is_active" checked>
-                            <span>Aktifkan jadwal ini</span>
-                        </label>
-                    </div>
-                </div>
 
-                <div class="form-actions">
-                    <a href="index.php" class="btn-action btn-cancel">
-                        <i class="fas fa-xmark"></i> Batal
-                    </a>
-                    <button type="submit" class="btn-action btn-save" id="btn-save">
-                        <i class="fas fa-floppy-disk"></i> Simpan
-                    </button>
+                    <div class="status-actions">
+                        <div class="field">
+                            <label class="active-wrap" for="is_active">
+                                <input type="checkbox" id="is_active" name="is_active" checked>
+                                <span>Aktifkan jadwal ini</span>
+                            </label>
+                        </div>
+
+                        <div class="form-actions">
+                            <a href="index.php" class="btn-action btn-cancel">
+                                <i class="fas fa-xmark"></i> Batal
+                            </a>
+                            <button type="submit" class="btn-action btn-save" id="btn-save">
+                                <i class="fas fa-floppy-disk"></i> Simpan
+                            </button>
+                        </div>
+                    </div>
                 </div>
             </form>
         </div>

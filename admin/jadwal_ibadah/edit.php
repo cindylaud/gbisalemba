@@ -15,7 +15,6 @@ if (!is_dir(JADWAL_UPLOAD_DIR)) {
 
 $table_state = ensureJadwalIbadahTable($conn);
 $has_urutan_column   = (bool) ($table_state['has_urutan_column']   ?? false);
-$has_kategori_column = (bool) ($table_state['has_kategori_column'] ?? false);
 $has_image_columns   = (bool) ($table_state['has_image_columns']   ?? false);
 
 $error   = '';
@@ -59,7 +58,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 
     $nama_ibadah = trim($_POST['nama_ibadah'] ?? '');
-    $kategori    = trim($_POST['kategori']    ?? '');
     $hari        = trim($_POST['hari']        ?? '');
     // JAM MULTI INPUT - handle as array like in tambah.php
     $jam_array = $_POST['jam'] ?? [];
@@ -142,12 +140,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             ];
             $values = [$nama_ibadah, $hari, $jam, $ruangan, $keterangan, $instagram, $is_active];
             $types  = 'ssssssi';
-
-            if ($has_kategori_column) {
-                $fields[] = 'kategori = ?';
-                $values[] = $kategori;
-                $types   .= 's';
-            }
 
             $final_image = $current_image;
             if ($has_image_columns) {
@@ -615,23 +607,6 @@ include __DIR__ . '/../includes/header.php';
                                value="<?php echo htmlspecialchars($_POST['nama_ibadah'] ?? $jadwal['nama_ibadah']); ?>"
                                required>
                     </div>
-
-                    <?php if ($has_kategori_column): ?>
-                        <div class="field">
-                            <label for="kategori">Kategori</label>
-                            <select class="select" id="kategori" name="kategori">
-                                <option value="">-- Pilih Kategori (Opsional) --</option>
-                                <?php
-                                $selected_kategori = $_POST['kategori'] ?? ($jadwal['kategori'] ?? '');
-                                $kategori_list = ['Ibadah Umum', 'Ibadah Anak', 'Ibadah Pemuda', 'Ibadah Khusus', 'Persekutuan Doa'];
-                                foreach ($kategori_list as $kat) {
-                                    $selected = ($selected_kategori == $kat) ? 'selected' : '';
-                                    echo "<option value=\"{$kat}\" {$selected}>{$kat}</option>";
-                                }
-                                ?>
-                            </select>
-                        </div>
-                    <?php endif; ?>
 
                     <div class="row-grid">
                         <div class="field">

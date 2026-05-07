@@ -743,10 +743,25 @@ $formulir_card_images = formulir_collect_images([
         min-height: 0;
     }
 
+    .formulir-hero-content,
+    .formulir-hero-copy {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+    }
+
     .formulir-header-title {
         font-size: clamp(40px, 6.2vw, 74px);
         line-height: 0.98;
         white-space: normal;
+        margin: 0;
+        font-weight: 800;
+        color: #ffffff;
+        text-transform: uppercase;
+        letter-spacing: 0.03em;
+        text-shadow: 0 16px 38px rgba(0, 0, 0, 0.3);
+        max-width: 100%;
     }
 
     .formulir-grid {
