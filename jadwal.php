@@ -268,11 +268,12 @@ $jadwal_hero_scale = number_format($jadwal_hero_zoom / 100, 2, '.', '');
                                                 </div>
                                             </div>
 
-                                            <?php if (!empty($jadwal['instagram'])): ?>
-                                                <?php
-                                                $ig_input = trim($jadwal['instagram']);
+                                            <?php
+                                            $ig_input = trim((string) ($jadwal['instagram'] ?? ''));
+                                            $ig_username = '';
+                                            $ig_profile_url = '';
 
-                                                // Ambil username dari link atau @
+                                            if ($ig_input !== '') {
                                                 if (strpos($ig_input, 'instagram.com') !== false) {
                                                     $ig_username = basename(parse_url($ig_input, PHP_URL_PATH));
                                                 } else {
@@ -280,21 +281,29 @@ $jadwal_hero_scale = number_format($jadwal_hero_zoom / 100, 2, '.', '');
                                                 }
 
                                                 $ig_username = trim($ig_username, '/');
-                                                ?>
-                                                <div class="jadwal-detail-item jadwal-detail-item-wide">
-    <span class="jadwal-info-icon-wrap">
-        <i class="fab fa-instagram jadwal-icon"></i>
-    </span>
-    <div>
-        <span class="jadwal-row-label">Instagram</span>
-        <a href="https://www.instagram.com/<?php echo htmlspecialchars($ig_username); ?>" 
-           target="_blank" 
-           class="jadwal-info-text jadwal-link-clickable">
-            @<?php echo htmlspecialchars($ig_username); ?>
-        </a>
-    </div>
-</div>
-<?php endif; ?>
+                                                if ($ig_username !== '') {
+                                                    $ig_profile_url = 'https://www.instagram.com/' . $ig_username;
+                                                }
+                                            }
+                                            ?>
+                                            <div class="jadwal-detail-item jadwal-detail-item-wide">
+                                                <span class="jadwal-info-icon-wrap">
+                                                    <i class="fab fa-instagram jadwal-icon"></i>
+                                                </span>
+                                                <div>
+                                                    <span class="jadwal-row-label">Instagram</span>
+                                                    <?php if ($ig_profile_url !== ''): ?>
+                                                        <a href="<?php echo htmlspecialchars($ig_profile_url); ?>"
+                                                           target="_blank"
+                                                           rel="noopener noreferrer"
+                                                           class="jadwal-info-text jadwal-link-clickable">
+                                                            @<?php echo htmlspecialchars($ig_username); ?>
+                                                        </a>
+                                                    <?php else: ?>
+                                                        <span class="jadwal-info-text">-</span>
+                                                    <?php endif; ?>
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
 
@@ -559,7 +568,7 @@ $jadwal_hero_scale = number_format($jadwal_hero_zoom / 100, 2, '.', '');
     }
 
     .jadwal-selector-shell {
-        align-items: start; 
+        align-items: stretch;
         position: relative;
         margin-bottom: 24px;
         max-width: 1040px;
@@ -568,7 +577,7 @@ $jadwal_hero_scale = number_format($jadwal_hero_zoom / 100, 2, '.', '');
         display: grid;
         grid-template-columns: 210px 1fr;
         gap: 0;
-        padding: 0;
+        padding: 0; /* remove extra shell padding to avoid top/bottom gaps */
         border-radius: 24px;
         background:
             linear-gradient(rgba(255, 255, 255, 0.02), rgba(255, 255, 255, 0.02)),
@@ -608,13 +617,14 @@ $jadwal_hero_scale = number_format($jadwal_hero_zoom / 100, 2, '.', '');
     .jadwal-selector-sidebar {
         position: relative;
         z-index: 1;
-        display: grid;
-        grid-auto-rows: 1fr;
-        gap: 4px;
-        padding: 16px 10px;
-        border-right: 1px solid rgba(16, 44, 87, 0.1);
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between; /* distribute buttons so there's no gap top/bottom */
+        gap: 6px;
+        padding: 6px 12px; /* minimal padding */
+        border-right: 1px solid rgba(16, 44, 87, 0.08);
         background: rgba(246, 250, 255, 0.5);
-        border-radius: 24px 0 0 24px;
+        border-radius: 20px 0 0 20px;
         height: 100%;
         overflow-y: auto;
     }
@@ -640,13 +650,13 @@ $jadwal_hero_scale = number_format($jadwal_hero_zoom / 100, 2, '.', '');
         background: transparent;
         color: rgba(16, 44, 87, 0.60);
         border-radius: 10px;
-        padding: 10px 12px;
+        padding: 9px 11px;
         font-weight: 700;
         font-size: 13px;
         cursor: pointer;
         width: 100%;
         min-height: 0;
-        height: 100%;
+        height: auto;
         transition: background 0.2s ease, color 0.2s ease;
     }
 
@@ -705,9 +715,9 @@ $jadwal_hero_scale = number_format($jadwal_hero_zoom / 100, 2, '.', '');
 
     .jadwal-detail-layout {
         display: grid;
-        grid-template-columns: minmax(0, 1fr) 236px;
-        gap: 14px;
-        align-items: start;
+        grid-template-columns: minmax(0, 1fr) 220px;
+        gap: 12px;
+        align-items: center; /* vertically center main content and thumb */
     }
 
     .jadwal-detail-main {
@@ -721,7 +731,7 @@ $jadwal_hero_scale = number_format($jadwal_hero_zoom / 100, 2, '.', '');
         justify-content: center;
         align-items: center;
         margin-bottom: 0;
-        padding: 10px 12px;
+        padding: 8px 10px;
         border-radius: 16px;
         background: rgba(255, 255, 255, 0.78);
         border: 1px solid rgba(16, 44, 87, 0.08);
@@ -729,7 +739,7 @@ $jadwal_hero_scale = number_format($jadwal_hero_zoom / 100, 2, '.', '');
 
     .jadwal-detail-title {
         margin: 0;
-        font-size: clamp(18px, 2.1vw, 25px);
+        font-size: clamp(17px, 1.95vw, 23px);
         line-height: 1.14;
         color: var(--color-text-main);
         text-align: center;
@@ -739,40 +749,49 @@ $jadwal_hero_scale = number_format($jadwal_hero_zoom / 100, 2, '.', '');
         display: grid;
         align-items: start;
         grid-template-columns: repeat(2, minmax(0, 1fr));
-        gap: 8px;
+        gap: 7px;
     }
 
     .jadwal-detail-item {
-        min-height: 70px;
+        height: 56px; /* fixed height to match compact Instagram row */
         display: grid;
         grid-template-columns: auto 1fr;
         align-items: center;
         text-align: left;
-        gap: 9px;
-        min-height: 84px;
-        padding: 10px;
+        gap: 7px;
+        padding: 6px 10px;
         border-radius: 12px;
         background: rgba(255, 255, 255, 0.9);
         border: 1px solid rgba(16, 44, 87, 0.08);
         box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.6);
+        overflow: hidden;
     }
 
     .jadwal-detail-item-wide {
         grid-column: 1 / -1;
+        height: 56px; /* make instagram row same height */
+        padding: 6px 10px;
+        display: grid;
+        grid-template-columns: auto 1fr;
+        align-items: center;
     }
 
     .jadwal-detail-thumb {
         display: flex;
-        align-items: flex-start;
+        align-items: center; /* center the image vertically */
+        justify-content: center;
+        padding: 6px;
     }
 
     .jadwal-detail-thumb-frame {
         position: relative;
         width: 100%;
+        max-width: 320px;
         aspect-ratio: 1 / 1;
         border-radius: 18px;
         overflow: hidden;
         box-shadow: 0 16px 32px rgba(16, 44, 87, 0.14);
+        align-self: center;
     }
 
     .jadwal-detail-thumb-frame::after {
@@ -881,8 +900,8 @@ $jadwal_hero_scale = number_format($jadwal_hero_zoom / 100, 2, '.', '');
     }
 
     .jadwal-info-icon-wrap {
-        width: 38px;
-        height: 38px;
+        width: 30px;
+        height: 30px;
         border-radius: 10px;
         display: inline-flex;
         align-items: center;
@@ -893,7 +912,7 @@ $jadwal_hero_scale = number_format($jadwal_hero_zoom / 100, 2, '.', '');
 
     .jadwal-detail-item>div {
         display: grid;
-        gap: 2px;
+        gap: 0;
         justify-items: start;
         align-items: start;
     }
@@ -905,10 +924,10 @@ $jadwal_hero_scale = number_format($jadwal_hero_zoom / 100, 2, '.', '');
 
     .jadwal-row-label {
         display: block;
-        margin-bottom: 1px;
-        font-size: 9px;
+        margin-bottom: 0;
+        font-size: 7px;
         font-weight: 800;
-        letter-spacing: 1.6px;
+        letter-spacing: 1.3px;
         text-transform: uppercase;
         color: rgba(16, 44, 87, 0.48);
         text-align: left;
@@ -918,8 +937,8 @@ $jadwal_hero_scale = number_format($jadwal_hero_zoom / 100, 2, '.', '');
     .jadwal-keterangan-text {
         display: block;
         color: var(--color-text-main);
-        font-size: 0.72rem;
-        line-height: 1.35;
+        font-size: 0.66rem;
+        line-height: 1.22;
         text-align: left;
     }
 
@@ -1235,36 +1254,174 @@ $jadwal_hero_scale = number_format($jadwal_hero_zoom / 100, 2, '.', '');
             justify-content: center;
         }
     }
+    /* ===== MOBILE ACCORDION ===== */
+.jadwal-mobile-accordion {
+    display: none; /* hidden di desktop */
+    margin-bottom: 24px;
+    border-radius: 20px;
+    overflow: hidden;
+    border: 1px solid rgba(16, 44, 87, 0.1);
+    box-shadow: 0 26px 58px rgba(16, 44, 87, 0.14);
+    background: linear-gradient(145deg, rgba(248,251,255,0.98) 0%, rgba(235,243,251,0.94) 100%);
+}
+
+.jadwal-acc-item {
+    border-bottom: 1px solid rgba(16, 44, 87, 0.08);
+}
+
+.jadwal-acc-item:last-child {
+    border-bottom: none;
+}
+
+.jadwal-acc-trigger {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 18px;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: 700;
+    color: rgba(16, 44, 87, 0.7);
+    text-align: left;
+    transition: background 0.2s ease, color 0.2s ease;
+}
+
+.jadwal-acc-trigger:hover {
+    background: rgba(20, 108, 148, 0.06);
+    color: var(--color-text-main);
+}
+
+.jadwal-acc-trigger.is-active {
+    background: rgba(20, 108, 148, 0.1);
+    color: var(--color-primary);
+    border-bottom: 1px solid rgba(16, 44, 87, 0.08);
+}
+
+.jadwal-acc-arrow {
+    font-size: 12px;
+    color: rgba(16, 44, 87, 0.35);
+    transition: transform 0.25s ease, color 0.2s ease;
+    flex-shrink: 0;
+}
+
+.jadwal-acc-item.is-open .jadwal-acc-arrow {
+    transform: rotate(180deg);
+    color: var(--color-primary);
+}
+
+.jadwal-acc-body {
+    padding: 12px 14px 14px;
+    background: rgba(255,255,255,0.5);
+}
+
+/* Sembunyikan shell desktop di mobile, tampilkan accordion */
+@media (max-width: 900px) {
+    .jadwal-selector-shell {
+        display: none !important;
+    }
+    .jadwal-mobile-accordion {
+        display: block;
+    }
+}
 </style>
 
 <script>
-    document.addEventListener('DOMContentLoaded', function () {
-        const tabButtons = document.querySelectorAll('.jadwal-tab-button');
-        const panels = document.querySelectorAll('.jadwal-detail-panel');
+document.addEventListener('DOMContentLoaded', function () {
+    const tabButtons = document.querySelectorAll('.jadwal-tab-button');
+    const panels     = document.querySelectorAll('.jadwal-detail-panel');
+    const sidebar    = document.querySelector('.jadwal-selector-sidebar');
+    const content    = document.querySelector('.jadwal-selector-content');
 
-        tabButtons.forEach(function (button) {
-            button.addEventListener('click', function () {
-                const targetId = button.getAttribute('data-target');
+    // Wrapper mobile yang akan menampung accordion
+    const mobileWrap = document.createElement('div');
+    mobileWrap.className = 'jadwal-mobile-accordion';
 
-                tabButtons.forEach(function (btn) {
-                    btn.classList.remove('is-active');
-                    btn.setAttribute('aria-selected', 'false');
-                });
+    // Sisipkan mobileWrap setelah shell (sebagai saudara)
+    const shell = document.querySelector('.jadwal-selector-shell');
+    shell.parentNode.insertBefore(mobileWrap, shell.nextSibling);
 
-                panels.forEach(function (panel) {
-                    panel.classList.remove('is-active');
-                });
+    // Bangun struktur accordion dari tab + panel yang sudah ada
+    tabButtons.forEach(function (button, i) {
+        const targetId = button.getAttribute('data-target');
+        const panel    = document.getElementById(targetId);
+        if (!panel) return;
 
-                button.classList.add('is-active');
-                button.setAttribute('aria-selected', 'true');
+        // Buat item accordion
+        const item = document.createElement('div');
+        item.className = 'jadwal-acc-item' + (i === 0 ? ' is-open' : '');
 
-                const activePanel = document.getElementById(targetId);
-                if (activePanel) {
-                    activePanel.classList.add('is-active');
-                }
+        // Buat trigger
+        const trigger = document.createElement('button');
+        trigger.type  = 'button';
+        trigger.className = 'jadwal-acc-trigger' + (i === 0 ? ' is-active' : '');
+        trigger.setAttribute('aria-expanded', i === 0 ? 'true' : 'false');
+        trigger.innerHTML =
+            '<strong class="jadwal-tab-name">' + button.querySelector('.jadwal-tab-name').textContent + '</strong>' +
+            '<i class="fas fa-chevron-down jadwal-acc-arrow"></i>';
+
+        // Buat body (clone panel agar tidak merusak desktop)
+        const body = document.createElement('div');
+        body.className = 'jadwal-acc-body';
+        if (i === 0) body.style.display = 'block';
+        else body.style.display = 'none';
+
+        // Clone konten panel ke dalam accordion body
+        const clone = panel.cloneNode(true);
+        clone.id = '';                      // hilangkan ID duplikat
+        clone.classList.add('is-active');   // selalu tampil di dalam body
+        clone.style.display = 'block';
+        body.appendChild(clone);
+
+        item.appendChild(trigger);
+        item.appendChild(body);
+        mobileWrap.appendChild(item);
+
+        // Event accordion
+        trigger.addEventListener('click', function () {
+            const isOpen = item.classList.contains('is-open');
+
+            // Tutup semua
+            mobileWrap.querySelectorAll('.jadwal-acc-item').forEach(function (it) {
+                it.classList.remove('is-open');
+                it.querySelector('.jadwal-acc-trigger').classList.remove('is-active');
+                it.querySelector('.jadwal-acc-trigger').setAttribute('aria-expanded', 'false');
+                it.querySelector('.jadwal-acc-body').style.display = 'none';
             });
+
+            // Buka yang diklik (toggle)
+            if (!isOpen) {
+                item.classList.add('is-open');
+                trigger.classList.add('is-active');
+                trigger.setAttribute('aria-expanded', 'true');
+                body.style.display = 'block';
+            }
         });
     });
+
+    // Desktop tab switching (tidak berubah)
+    tabButtons.forEach(function (button) {
+        button.addEventListener('click', function () {
+            const targetId = button.getAttribute('data-target');
+
+            tabButtons.forEach(function (btn) {
+                btn.classList.remove('is-active');
+                btn.setAttribute('aria-selected', 'false');
+            });
+            panels.forEach(function (panel) {
+                panel.classList.remove('is-active');
+            });
+
+            button.classList.add('is-active');
+            button.setAttribute('aria-selected', 'true');
+
+            const activePanel = document.getElementById(targetId);
+            if (activePanel) activePanel.classList.add('is-active');
+        });
+    });
+});
 </script>
 
 <?php require_once __DIR__ . '/includes/footer.php'; ?>

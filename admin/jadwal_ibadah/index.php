@@ -21,6 +21,23 @@ $result = $stmt->get_result();
 $jadwal_list = $result->fetch_all(MYSQLI_ASSOC);
 $stmt->close();
 
+$total_count = count($jadwal_list);
+$active_count = 0;
+$inactive_count = 0;
+$image_count = 0;
+
+foreach ($jadwal_list as $jadwal_row) {
+    if ((int) ($jadwal_row['is_active'] ?? 0) === 1) {
+        $active_count++;
+    } else {
+        $inactive_count++;
+    }
+
+    if (!empty($jadwal_row['image'])) {
+        $image_count++;
+    }
+}
+
 $admin_page_title = 'Kelola Jadwal Ibadah';
 include __DIR__ . '/../includes/header.php';
 ?>
@@ -31,15 +48,23 @@ include __DIR__ . '/../includes/header.php';
         gap: 16px;
     }
 
+    .panel-list {
+        background: #fff;
+        border: 1px solid rgba(16, 44, 87, 0.08);
+        box-shadow: 0 10px 24px rgba(15, 39, 66, 0.05);
+    }
+
+    /* ALERT */
     .admin-alert {
         border-radius: 12px;
         padding: 12px 14px;
         font-size: 13px;
         font-weight: 600;
         border: 1px solid transparent;
-        opacity: 1;
-        transform: translateY(0);
-        transition: opacity 0.35s ease, transform 0.35s ease;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        transition: opacity 0.3s ease, transform 0.3s ease;
     }
 
     .admin-alert.is-hiding {
@@ -59,12 +84,10 @@ include __DIR__ . '/../includes/header.php';
         border-color: #f8c7c7;
     }
 
+    /* PANEL */
     .panel-list {
-        background: linear-gradient(180deg, #ffffff 0%, #f8fbfe 100%);
-        border: 1px solid rgba(16, 44, 87, 0.1);
         border-radius: 22px;
         padding: 18px;
-        box-shadow: 0 12px 26px rgba(15, 39, 66, 0.08);
     }
 
     .panel-head {
@@ -72,85 +95,107 @@ include __DIR__ . '/../includes/header.php';
         align-items: center;
         justify-content: space-between;
         gap: 12px;
-        margin-bottom: 16px;
-        padding-bottom: 14px;
-        border-bottom: 1px solid rgba(16, 44, 87, 0.1);
+        margin-bottom: 0;
+        padding-bottom: 12px;
+        border-bottom: 1px solid rgba(16, 44, 87, 0.08);
     }
 
     .panel-title {
         display: flex;
         align-items: center;
-        gap: 10px;
+        gap: 8px;
         color: #102c57;
-        font-size: 22px;
-        font-weight: 800;
+        font-size: 20px;
+        font-weight: 700;
         margin: 0;
     }
 
     .panel-title i {
         color: #146c94;
-        font-size: 24px;
+        font-size: 18px;
     }
 
+    .panel-head-actions {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        flex-wrap: wrap;
+        margin-left: auto;
+    }
+
+    /* BUTTON TAMBAH */
     .btn-add-jadwal {
         display: inline-flex;
         align-items: center;
-        gap: 8px;
-        padding: 9px 13px;
-        border-radius: 10px;
-        border: 1px solid rgba(20, 108, 148, 0.28);
-        background: linear-gradient(135deg, #1f466f 0%, #175f87 100%);
+        gap: 6px;
+        padding: 8px 12px;
+        border-radius: 8px;
+        background: #102c57;
         color: #fff;
         font-size: 12px;
-        font-weight: 700;
+        font-weight: 600;
         text-decoration: none;
-        box-shadow: 0 8px 14px rgba(20, 108, 148, 0.2);
-        transition: transform 0.18s ease, box-shadow 0.18s ease;
+        transition: 0.2s ease;
     }
 
     .btn-add-jadwal:hover {
+        background: #163b70;
         color: #fff;
         text-decoration: none;
-        transform: translateY(-1px);
-        box-shadow: 0 10px 18px rgba(20, 108, 148, 0.26);
     }
 
+    .panel-head-meta {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        color: rgba(72, 97, 131, 0.9);
+        font-size: 12px;
+        font-weight: 600;
+    }
+
+    .panel-head-meta i {
+        color: #146c94;
+    }
+
+    /* TABLE */
     .jadwal-table-wrap {
+        margin-top: 16px;
         border: 1px solid rgba(16, 44, 87, 0.08);
-        border-radius: 14px;
-        overflow: auto;
+        border-radius: 18px;
+        overflow-x: auto;
         background: #fff;
     }
 
     .jadwal-table {
         width: 100%;
-        border-collapse: separate;
-        border-spacing: 0;
-        margin: 0;
+        border-collapse: collapse;
     }
 
     .jadwal-table thead th {
-        background: linear-gradient(180deg, #eff7fb 0%, #e4f0f5 100%);
-        color: #1e3a5f;
-        padding: 12px 14px;
-        border-bottom: 1px solid #d9e9ef;
-        font-size: 12px;
-        font-weight: 800;
+        background: #f5f8fb;
+        color: #486581;
+        padding: 11px 12px;
+        font-size: 11px;
+        font-weight: 700;
+        border-bottom: 1px solid #e6edf3;
         text-transform: uppercase;
-        letter-spacing: 0.4px;
         white-space: nowrap;
     }
 
     .jadwal-table tbody td {
-        padding: 12px 14px;
-        font-size: 14px;
+        padding: 12px;
+        font-size: 13px;
         color: #344054;
-        border-bottom: 1px solid #edf3f8;
+        border-bottom: 1px solid #eef2f6;
         vertical-align: middle;
     }
 
+    .jadwal-table tbody tr:nth-child(odd) {
+        background: rgba(248, 251, 254, 0.78);
+    }
+
     .jadwal-table tbody tr:hover {
-        background: rgba(63, 182, 168, 0.06);
+        background: rgba(20, 108, 148, 0.05);
     }
 
     .jadwal-table tbody tr:last-child td {
@@ -164,74 +209,74 @@ include __DIR__ . '/../includes/header.php';
         text-align: center;
     }
 
-    .jadwal-table th.col-aksi,
-    .jadwal-table td.col-aksi {
-        min-width: 152px;
-    }
-
     .jadwal-name {
-        font-weight: 700;
+        font-weight: 600;
         color: #243b5f;
     }
 
+    .jadwal-table td:nth-child(2) {
+        font-weight: 600;
+        color: #243b5f;
+    }
+
+    /* FOTO */
     .jadwal-photo-thumb {
-        width: 56px;
-        height: 56px;
-        border-radius: 12px;
+        width: 52px;
+        height: 52px;
+        border-radius: 10px;
         object-fit: cover;
-        object-position: center;
-        border: 1px solid rgba(16, 44, 87, 0.14);
+        border: 1px solid rgba(16, 44, 87, 0.1);
         background: #eef4f8;
     }
 
     .jadwal-photo-empty {
-        width: 56px;
-        height: 56px;
-        border-radius: 12px;
+        width: 52px;
+        height: 52px;
+        border-radius: 10px;
         display: inline-flex;
         align-items: center;
         justify-content: center;
-        border: 1px dashed rgba(16, 44, 87, 0.18);
+        border: 1px dashed rgba(16, 44, 87, 0.16);
         background: #f4f8fc;
         color: #9ab1c8;
-        font-size: 18px;
+        font-size: 16px;
     }
 
+    /* STATUS */
     .status-badge {
         display: inline-flex;
         align-items: center;
         justify-content: center;
-        padding: 5px 11px;
+        padding: 4px 10px;
         border-radius: 999px;
-        font-size: 11px;
-        font-weight: 800;
-        letter-spacing: 0.3px;
+        font-size: 10px;
+        font-weight: 700;
         text-transform: uppercase;
     }
 
     .status-badge.active {
         color: #1f6a31;
-        background: rgba(47, 158, 68, 0.16);
+        background: rgba(47, 158, 68, 0.14);
     }
 
     .status-badge.inactive {
         color: #4f5963;
-        background: rgba(108, 117, 125, 0.15);
+        background: rgba(108, 117, 125, 0.12);
     }
 
+    /* URUTAN */
     .urutan-control {
         display: inline-flex;
         align-items: center;
         justify-content: center;
         gap: 4px;
-        white-space: nowrap;
     }
 
     .urutan-value {
-        min-width: 30px;
+        min-width: 28px;
         height: 28px;
-        border-radius: 8px;
-        border: 1px solid rgba(16, 44, 87, 0.16);
+        border-radius: 7px;
+        border: 1px solid rgba(16, 44, 87, 0.12);
         background: #f8fbfe;
         color: #243b5f;
         font-size: 11px;
@@ -239,151 +284,126 @@ include __DIR__ . '/../includes/header.php';
         display: inline-flex;
         align-items: center;
         justify-content: center;
-        padding: 0 7px;
+        padding: 0 6px;
     }
 
     .btn-order-mini {
-        width: 28px;
-        height: 28px;
-        border-radius: 7px;
+        width: 26px;
+        height: 26px;
+        border-radius: 6px;
         display: inline-flex;
         align-items: center;
         justify-content: center;
         text-decoration: none;
-        border: 1px solid rgba(79, 89, 99, 0.35);
-        background: linear-gradient(135deg, #8592a0 0%, #707d8a 100%);
-        color: #fff;
+        border: 1px solid rgba(79, 89, 99, 0.22);
+        background: #fff;
+        color: #5b6572;
         font-size: 10px;
-        box-shadow: 0 5px 10px rgba(16, 44, 87, 0.12);
-        transition: transform 0.18s ease, box-shadow 0.18s ease;
+        transition: 0.2s ease;
     }
 
     .btn-order-mini:hover {
+        background: #f1f5f9;
+        color: #102c57;
         text-decoration: none;
-        color: #fff;
-        transform: translateY(-1px);
-        box-shadow: 0 8px 14px rgba(16, 44, 87, 0.16);
     }
 
     .btn-order-mini.is-disabled {
-        background: #c4ccd5;
-        border-color: #c4ccd5;
-        box-shadow: none;
+        opacity: 0.45;
         pointer-events: none;
         cursor: not-allowed;
     }
 
+    /* ACTIONS */
     .actions {
         display: flex;
         align-items: center;
         justify-content: center;
-        gap: 5px;
-        flex-wrap: nowrap;
-        white-space: nowrap;
+        gap: 6px;
     }
 
     .btn-action {
-        width: 34px;
-        height: 30px;
-        border-radius: 7px;
+        width: 32px;
+        height: 32px;
+        border-radius: 8px;
         display: inline-flex;
         align-items: center;
         justify-content: center;
         text-decoration: none;
-        border: 1px solid transparent;
+        border: none;
         color: #fff;
         font-size: 12px;
-        box-shadow: 0 6px 12px rgba(16, 44, 87, 0.12);
-        transition: transform 0.18s ease, box-shadow 0.18s ease, filter 0.18s ease;
+        transition: 0.2s ease;
     }
 
     .btn-action:hover {
+        transform: translateY(-1px);
         text-decoration: none;
         color: #fff;
-        transform: translateY(-1px);
-        box-shadow: 0 8px 14px rgba(16, 44, 87, 0.16);
-        filter: saturate(1.03);
-    }
-
-    .btn-order {
-        background: linear-gradient(135deg, #8592a0 0%, #707d8a 100%);
-        border-color: rgba(79, 89, 99, 0.35);
-    }
-
-    .btn-order.is-disabled,
-    .btn-order:disabled {
-        background: #c4ccd5;
-        border-color: #c4ccd5;
-        box-shadow: none;
-        pointer-events: none;
-        cursor: not-allowed;
     }
 
     .btn-toggle {
-        background: linear-gradient(135deg, #f0b434 0%, #d89a1a 100%);
-        border-color: rgba(158, 102, 4, 0.45);
-        color: #17324d;
-        font-weight: 700;
-    }
-
-    .btn-toggle:hover {
-        color: #17324d;
+        background: #e7b13d;
     }
 
     .btn-edit {
-        background: linear-gradient(135deg, #274d7f 0%, #1d3f6b 100%);
-        border-color: rgba(19, 54, 97, 0.5);
+        background: #1f466f;
     }
 
     .btn-delete {
-        background: linear-gradient(135deg, #e45f5a 0%, #cb3f3a 100%);
-        border-color: rgba(165, 40, 34, 0.45);
+        background: #d9534f;
     }
 
+    /* EMPTY */
     .empty-state {
         text-align: center;
-        padding: 44px 20px;
+        padding: 36px 16px;
         color: #6b7c93;
     }
 
     .empty-state i {
-        font-size: 44px;
-        margin-bottom: 12px;
+        font-size: 36px;
+        margin-bottom: 10px;
         color: #9ab1c8;
     }
 
     .empty-state h5 {
         color: #4f6580;
+        font-size: 18px;
         font-weight: 700;
+        margin-bottom: 6px;
     }
 
     .empty-state p {
-        margin-bottom: 14px;
+        margin-bottom: 0;
+        font-size: 13px;
     }
 
+    /* TABLET */
     @media (max-width: 992px) {
         .panel-head {
             flex-direction: column;
             align-items: flex-start;
         }
 
-        .panel-title {
-            font-size: 20px;
-        }
-
         .jadwal-table tbody td {
-            font-size: 13px;
+            font-size: 12px;
         }
     }
 
+    /* MOBILE */
     @media (max-width: 767px) {
         .panel-list {
-            padding: 14px;
-            border-radius: 16px;
+            padding-top: 14px;
+            padding-bottom: 14px;
+        }
+
+        .panel-title {
+            font-size: 18px;
         }
 
         .jadwal-table-wrap {
-            border: 0;
+            border: none;
             background: transparent;
             overflow: visible;
         }
@@ -404,11 +424,10 @@ include __DIR__ . '/../includes/header.php';
 
         .jadwal-table tbody tr {
             background: #fff;
-            border: 1px solid rgba(16, 44, 87, 0.1);
+            border: 1px solid rgba(16, 44, 87, 0.08);
             border-radius: 14px;
-            padding: 10px;
+            padding: 12px;
             margin-bottom: 10px;
-            box-shadow: 0 8px 16px rgba(15, 39, 66, 0.05);
         }
 
         .jadwal-table tbody td {
@@ -416,27 +435,26 @@ include __DIR__ . '/../includes/header.php';
             align-items: center;
             justify-content: space-between;
             gap: 10px;
-            padding: 8px 0;
-            border-bottom: 1px solid #edf3f8;
+            padding: 9px 0;
+            border-bottom: 1px solid #eef2f6;
             text-align: left !important;
-            font-size: 13px;
+            font-size: 12px;
         }
 
         .jadwal-table tbody td:last-child {
-            border-bottom: 0;
+            border-bottom: none;
             padding-bottom: 0;
         }
 
         .jadwal-table tbody td::before {
-            font-size: 11px;
-            font-weight: 800;
+            font-size: 10px;
+            font-weight: 700;
             text-transform: uppercase;
-            letter-spacing: 0.3px;
             color: #7388a2;
         }
 
         .jadwal-table tbody td:nth-child(1)::before { content: 'No'; }
-        .jadwal-table tbody td:nth-child(2)::before { content: 'Nama Ibadah'; }
+        .jadwal-table tbody td:nth-child(2)::before { content: 'Nama'; }
         .jadwal-table tbody td:nth-child(3)::before { content: 'Foto'; }
         .jadwal-table tbody td:nth-child(4)::before { content: 'Hari'; }
         .jadwal-table tbody td:nth-child(5)::before { content: 'Jam'; }
@@ -455,10 +473,7 @@ include __DIR__ . '/../includes/header.php';
             margin-bottom: 8px;
         }
 
-        .jadwal-table tbody td:nth-child(10) .actions {
-            display: flex;
-            gap: 8px;
-            width: 100%;
+        .actions {
             justify-content: flex-start;
         }
     }
@@ -482,10 +497,17 @@ include __DIR__ . '/../includes/header.php';
     <div class="panel-list">
         <div class="panel-head">
             <div class="panel-title"><i class="fas fa-calendar-week"></i> Daftar Jadwal Ibadah</div>
-            <a href="tambah.php" class="btn-add-jadwal">
-                <i class="fas fa-plus"></i> Tambah Jadwal
-            </a>
+            <div class="panel-head-actions">
+                <div class="panel-head-meta">
+                    <i class="fas fa-layer-group"></i>
+                    <span><?php echo (int) $total_count; ?> data</span>
+                </div>
+                <a href="tambah.php" class="btn-add-jadwal">
+                    <i class="fas fa-plus"></i> Tambah Jadwal
+                </a>
+            </div>
         </div>
+
         <?php if (empty($jadwal_list)): ?>
             <div class="empty-state">
                 <i class="fas fa-calendar-alt"></i>

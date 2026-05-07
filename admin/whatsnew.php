@@ -330,17 +330,58 @@ if ($panelZoom < 50) {
         .alert-danger { background:#f8d7da; color:#721c24; border:1px solid #f5c6cb; }
 
         .layout { display:grid; grid-template-columns:minmax(0,1.18fr) minmax(320px,0.82fr); gap:18px; align-items:start; min-width:0; }
-        .panel { background:linear-gradient(180deg,#fff 0%,#f8fbfe 100%); border:1px solid rgba(16,44,87,.1); border-radius:22px; padding:20px; box-shadow:0 12px 26px rgba(15,39,66,.08); min-width:0; }
+        .panel { background:#fff; border:1px solid rgba(16,44,87,.08); border-radius:22px; padding:20px; box-shadow:0 10px 24px rgba(15,39,66,.05); min-width:0; }
+        
+        .panel-head {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            margin-bottom: 0;
+            padding-bottom: 12px;
+            border-bottom: 1px solid rgba(16, 44, 87, 0.08);
+        }
+
+        .panel-title { display:flex; align-items:center; gap:10px; font-size:18px; font-weight:700; color:#102C57; margin:0; padding:0; }
+        .panel-title::before { font-family:'Font Awesome 6 Free'; font-weight:900; color:#146C94; font-size:16px; }
+        .list-title::before { content:'\f03a'; }
+        .upload-title::before { content:'\f030'; }
+
+        .panel-head-actions {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-left: auto;
+        }
+
+        .btn-add-coming {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 8px 12px;
+            border-radius: 8px;
+            background: #102c57;
+            color: #fff;
+            font-size: 12px;
+            font-weight: 600;
+            text-decoration: none;
+            transition: 0.2s ease;
+        }
+
+        .btn-add-coming:hover {
+            background: #163b70;
+            color: #fff;
+            text-decoration: none;
+        }
+
         .table-scroll { width:100%; min-width:0; overflow-x:auto; }
         .panel-upload { position:sticky; top:104px; z-index:5; background:#fff; border:1px solid rgba(16,44,87,.08); border-radius:16px; padding:16px; box-shadow:0 4px 14px rgba(15,39,66,.05); }
 
-        .panel-title { display:flex; align-items:center; gap:10px; font-size:19px; font-weight:800; color:#102C57; margin-bottom:14px; padding-bottom:12px; border-bottom:1px solid rgba(16,44,87,.1); }
-        .panel-title::before { font-family:'Font Awesome 6 Free'; font-weight:900; color:#146C94; font-size:17px; }
-        .list-title::before { content:'\f03a'; }
-        .upload-title::before { content:'\f030'; }
+        .panel-upload .panel-title { gap:8px; margin-bottom:10px; padding-bottom:10px; font-size:18px; border-bottom:1px solid rgba(16,44,87,.08); }
         .panel-upload .panel-title { gap:8px; margin-bottom:10px; padding-bottom:10px; font-size:18px; border-bottom:1px solid rgba(16,44,87,.08); }
 
-        .slot-note { margin-top:-4px; margin-bottom:14px; font-size:12px; color:#6b7c93; font-weight:600; }
+        .slot-note { margin-top:0; margin-bottom:14px; font-size:12px; color:#6b7c93; font-weight:600; }
         .panel-upload .slot-note { margin-top:0; margin-bottom:12px; font-size:11px; color:#6f8099; font-weight:500; }
 
         table { width:100%; border-collapse:separate; border-spacing:0; background:#fff; border-radius:14px; overflow:hidden; border:1px solid rgba(16,44,87,.08); }
@@ -477,12 +518,7 @@ if ($panelZoom < 50) {
             <div>
                 <h1>Kelola Coming Soon</h1>
             </div>
-            <div style="display:flex; align-items:center; gap:12px;">
-                <a href="?create=1#coming_form" class="btn btn-primary" style="display:inline-flex; align-items:center; gap:6px;">
-                    <i class="fas fa-plus"></i> Tambah Baru
-                </a>
-                <div class="admin-topbar-meta">Halo, <strong><?php echo htmlspecialchars($_SESSION['username'] ?? 'Admin'); ?></strong></div>
-            </div>
+            <div class="admin-topbar-meta">Halo, <strong><?php echo htmlspecialchars($_SESSION['username'] ?? 'Admin'); ?></strong></div>
         </header>
         <div class="admin-content">
             <div class="container">
@@ -492,7 +528,14 @@ if ($panelZoom < 50) {
 
                 <div class="layout">
                     <div class="panel panel-list">
-                        <div class="panel-title list-title">Daftar Coming Soon</div>
+                        <div class="panel-head">
+                            <h2 class="panel-title list-title"></i> Daftar Coming Soon</h2>
+                            <div class="panel-head-actions">
+                                <a href="?create=1#coming_form" class="btn-add-coming">
+                                    <i class="fas fa-plus"></i> Tambah Baru
+                                </a>
+                            </div>
+                        </div>
                         <p class="slot-note">Pilih gambar yang ingin dikelola, lalu ubah di panel kanan.</p>
 
                         <?php if (empty($items)): ?>
