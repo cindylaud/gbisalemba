@@ -149,8 +149,12 @@ $cta_photo = gbi_find_first_image([
     <?php
     $slider_has_zoom = gbi_table_has_column($conn, 'slider', 'image_zoom');
     $slider_zoom_select = $slider_has_zoom ? 'COALESCE(image_zoom, 100) AS image_zoom' : '100 AS image_zoom';
+    $slider_has_pos_x = gbi_table_has_column($conn, 'slider', 'image_pos_x');
+    $slider_has_pos_y = gbi_table_has_column($conn, 'slider', 'image_pos_y');
+    $slider_pos_x_select = $slider_has_pos_x ? 'COALESCE(image_pos_x, 50) AS image_pos_x' : '50 AS image_pos_x';
+    $slider_pos_y_select = $slider_has_pos_y ? 'COALESCE(image_pos_y, 50) AS image_pos_y' : '50 AS image_pos_y';
 
-    $q = "SELECT image, urutan, {$slider_zoom_select}
+    $q = "SELECT image, urutan, {$slider_zoom_select}, {$slider_pos_x_select}, {$slider_pos_y_select}
                 FROM slider
                 WHERE is_active = 1
                     AND image IS NOT NULL
@@ -172,6 +176,8 @@ $cta_photo = gbi_find_first_image([
             $images[] = [
                 'image' => (string) $row['image'],
                 'zoom' => $zoom,
+                'pos_x' => max(0, min(100, (int) ($row['image_pos_x'] ?? 50))),
+                'pos_y' => max(0, min(100, (int) ($row['image_pos_y'] ?? 50))),
             ];
     }
 
@@ -187,7 +193,7 @@ $cta_photo = gbi_find_first_image([
                 $bgScale = number_format(((int) $slide['zoom']) / 100, 2, '.', '');
                 ?>
                 <div class="hero-slide <?php echo $i === 0 ? 'active' : ''; ?>">
-                    <div class="hero-bg" style="background-image:url('uploads/slider/<?php echo htmlspecialchars($slide['image']); ?>'); --hero-bg-scale:<?php echo htmlspecialchars($bgScale); ?>;"></div>
+                    <div class="hero-bg" style="background-image:url('uploads/slider/<?php echo htmlspecialchars($slide['image']); ?>'); background-position: <?php echo (int) $slide['pos_x']; ?>% <?php echo (int) $slide['pos_y']; ?>% !important; --hero-bg-scale:<?php echo htmlspecialchars($bgScale); ?>;"></div>
                     <div class="hero-overlay"></div>
                 </div>
             <?php } ?>
@@ -217,7 +223,7 @@ $cta_photo = gbi_find_first_image([
             </div>
         </div>
 
-        <p class="hero-countdown-caption" id="heroServiceLabel">Menuju Ibadah Raya Minggu 08:00 WIB</p>
+        <p class="hero-countdown-caption" id="heroServiceLabel">Ibadah Raya 08:00 WIB</p>
         <div class="hero-live-actions" id="heroLiveActions">
             <a id="heroLivePrimary" href="https://www.youtube.com/@gbisalemba" target="_blank" rel="noopener noreferrer" class="hero-live-btn hero-live-btn-primary">Ke YouTube</a>
             <a id="heroLiveSecondary" href="https://maps.app.goo.gl/6duXhZBcrC26enUPA" target="_blank" rel="noopener noreferrer" class="hero-live-btn hero-live-btn-secondary">Lokasi Gereja</a>

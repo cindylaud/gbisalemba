@@ -63,7 +63,7 @@
 
   function serviceTitleForView(title) {
     if (!title) return "";
-    return isMobileView() ? title.replace("Ibadah Raya ", "") : title;
+    return title;
   }
 
   function formatServerClock(timestamp) {
@@ -283,8 +283,7 @@
           : dayDiff + " hari lagi";
 
     if (serviceEl)
-      serviceEl.textContent =
-        dayText + " • " + serviceTitleForView(state.nextSlot.title);
+      serviceEl.textContent = serviceTitleForView(state.nextSlot.title);
   }
 
   updateHeroCountdown();

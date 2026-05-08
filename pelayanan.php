@@ -923,59 +923,60 @@ $pelayanan_hero_scale = number_format($pelayanan_hero_zoom / 100, 2, '.', '');
     .pelayanan-alt-row {
         border-radius: 0;
         padding: 0;
-        gap: 20px;
-        align-items: center;
+        gap: 14px;
+        align-items: flex-start;
     }
 
-    /* Grid layout for image-left: image on left (180px), text on right (1fr) */
-    .pelayanan-alt-item.image-left .pelayanan-alt-row {
-        display: grid;
-        grid-template-columns: 180px 1fr;
-    }
-
-    /* Grid layout for image-right: text on left (1fr), image on right (180px) */
+    /* Keep the image compact, but let the text breathe on mobile */
+    .pelayanan-alt-item.image-left .pelayanan-alt-row,
     .pelayanan-alt-item.image-right .pelayanan-alt-row {
         display: grid;
-        grid-template-columns: 1fr 180px;
+        grid-template-columns: minmax(120px, 42vw) 1fr;
     }
 
-    /* Keep desktop ordering but scale media for small screens */
+    .pelayanan-alt-item.image-right .pelayanan-alt-row {
+        grid-template-columns: 1fr minmax(120px, 42vw);
+    }
+
+    /* Keep desktop alternating ordering on mobile too */
     .pelayanan-alt-item.image-left .pelayanan-alt-media {
         order: 1;
         justify-self: auto;
+        width: 100%;
     }
 
     .pelayanan-alt-item.image-left .pelayanan-alt-content {
         order: 2;
         justify-self: auto;
         text-align: left;
-        padding: 0 12px;
+        padding: 4px 0 0 8px;
+        align-self: center;
     }
 
     .pelayanan-alt-item.image-right .pelayanan-alt-media {
         order: 2;
         justify-self: auto;
+        width: 100%;
     }
 
     .pelayanan-alt-item.image-right .pelayanan-alt-content {
         order: 1;
         justify-self: auto;
         text-align: left;
-        padding: 0 12px;
+        padding: 4px 8px 0 0;
+        align-self: center;
     }
 
-    /* Truncate long descriptions on mobile to keep layout balanced */
     .pelayanan-card-description {
-        display: -webkit-box;
-        -webkit-line-clamp: 2;
-        -webkit-box-orient: vertical;
-        overflow: hidden;
+        overflow: visible;
     }
 
-    /* Ensure consistent media size on mobile */
+    /* Ensure consistent media size on mobile without forcing a fixed box */
     .pelayanan-alt-media {
-        width: 180px !important;
-        height: 180px !important;
+        width: 100% !important;
+        max-width: 180px;
+        aspect-ratio: 1 / 1;
+        height: auto !important;
         flex-shrink: 0;
     }
 
@@ -991,9 +992,9 @@ $pelayanan_hero_scale = number_format($pelayanan_hero_zoom / 100, 2, '.', '');
     }
 
     .pelayanan-card-title {
-        font-size: clamp(20px, 5.5vw, 28px);
-        line-height: 1.15;
-        max-width: 100%;
+        font-size: clamp(18px, 5vw, 24px);
+        line-height: 1.12;
+        max-width: none;
     }
 
     .pelayanan-card-description {

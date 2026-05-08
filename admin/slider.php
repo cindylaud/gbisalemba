@@ -38,7 +38,20 @@ function ensureSliderZoomColumn($conn) {
     }
 }
 
+function ensureSliderPositionColumns($conn) {
+    $checkX = $conn->query("SHOW COLUMNS FROM slider LIKE 'image_pos_x'");
+    if ($checkX && $checkX->num_rows === 0) {
+        $conn->query("ALTER TABLE slider ADD COLUMN image_pos_x TINYINT UNSIGNED NOT NULL DEFAULT 50 AFTER image_zoom");
+    }
+
+    $checkY = $conn->query("SHOW COLUMNS FROM slider LIKE 'image_pos_y'");
+    if ($checkY && $checkY->num_rows === 0) {
+        $conn->query("ALTER TABLE slider ADD COLUMN image_pos_y TINYINT UNSIGNED NOT NULL DEFAULT 50 AFTER image_pos_x");
+    }
+}
+
 ensureSliderZoomColumn($conn);
+ensureSliderPositionColumns($conn);
 
 $message = '';
 $error = '';
@@ -90,10 +103,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['urutan']) && $error =
     $urutan = intval($_POST['urutan']);
     $is_active = isset($_POST['is_active']) ? 1 : 0;
     $image_zoom = intval($_POST['image_zoom'] ?? 100);
+    $image_pos_x = intval($_POST['image_pos_x'] ?? 50);
+    $image_pos_y = intval($_POST['image_pos_y'] ?? 50);
     if ($image_zoom < 50) {
         $image_zoom = 50;
     } elseif ($image_zoom > 150) {
         $image_zoom = 150;
+    }
+    if ($image_pos_x < 0) {
+        $image_pos_x = 0;
+    } elseif ($image_pos_x > 100) {
+        $image_pos_x = 100;
+    }
+    if ($image_pos_y < 0) {
+        $image_pos_y = 0;
+    } elseif ($image_pos_y > 100) {
+        $image_pos_y = 100;
     }
     
     // Validasi urutan 1-4
@@ -163,12 +188,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['urutan']) && $error =
                 // Update existing record
                 if ($update_image) {
                     // Update dengan gambar baru
-                    $stmt = $conn->prepare("UPDATE slider SET image = ?, image_zoom = ?, is_active = ?, updated_at = NOW() WHERE urutan = ?");
-                    $stmt->bind_param("siii", $new_filename, $image_zoom, $is_active, $urutan);
+                    $stmt = $conn->prepare("UPDATE slider SET image = ?, image_zoom = ?, image_pos_x = ?, image_pos_y = ?, is_active = ?, updated_at = NOW() WHERE urutan = ?");
+                    $stmt->bind_param("siiiii", $new_filename, $image_zoom, $image_pos_x, $image_pos_y, $is_active, $urutan);
                 } else {
                     // Update zoom + is_active (tanpa ubah image)
-                    $stmt = $conn->prepare("UPDATE slider SET image_zoom = ?, is_active = ?, updated_at = NOW() WHERE urutan = ?");
-                    $stmt->bind_param("iii", $image_zoom, $is_active, $urutan);
+                    $stmt = $conn->prepare("UPDATE slider SET image_zoom = ?, image_pos_x = ?, image_pos_y = ?, is_active = ?, updated_at = NOW() WHERE urutan = ?");
+                    $stmt->bind_param("iiiii", $image_zoom, $image_pos_x, $image_pos_y, $is_active, $urutan);
                 }
                 
                 if ($stmt->execute()) {
@@ -183,8 +208,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['urutan']) && $error =
             } else {
                 // Insert new (seharusnya tidak pernah sampai sini karena auto-seed)
                 $img = $update_image ? $new_filename : 'default.png';
-                $stmt = $conn->prepare("INSERT INTO slider (urutan, title, subtitle, image, image_zoom, is_active, created_at) VALUES (?, NULL, NULL, ?, ?, ?, NOW())");
-                $stmt->bind_param("isii", $urutan, $img, $image_zoom, $is_active);
+                $stmt = $conn->prepare("INSERT INTO slider (urutan, title, subtitle, image, image_zoom, image_pos_x, image_pos_y, is_active, created_at) VALUES (?, NULL, NULL, ?, ?, ?, ?, ?, NOW())");
+                $stmt->bind_param("isiiii", $urutan, $img, $image_zoom, $image_pos_x, $image_pos_y, $is_active);
                 
                 if ($stmt->execute()) {
                     $message = 'Foto ' . $urutan . ' berhasil disimpan';
@@ -201,7 +226,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['urutan']) && $error =
 }
 
 // Get data untuk 4 card (urutan 1-4)
-$query = "SELECT id, urutan, image, COALESCE(image_zoom, 100) AS image_zoom, is_active FROM slider WHERE urutan IN (1,2,3,4) ORDER BY urutan ASC";
+$query = "SELECT id, urutan, image, COALESCE(image_zoom, 100) AS image_zoom, COALESCE(image_pos_x, 50) AS image_pos_x, COALESCE(image_pos_y, 50) AS image_pos_y, is_active FROM slider WHERE urutan IN (1,2,3,4) ORDER BY urutan ASC";
 $result = $conn->query($query);
 if ($result === false) {
     $error = 'Query error: ' . $conn->error;
@@ -233,6 +258,8 @@ $selected_has_image = false;
 $selected_image_path = '';
 $selected_is_active = false;
 $selected_zoom = 100;
+$selected_pos_x = 50;
+$selected_pos_y = 50;
 
 if ($selected_card && !empty($selected_card['image']) && $selected_card['image'] !== 'default.png') {
     $selected_file_path = __DIR__ . '/../uploads/slider/' . $selected_card['image'];
@@ -252,6 +279,20 @@ if ($selected_card) {
         $selected_zoom = 50;
     } elseif ($selected_zoom > 150) {
         $selected_zoom = 150;
+    }
+
+    $selected_pos_x = (int) ($selected_card['image_pos_x'] ?? 50);
+    if ($selected_pos_x < 0) {
+        $selected_pos_x = 0;
+    } elseif ($selected_pos_x > 100) {
+        $selected_pos_x = 100;
+    }
+
+    $selected_pos_y = (int) ($selected_card['image_pos_y'] ?? 50);
+    if ($selected_pos_y < 0) {
+        $selected_pos_y = 0;
+    } elseif ($selected_pos_y > 100) {
+        $selected_pos_y = 100;
     }
 }
 ?>
@@ -887,13 +928,13 @@ if ($selected_card) {
 
                 <div class="preview-box">
                     <?php if ($selected_has_image): ?>
-                        <img id="slider_preview_img" src="<?php echo htmlspecialchars($selected_image_path); ?>" alt="Slider <?php echo $selected_slot; ?>" title="Slider <?php echo $selected_slot; ?>" style="transform:scale(<?php echo htmlspecialchars(number_format($selected_zoom / 100, 2, '.', '')); ?>);">
+                        <img id="slider_preview_img" src="<?php echo htmlspecialchars($selected_image_path); ?>" alt="Slider <?php echo $selected_slot; ?>" title="Slider <?php echo $selected_slot; ?>" style="transform:scale(<?php echo htmlspecialchars(number_format($selected_zoom / 100, 2, '.', '')); ?>); object-position: <?php echo (int) $selected_pos_x; ?>% <?php echo (int) $selected_pos_y; ?>%;">
                     <?php else: ?>
                         <div class="placeholder">
                             <div class="icon"><i class="fas fa-camera"></i></div>
                             <div class="text">Belum ada gambar</div>
                         </div>
-                        <img id="slider_preview_img" src="" alt="Preview Slider <?php echo $selected_slot; ?>" style="display:none;">
+                        <img id="slider_preview_img" src="" alt="Preview Slider <?php echo $selected_slot; ?>" style="display:none; object-position: <?php echo (int) $selected_pos_x; ?>% <?php echo (int) $selected_pos_y; ?>%;">
                     <?php endif; ?>
                 </div>
 
@@ -919,6 +960,24 @@ if ($selected_card) {
                         <p class="info-text">Atur skala foto untuk tampilan slider di website jemaat.</p>
                     </div>
 
+                    <div class="form-group">
+                        <div class="range-row">
+                            <label for="image_pos_x">Posisi Horizontal</label>
+                            <span class="range-value" id="image_pos_x_value"><?php echo (int) $selected_pos_x; ?>%</span>
+                        </div>
+                        <input type="range" id="image_pos_x" name="image_pos_x" min="0" max="100" value="<?php echo (int) $selected_pos_x; ?>">
+                        <p class="info-text">Geser kiri atau kanan. 0% = paling kiri, 100% = paling kanan.</p>
+                    </div>
+
+                    <div class="form-group">
+                        <div class="range-row">
+                            <label for="image_pos_y">Posisi Vertikal</label>
+                            <span class="range-value" id="image_pos_y_value"><?php echo (int) $selected_pos_y; ?>%</span>
+                        </div>
+                        <input type="range" id="image_pos_y" name="image_pos_y" min="0" max="100" value="<?php echo (int) $selected_pos_y; ?>">
+                        <p class="info-text">Geser atas atau bawah. 0% = paling atas, 100% = paling bawah.</p>
+                    </div>
+
                     <div class="checkbox-group">
                         <input type="checkbox" id="active_selected" name="is_active" value="1" <?php echo $selected_is_active ? 'checked' : ''; ?>>
                         <label for="active_selected">Tampilkan di Frontend</label>
@@ -939,8 +998,12 @@ if ($selected_card) {
     const previewImg = document.getElementById('slider_preview_img');
     const zoomInput = document.getElementById('image_zoom');
     const zoomValue = document.getElementById('image_zoom_value');
+    const posXInput = document.getElementById('image_pos_x');
+    const posXValue = document.getElementById('image_pos_x_value');
+    const posYInput = document.getElementById('image_pos_y');
+    const posYValue = document.getElementById('image_pos_y_value');
 
-    if (!zoomInput || !zoomValue || !previewImg) {
+    if (!zoomInput || !zoomValue || !posXInput || !posXValue || !posYInput || !posYValue || !previewImg) {
         return;
     }
 
@@ -951,6 +1014,17 @@ if ($selected_card) {
         const safeZoom = Number.isFinite(zoom) ? Math.max(50, Math.min(150, zoom)) : 100;
         zoomValue.textContent = safeZoom + '%';
         previewImg.style.transform = 'scale(' + (safeZoom / 100).toFixed(2) + ')';
+    }
+
+    function applyPosition() {
+        const posX = parseInt(posXInput.value || '50', 10);
+        const safePosX = Number.isFinite(posX) ? Math.max(0, Math.min(100, posX)) : 50;
+        const posY = parseInt(posYInput.value || '50', 10);
+        const safePosY = Number.isFinite(posY) ? Math.max(0, Math.min(100, posY)) : 50;
+
+        posXValue.textContent = safePosX + '%';
+        posYValue.textContent = safePosY + '%';
+        previewImg.style.objectPosition = safePosX + '% ' + safePosY + '%';
     }
 
     if (input) {
@@ -978,7 +1052,10 @@ if ($selected_card) {
     }
 
     zoomInput.addEventListener('input', applyZoom);
+    posXInput.addEventListener('input', applyPosition);
+    posYInput.addEventListener('input', applyPosition);
     applyZoom();
+    applyPosition();
 })();
 </script>
 </body>

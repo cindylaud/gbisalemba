@@ -755,15 +755,30 @@ header{
     justify-content: center;
   }
 
-  /* Mobile: Adjust hero slide height and image fitting */
+    /* Mobile slider fix */
+  #sliderSection.hero-slider {
+    min-height: 520px !important;
+    height: 72vh !important;
+  }
+
   #sliderSection .hero-slide {
-    height: 60vh !important;
+    height: 100% !important;
   }
 
   #sliderSection .hero-bg {
-    background-size: contain !important;
-    background-position: center !important;
-    background-repeat: no-repeat !important;
+    background-size: cover !important;
+    background-position: center center !important;
+  }
+
+  .hero-dots {
+    bottom: 14px !important;
+    width: 100%;
+    justify-content: center;
+  }
+
+  .hero-countdown-card {
+    width: calc(100% - 24px);
+    max-width: 100%;
   }
 
   .whats-new .whats-new-card img {

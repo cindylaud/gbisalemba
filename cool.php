@@ -37,12 +37,22 @@ foreach ($cool_images as $key => $img) {
                 <p class="cool-hero-text">COOL adalah suatu bentuk komunitas dimana anggota-anggotanya saling membangun
                     dan saling menguatkan, serta mengalami kasih dan kuasa Allah. COOL merupakan kelompok kecil yang
                     terdiri dari 3-10 orang yang bersepakat untuk bertumbuh bersama.</p>
+                <div class="cool-hero-actions">
+                    <a href="#cool-join" class="cool-btn cool-btn-primary">JOIN US</a>
+                    <a href="#cool-reasons" class="cool-btn cool-btn-secondary">Mengapa COOL?</a>
+                </div>
+                <div class="cool-hero-meta">
+                    <span>Cari</span>
+                    <span>Gembalakan</span>
+                    <span>Utus</span>
+                </div>
 
             </div>
 
             <div class="cool-hero-media">
                 <span class="cool-floating-tag cool-floating-tag-left">Kesatuan Hati</span>
                 <span class="cool-floating-tag cool-floating-tag-right">Tumbuh Bersama</span>
+                <span class="cool-floating-tag cool-floating-tag-center">Memenangkan Jiwa</span>
                 <div class="cool-hero-photo-stack">
                     <div class="cool-hero-photo-main">
                         <img src="<?= htmlspecialchars($cool_images['hero']) ?>"
@@ -61,15 +71,6 @@ foreach ($cool_images as $key => $img) {
                 </div>
                 <div class="cool-hero-quote">
                     Dalam kasih mempersiapkan umat yang layak menjadi seperti Kristus.
-                </div>
-                <div class="cool-hero-actions">
-                    <a href="#cool-join" class="cool-btn cool-btn-primary">JOIN US</a>
-                    <a href="#cool-reasons" class="cool-btn cool-btn-secondary">Mengapa COOL?</a>
-                </div>
-                <div class="cool-hero-meta">
-                    <span>Cari</span>
-                    <span>Gembalakan</span>
-                    <span>Utus</span>
                 </div>
             </div>
         </div>
@@ -119,21 +120,21 @@ foreach ($cool_images as $key => $img) {
 
                 <div class="cool-reason-grid">
                     <article class="cool-reason-card">
-                        <div class="cool-reason-icon"><i class="fas fa-users"></i></div>
+                        <div class="cool-reason-icon"><i class="fas fa-heart"></i></div>
                         <p class="cool-verse">Ibrani 10:24-25</p>
                         <h3>Iman Tidak Dirancang untuk Sendiri</h3>
                         <p>Kita butuh saling menguatkan, bukan berjalan sendirian.</p>
                     </article>
 
                     <article class="cool-reason-card">
-                        <div class="cool-reason-icon"><i class="fas fa-arrows-alt-h"></i></div>
+                        <div class="cool-reason-icon"><i class="fas fa-seedling"></i></div>
                         <p class="cool-verse">Amsal 27:17</p>
                         <h3>Pertumbuhan Terjadi dalam Hubungan</h3>
                         <p>"Besi menajamkan besi." Iman bertumbuh lewat relasi, bukan hanya ibadah raya.</p>
                     </article>
 
                     <article class="cool-reason-card">
-                        <div class="cool-reason-icon"><i class="fas fa-hands"></i></div>
+                        <div class="cool-reason-icon"><i class="fas fa-hands-helping"></i></div>
                         <p class="cool-verse">Galatia 6:2</p>
                         <h3>Tempat Saling Menopang</h3>
                         <p>Komunitas sel adalah tempat menanggung beban bersama.</p>
@@ -288,14 +289,14 @@ foreach ($cool_images as $key => $img) {
     }
 
     .cool-hero {
-        padding: 34px 0 54px;
+        padding: 24px 0 36px;
     }
 
     .cool-hero-shell {
         display: grid;
         grid-template-columns: 1fr;
-        gap: 28px;
-        padding: 48px;
+        gap: 20px;
+        padding: 36px;
         border-radius: 36px;
         background: rgba(236, 244, 253, 0.9);
         box-shadow: var(--cool-shadow);
@@ -342,8 +343,8 @@ foreach ($cool_images as $key => $img) {
     @media (min-width: 1101px) {
         .cool-hero-shell {
             grid-template-columns: minmax(0, 1.02fr) minmax(0, 0.98fr);
-            gap: 42px;
-            align-items: center;
+            gap: 28px;
+            align-items: flex-start;
         }
 
         .cool-hero-heading {
@@ -361,14 +362,32 @@ foreach ($cool_images as $key => $img) {
 
         .cool-hero-media {
             margin-top: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
         }
 
         .cool-hero-photo-stack {
-            padding: 28px 0 54px 44px;
+            width: 100%;
+            padding: 16px 0 20px 24px;
         }
 
         .cool-hero-quote {
-            margin: 18px 0 0 auto;
+            margin: 8px 0 0;
+            text-align: left;
+        }
+
+        .cool-hero-actions,
+        .cool-hero-meta {
+            justify-content: flex-start;
+        }
+
+        .cool-hero-actions {
+            margin-top: 12px;
+        }
+
+        .cool-hero-meta {
+            margin-top: 12px;
         }
     }
 
@@ -432,7 +451,7 @@ foreach ($cool_images as $key => $img) {
 
     .cool-hero-text {
         max-width: 600px;
-        margin: 24px 0 0;
+        margin: 16px 0 0;
         font-size: 1rem;
         line-height: 1.9;
         color: rgba(18, 56, 95, 0.86);
@@ -442,7 +461,7 @@ foreach ($cool_images as $key => $img) {
         display: flex;
         gap: 14px;
         flex-wrap: wrap;
-        margin-top: 28px;
+        margin-top: 16px;
     }
 
     .cool-btn {
@@ -486,7 +505,7 @@ foreach ($cool_images as $key => $img) {
         display: flex;
         gap: 12px;
         flex-wrap: wrap;
-        margin-top: 26px;
+        margin-top: 14px;
     }
 
     .cool-hero-meta span,
@@ -517,11 +536,11 @@ foreach ($cool_images as $key => $img) {
 
     .cool-hero-photo-stack {
         position: relative;
-        padding: 28px 0 54px 44px;
+        padding: 18px 0 26px 28px;
     }
 
     .cool-hero-photo-main {
-        height: 540px;
+        height: 500px;
         border-radius: 34px;
         overflow: hidden;
         box-shadow: 0 30px 60px rgba(11, 31, 55, 0.2);
@@ -535,6 +554,16 @@ foreach ($cool_images as $key => $img) {
         width: 100%;
         height: 100%;
         object-fit: cover;
+        transition: transform 0.4s ease, filter 0.4s ease;
+    }
+
+    .cool-hero-photo-main:hover img,
+    .cool-hero-photo-card:hover img,
+    .cool-pillar-photo:hover img,
+    .cool-collage-photo:hover img,
+    .cool-category-photo:hover img {
+        transform: scale(1.06);
+        filter: brightness(1.08);
     }
 
     .cool-hero-photo-card {
@@ -549,11 +578,11 @@ foreach ($cool_images as $key => $img) {
     }
 
     .cool-hero-photo-card img {
-        height: 176px;
+        height: 164px;
     }
 
     .cool-hero-card-copy {
-        padding: 22px 22px 24px;
+        padding: 20px 20px 22px;
     }
 
     .cool-card-label,
@@ -620,6 +649,14 @@ foreach ($cool_images as $key => $img) {
         transform: rotate(8deg);
     }
 
+    .cool-floating-tag-center {
+        top: 40%;
+        left: 50%;
+        transform: translate(-50%, -50%) rotate(8deg);
+        background: linear-gradient(135deg, #5ba3d0 0%, #7fb3db 100%);
+        box-shadow: 0 18px 36px rgba(91, 163, 208, 0.28);
+    }
+
     .cool-hero-quote {
         max-width: 420px;
         margin: 18px 0 0 auto;
@@ -632,11 +669,15 @@ foreach ($cool_images as $key => $img) {
     .cool-manifesto,
     .cool-history-categories,
     .cool-join-section {
-        padding: 34px 0 60px;
+        padding: 24px 0 36px;
+    }
+
+    .cool-history-categories {
+        padding-top: 8px;
     }
 
     .cool-join-section {
-        padding-top: 16px;
+        padding-top: 8px;
     }
 
     .cool-section-note {
@@ -664,32 +705,71 @@ foreach ($cool_images as $key => $img) {
     .cool-pillars {
         display: grid;
         grid-template-columns: repeat(3, minmax(0, 1fr));
-        gap: 22px;
-        margin-top: 36px;
+        gap: 14px;
+        margin-top: 22px;
     }
 
     .cool-pillar-card {
+        position: relative;
+        overflow: hidden;
         padding: 18px;
-        border-radius: 26px;
-        background: rgba(235, 244, 254, 0.7);
-        border: 1px solid rgba(18, 56, 95, 0.08);
-        box-shadow: 0 18px 38px rgba(18, 45, 73, 0.08);
+        border-radius: 30px;
+        background:
+            linear-gradient(180deg, rgba(255, 255, 255, 0.86) 0%, rgba(233, 242, 250, 0.78) 100%);
+        border: 1px solid rgba(255, 255, 255, 0.42);
+        box-shadow:
+            0 20px 42px rgba(18, 45, 73, 0.08),
+            inset 0 1px 0 rgba(255, 255, 255, 0.6);
+        backdrop-filter: blur(18px) saturate(120%);
+        transition: transform 0.28s ease, box-shadow 0.28s ease, border-color 0.28s ease;
+    }
+
+    .cool-pillar-card::before {
+        content: '';
+        position: absolute;
+        inset: 0 auto auto 0;
+        width: 100%;
+        height: 4px;
+        background: linear-gradient(90deg, rgba(91, 163, 208, 0.95) 0%, rgba(167, 206, 232, 0.9) 52%, rgba(53, 107, 162, 0.55) 100%);
+    }
+
+    .cool-pillar-card::after {
+        content: '';
+        position: absolute;
+        right: -34px;
+        bottom: -34px;
+        width: 132px;
+        height: 132px;
+        border-radius: 50%;
+        background: radial-gradient(circle, rgba(91, 163, 208, 0.16) 0%, transparent 70%);
+        pointer-events: none;
+    }
+
+    .cool-pillar-card:hover {
+        transform: translateY(-8px);
+        box-shadow:
+            0 28px 52px rgba(18, 45, 73, 0.14),
+            0 0 0 1px rgba(91, 163, 208, 0.1),
+            inset 0 1px 0 rgba(255, 255, 255, 0.7);
+        border-color: rgba(91, 163, 208, 0.24);
     }
 
     .cool-pillar-photo {
-        height: 220px;
-        border-radius: 20px;
+        height: 214px;
+        border-radius: 24px;
         overflow: hidden;
-        margin-bottom: 18px;
+        margin-bottom: 16px;
+        box-shadow: 0 18px 34px rgba(18, 45, 73, 0.1);
     }
 
     .cool-pillar-card h3,
     .cool-reason-card h3,
     .cool-category-card h3 {
         margin: 0 0 8px;
-        font-size: 28px;
-        line-height: 1;
+        font-size: 24px;
+        line-height: 1.05;
         font-family: inherit;
+        font-weight: 800;
         color: var(--cool-ink-deep);
     }
 
@@ -697,8 +777,9 @@ foreach ($cool_images as $key => $img) {
     .cool-reason-card p,
     .cool-category-card p {
         margin: 0;
-        line-height: 1.75;
-        color: rgba(18, 56, 95, 0.8);
+        line-height: 1.72;
+        color: rgba(18, 56, 95, 0.76);
+        font-size: 14px;
     }
 
     .cool-principle-badge {
@@ -718,11 +799,11 @@ foreach ($cool_images as $key => $img) {
     }
 
     .cool-reasons {
-        padding: 16px 0 72px;
+        padding: 8px 0 20px;
     }
 
     .cool-reasons-frame {
-        padding: 54px 34px;
+        padding: 34px 24px;
         border-radius: 36px;
         background:
             linear-gradient(180deg, rgba(11, 31, 55, 0.52), rgba(11, 31, 55, 0.8)),
@@ -742,54 +823,79 @@ foreach ($cool_images as $key => $img) {
     .cool-reason-grid {
         display: grid;
         grid-template-columns: repeat(3, minmax(0, 1fr));
-        gap: 22px;
-        margin-top: 34px;
+        gap: 12px;
+        margin-top: 16px;
     }
 
     .cool-reason-card {
-        padding: 28px 24px;
-        border-radius: 24px;
-        background: rgba(233, 242, 252, 0.94);
-        border: 1px solid rgba(255, 255, 255, 0.16);
-        box-shadow: 0 16px 34px rgba(11, 31, 55, 0.18);
+        padding: 22px 20px;
+        border-radius: 22px;
+        background: linear-gradient(180deg, rgba(244, 248, 252, 0.98) 0%, rgba(233, 242, 250, 0.98) 100%);
+        border: 1px solid rgba(18, 56, 95, 0.08);
+        box-shadow: 0 12px 24px rgba(11, 31, 55, 0.08);
+        position: relative;
+        overflow: hidden;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .cool-reason-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 3px;
+        background: linear-gradient(90deg, rgba(91, 163, 208, 0.9) 0%, rgba(74, 143, 191, 0.55) 100%);
+    }
+
+    .cool-reason-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 18px 34px rgba(11, 31, 55, 0.12);
     }
 
     .cool-reason-icon,
     .cool-category-icon {
-        width: 62px;
-        height: 62px;
+        width: 54px;
+        height: 54px;
         border-radius: 18px;
         display: inline-flex;
         align-items: center;
         justify-content: center;
-        background: linear-gradient(135deg, var(--cool-ink) 0%, #326997 100%);
-        color: var(--cool-white);
-        font-size: 24px;
-        margin-bottom: 18px;
+        background: linear-gradient(135deg, rgba(91, 163, 208, 0.16) 0%, rgba(74, 143, 191, 0.1) 100%);
+        color: #4a7ead;
+        font-size: 22px;
+        margin-bottom: 12px;
+        box-shadow: none;
+        border: 1px solid rgba(74, 143, 191, 0.16);
     }
 
     .cool-verse {
-        min-height: 34px;
-        padding: 0 14px;
-        margin-bottom: 14px;
-        background: rgba(86, 140, 198, 0.2);
-        color: var(--cool-ink);
-        font-size: 11px;
-        letter-spacing: 0.08em;
+        min-height: 30px;
+        padding: 0 11px;
+        margin-bottom: 12px;
+        background: rgba(91, 163, 208, 0.1);
+        color: #4a7ead;
+        font-size: 9px;
+        font-weight: 900;
+        letter-spacing: 0.07em;
         text-transform: uppercase;
+        border-radius: 999px;
+        border: 1px solid rgba(74, 143, 191, 0.14);
+        display: inline-flex;
+        align-items: center;
     }
 
     .cool-history-layout {
         display: grid;
         grid-template-columns: repeat(2, minmax(0, 1fr));
-        gap: 20px;
-        align-items: start;
+        gap: 14px;
+        align-items: stretch;
     }
 
     .cool-history-panel,
     .cool-categories-panel,
     .cool-join-card {
-        padding: 28px;
+        padding: 22px;
         border-radius: 28px;
         box-shadow: var(--cool-shadow);
     }
@@ -803,6 +909,13 @@ foreach ($cool_images as $key => $img) {
         color: var(--cool-white);
     }
 
+    .cool-history-panel,
+    .cool-categories-panel {
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+    }
+
     .cool-history-panel h2,
     .cool-categories-panel h2,
     .cool-join-copy h2 {
@@ -813,11 +926,11 @@ foreach ($cool_images as $key => $img) {
 
     .cool-timeline {
         display: grid;
-        gap: 14px;
+        gap: 10px;
     }
 
     .cool-timeline-item {
-        padding: 16px 18px;
+        padding: 12px 14px;
         border-radius: 18px;
         background: rgba(18, 56, 95, 0.04);
         border: 1px solid rgba(18, 56, 95, 0.08);
@@ -844,7 +957,11 @@ foreach ($cool_images as $key => $img) {
 
     .cool-category-list {
         display: grid;
-        gap: 12px;
+        gap: 10px;
+    }
+
+    .cool-categories-panel .cool-category-list {
+        margin-bottom: 10px;
     }
 
     .cool-category-card {
@@ -883,21 +1000,51 @@ foreach ($cool_images as $key => $img) {
     }
 
     .cool-category-photo {
-        margin-top: 14px;
-        height: 200px;
+        margin-top: 18px;
+        height: 230px;
         box-shadow: 0 18px 36px rgba(8, 24, 43, 0.2);
+        margin-top: auto;
+    }
+
+    .cool-categories-panel .cool-category-card {
+        grid-template-columns: 52px 1fr;
+        gap: 12px;
+        padding: 12px 14px;
+        border-radius: 18px;
+        background: rgba(255, 255, 255, 0.1);
+        border: 1px solid rgba(255, 255, 255, 0.14);
+    }
+
+    .cool-categories-panel .cool-category-icon {
+        width: 52px;
+        height: 52px;
+        border-radius: 16px;
+        background: linear-gradient(135deg, rgba(255, 255, 255, 0.18) 0%, rgba(255, 255, 255, 0.08) 100%);
+        border: 1px solid rgba(255, 255, 255, 0.16);
+        color: #ffffff;
+        font-size: 20px;
+        box-shadow: none;
+        margin-bottom: 0;
+    }
+
+    .cool-categories-panel .cool-category-card h3 {
+        font-size: 22px;
+    }
+
+    .cool-categories-panel .cool-category-card p {
+        font-size: 13px;
     }
 
     .cool-join-card {
         display: grid;
         grid-template-columns: minmax(0, 1.05fr) minmax(320px, 0.95fr);
-        gap: 18px;
+        gap: 12px;
         background: linear-gradient(135deg, rgba(233, 242, 252, 0.94) 0%, rgba(206, 223, 242, 0.92) 100%);
     }
 
     .cool-contact-stack {
         display: grid;
-        gap: 10px;
+        gap: 8px;
     }
 
     .cool-contact-item {
@@ -935,6 +1082,11 @@ foreach ($cool_images as $key => $img) {
 
     @media (max-width: 1100px) {
 
+        .cool-hero-shell {
+            display: flex;
+            flex-direction: column;
+        }
+
         .cool-hero-shell,
         .cool-history-layout,
         .cool-join-card,
@@ -943,7 +1095,12 @@ foreach ($cool_images as $key => $img) {
             grid-template-columns: 1fr;
         }
 
+        .cool-hero-copy {
+            order: 1;
+        }
+
         .cool-hero-media {
+            order: 2;
             margin-top: 8px;
         }
 
@@ -1049,6 +1206,13 @@ foreach ($cool_images as $key => $img) {
             right: 8px;
         }
 
+        .cool-floating-tag-center {
+            top: 320px;
+            left: 50%;
+            bottom: auto;
+            transform: translateX(-50%) rotate(8deg);
+        }
+
         .cool-hero-quote {
             margin: 14px 0 0;
             max-width: none;
@@ -1082,7 +1246,7 @@ foreach ($cool_images as $key => $img) {
         }
 
         .cool-pillar-photo {
-            height: 180px;
+            height: 186px;
         }
 
         .cool-panel,
@@ -1098,7 +1262,7 @@ foreach ($cool_images as $key => $img) {
         .cool-pillar-card h3,
         .cool-reason-card h3,
         .cool-category-card h3 {
-            font-size: 24px;
+            font-size: 22px;
         }
 
         .cool-category-photo {
@@ -1125,6 +1289,20 @@ foreach ($cool_images as $key => $img) {
             border-radius: 12px;
             font-size: 18px;
             margin-bottom: 0;
+        }
+
+        .cool-categories-panel .cool-category-card {
+            grid-template-columns: 44px 1fr;
+            gap: 10px;
+            padding: 10px 10px;
+            border-radius: 12px;
+        }
+
+        .cool-categories-panel .cool-category-icon {
+            width: 44px;
+            height: 44px;
+            border-radius: 12px;
+            font-size: 18px;
         }
 
         .cool-category-card h3 {
