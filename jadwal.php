@@ -1229,10 +1229,10 @@ $jadwal_hero_scale = number_format($jadwal_hero_zoom / 100, 2, '.', '');
     }
 
     @media (max-width: 768px) {
-        /* make hero height match pelayanan on mobile */
         .jadwal-hero {
-            height: clamp(290px, 45vh, 440px);
-            min-height: 0;
+            min-height: unset;
+            height: unset;
+            aspect-ratio: 16 / 9;
         }
 
         .jadwal-hero-container {
@@ -1363,12 +1363,38 @@ $jadwal_hero_scale = number_format($jadwal_hero_zoom / 100, 2, '.', '');
 
     /* Sembunyikan shell desktop di mobile, tampilkan accordion */
     @media (max-width: 900px) {
+        .jadwal-hero-section {
+            padding-bottom: 12px;
+        }
+
+        .jadwal-hero-container {
+            padding: 0;
+        }
+
+        .jadwal-hero {
+            min-height: unset;
+            height: unset;
+            aspect-ratio: 16 / 9;
+        }
+
         .jadwal-selector-shell {
             display: none !important;
         }
 
         .jadwal-mobile-accordion {
             display: block;
+        }
+
+        .jadwal-acc-body {
+            padding: 10px 12px 12px;
+        }
+
+        .jadwal-detail-thumb {
+            padding: 4px 0 0;
+        }
+
+        .jadwal-detail-thumb-frame {
+            max-width: 180px;
         }
     }
 </style>

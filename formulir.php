@@ -730,17 +730,23 @@ $formulir_card_images = formulir_collect_images([
         padding-right: 14px;
     }
 
+    .formulir-header-section {
+        padding: 0 0 12px;
+    }
+
     .formulir-section {
         padding: 0 0 10px !important;
     }
 
-    .formulir-header-section {
-        padding: 0;
+    .formulir-header-section .container-large {
+        padding-left: 0;
+        padding-right: 0;
     }
 
     .formulir-hero-banner {
-        height: clamp(180px, 31vh, 230px);
-        min-height: 0;
+        min-height: unset;
+        height: unset;
+        aspect-ratio: 16 / 9;
     }
 
     .formulir-hero-content,

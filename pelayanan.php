@@ -840,8 +840,10 @@ $pelayanan_hero_scale = number_format($pelayanan_hero_zoom / 100, 2, '.', '');
         padding: 0 0 24px;
     }
 
+    /* Tablet: proporsi tetap seperti desktop */
     .pelayanan-hero-banner {
-        height: clamp(200px, 32vh, 280px);
+        min-height: clamp(290px, 45vh, 440px);
+        height: clamp(290px, 45vh, 440px);
     }
 
     .pelayanan-alt-row {
@@ -894,9 +896,17 @@ $pelayanan_hero_scale = number_format($pelayanan_hero_zoom / 100, 2, '.', '');
         padding: 0;
     }
 
+    /*
+     * PERUBAHAN UTAMA:
+     * Pakai aspect-ratio 16/9 agar tinggi hero
+     * otomatis proporsional mengikuti lebar layar.
+     * Di HP 375px lebar → tinggi ~211px (pas, tidak terlalu besar/kecil).
+     * min-height & height di-unset agar tidak konflik.
+     */
     .pelayanan-hero-banner {
-        min-height: clamp(180px, 33vh, 220px);
-        height: clamp(180px, 33vh, 220px);
+        min-height: unset;
+        height: unset;
+        aspect-ratio: 16 / 9;
     }
 
     /* Keep same heading sizing as desktop for consistency */
@@ -1033,5 +1043,3 @@ $pelayanan_hero_scale = number_format($pelayanan_hero_zoom / 100, 2, '.', '');
 <?php
 include __DIR__ . '/includes/footer.php';
 ?>
-
-

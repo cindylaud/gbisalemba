@@ -117,31 +117,31 @@ include __DIR__ . '/../includes/header.php';
 <style>
     .add-layout { display: grid; gap: 12px; }
     .panel { background: #ffffff; border: 1px solid rgba(16, 44, 87, 0.08); border-radius: 18px; box-shadow: 0 8px 18px rgba(15, 39, 66, 0.06); }
-    .panel-form { padding: 20px; }
-    .panel-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 10px; padding-bottom: 10px; border-bottom: 1px solid rgba(16, 44, 87, 0.1); }
-    .panel-title { margin: 0; display: inline-flex; align-items: center; gap: 9px; font-size: 22px; color: #102c57; font-weight: 800; }
+    .panel-form { padding: 16px; }
+    .panel-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 8px; padding-bottom: 8px; border-bottom: 1px solid rgba(16, 44, 87, 0.1); }
+    .panel-title { margin: 0; display: inline-flex; align-items: center; gap: 8px; font-size: 19px; color: #102c57; font-weight: 800; }
     .panel-title i { color: #146c94; }
-    .form-grid { display: grid; gap: 14px; }
-    .form-section { display: grid; gap: 12px; padding-bottom: 14px; border-bottom: 1px solid rgba(16, 44, 87, 0.06); }
+    .form-grid { display: grid; gap: 10px; }
+    .form-section { display: grid; gap: 10px; padding-bottom: 12px; border-bottom: 1px solid rgba(16, 44, 87, 0.06); }
     .form-section:last-of-type { padding-bottom: 0; border-bottom: none; }
-    .form-section-title { margin: 0 0 2px 0; font-size: 12px; font-weight: 700; color: #7a8fa7; text-transform: uppercase; letter-spacing: 0.4px; }
-    .row-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
-    .field { display: grid; gap: 5px; }
-    .field label { margin: 0; font-size: 13px; font-weight: 700; color: #234267; }
+    .form-section-title { margin: 0 0 1px 0; font-size: 11px; font-weight: 700; color: #7a8fa7; text-transform: uppercase; letter-spacing: 0.4px; }
+    .row-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+    .field { display: grid; gap: 4px; }
+    .field label { margin: 0; font-size: 12px; font-weight: 700; color: #234267; }
     .req { color: #dc3545; }
-    .input, .select, .textarea { width: 100%; border: 1px solid rgba(16, 44, 87, 0.14); border-radius: 11px; padding: 11px 13px; background: #ffffff; color: #344054; font-size: 13px; font-family: inherit; transition: border-color 0.25s ease, box-shadow 0.25s ease; }
+    .input, .select, .textarea { width: 100%; border: 1px solid rgba(16, 44, 87, 0.14); border-radius: 10px; padding: 9px 11px; background: #ffffff; color: #344054; font-size: 12px; font-family: inherit; transition: border-color 0.25s ease, box-shadow 0.25s ease; }
     .input:focus, .select:focus, .textarea:focus { outline: none; border-color: rgba(20, 108, 148, 0.7); box-shadow: 0 0 0 3px rgba(20, 108, 148, 0.08); }
-    .hint { margin: 0; color: #6b7c93; font-size: 12px; line-height: 1.45; }
-    .form-actions { display: flex; justify-content: space-between; align-items: center; gap: 10px; border-top: 1px solid rgba(16, 44, 87, 0.1); padding-top: 14px; margin-top: 2px; }
-    .btn-action { display: inline-flex; align-items: center; justify-content: center; gap: 8px; border-radius: 11px; padding: 11px 16px; font-size: 13px; font-weight: 700; text-decoration: none; border: 1px solid transparent; cursor: pointer; transition: all 0.2s ease; }
+    .hint { margin: 0; color: #6b7c93; font-size: 11px; line-height: 1.4; }
+    .form-actions { display: flex; justify-content: space-between; align-items: center; gap: 8px; border-top: 1px solid rgba(16, 44, 87, 0.1); padding-top: 12px; margin-top: 2px; }
+    .btn-action { display: inline-flex; align-items: center; justify-content: center; gap: 7px; border-radius: 10px; padding: 9px 14px; font-size: 12px; font-weight: 700; text-decoration: none; border: 1px solid transparent; cursor: pointer; transition: all 0.2s ease; }
     .btn-action:hover { text-decoration: none; transform: translateY(-1px); }
     .btn-cancel { background: #f5f8fb; border-color: rgba(16, 44, 87, 0.12); color: #2d4e77; }
     .btn-cancel:hover { color: #2d4e77; background: #eef3f9; box-shadow: 0 6px 12px rgba(16, 44, 87, 0.08); }
     .btn-save { background: #146c94; border-color: #0f4568; color: #fff; box-shadow: 0 6px 14px rgba(20, 108, 148, 0.2); }
     .btn-save:hover { color: #fff; background: #127a9d; box-shadow: 0 8px 18px rgba(20, 108, 148, 0.25); }
-    .btn-back { display: inline-flex; align-items: center; gap: 8px; padding: 9px 14px; border-radius: 12px; border: 1px solid rgba(16, 44, 87, 0.14); background: #f3f8fc; color: #1f3f6f; font-size: 13px; font-weight: 700; text-decoration: none; transition: transform 0.18s ease; }
+    .btn-back { display: inline-flex; align-items: center; gap: 7px; padding: 8px 12px; border-radius: 10px; border: 1px solid rgba(16, 44, 87, 0.14); background: #f3f8fc; color: #1f3f6f; font-size: 12px; font-weight: 700; text-decoration: none; transition: transform 0.18s ease; }
     .btn-back:hover { text-decoration: none; color: #1f3f6f; transform: translateY(-1px); box-shadow: 0 8px 16px rgba(16, 44, 87, 0.14); }
-    .admin-alert { border-radius: 12px; padding: 12px 14px; font-size: 13px; font-weight: 600; border: 1px solid transparent; }
+    .admin-alert { border-radius: 12px; padding: 10px 12px; font-size: 12px; font-weight: 600; border: 1px solid transparent; }
     .admin-alert.error { background: #fde8e8; color: #8d2d2d; border-color: #f8c7c7; }
     @media (max-width: 640px) { .form-actions { flex-direction: column-reverse; align-items: stretch; } .btn-action { width: 100%; } .row-grid { grid-template-columns: 1fr; } }
 </style>
