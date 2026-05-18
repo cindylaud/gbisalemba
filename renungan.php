@@ -15,11 +15,37 @@ function gbi_excerpt($text, $limit = 140)
 }
 
 $renunganItems = [];
-$query = $conn->query("SELECT id, judul, isi, ayat, tanggal FROM renungan ORDER BY tanggal DESC, id DESC");
 
-if ($query) {
-    while ($row = $query->fetch_assoc()) {
+// Pagination: 5 items per page
+$page = isset($_GET['page']) ? (int) $_GET['page'] : 1;
+if ($page < 1) $page = 1;
+$perPage = 5;
+$offset = ($page - 1) * $perPage;
+
+// Total rows (for page count)
+$totalRows = 0;
+if ($countRes = $conn->query("SELECT COUNT(*) AS total FROM renungan")) {
+    $r = $countRes->fetch_assoc();
+    $totalRows = isset($r['total']) ? (int) $r['total'] : 0;
+}
+$totalPages = $perPage > 0 ? (int) ceil($totalRows / $perPage) : 1;
+
+// Fetch page items (use prepared statement; fallback to direct query)
+$stmt = $conn->prepare("SELECT id, judul, isi, ayat, tanggal FROM renungan ORDER BY tanggal DESC, id DESC LIMIT ?, ?");
+if ($stmt) {
+    $stmt->bind_param("ii", $offset, $perPage);
+    $stmt->execute();
+    $res = $stmt->get_result();
+    while ($row = $res->fetch_assoc()) {
         $renunganItems[] = $row;
+    }
+    $stmt->close();
+} else {
+    $query = $conn->query("SELECT id, judul, isi, ayat, tanggal FROM renungan ORDER BY tanggal DESC, id DESC LIMIT $offset, $perPage");
+    if ($query) {
+        while ($row = $query->fetch_assoc()) {
+            $renunganItems[] = $row;
+        }
     }
 }
 ?>
@@ -42,6 +68,22 @@ if ($query) {
             <div class="renungan-empty">
                 Belum ada renungan tersedia saat ini.
             </div>
+
+            <?php if ($totalPages > 1): ?>
+                <nav class="renungan-pagination" aria-label="Pagination">
+                    <?php if ($page > 1): ?>
+                        <a class="prev" href="?page=<?= $page - 1 ?>">« Sebelumnya</a>
+                    <?php endif; ?>
+
+                    <?php for ($p = 1; $p <= $totalPages; $p++): ?>
+                        <a class="page-num <?= $p === $page ? 'active' : '' ?>" href="?page=<?= $p ?>"><?= $p ?></a>
+                    <?php endfor; ?>
+
+                    <?php if ($page < $totalPages): ?>
+                        <a class="next" href="?page=<?= $page + 1 ?>">Berikutnya »</a>
+                    <?php endif; ?>
+                </nav>
+            <?php endif; ?>
 
         <?php else: ?>
 
@@ -298,6 +340,33 @@ if ($query) {
     text-align: center;
     padding: 60px 20px;
     color: rgba(18, 56, 95, 0.5);
+}
+
+/* Pagination */
+.renungan-pagination {
+    display: flex;
+    gap: 8px;
+    justify-content: center;
+    margin: 32px 0 12px;
+    flex-wrap: wrap;
+}
+.renungan-pagination a {
+    padding: 8px 12px;
+    border-radius: 8px;
+    background: transparent;
+    color: #12385f;
+    text-decoration: none;
+    border: 1px solid rgba(18,56,95,0.06);
+    font-weight: 600;
+}
+.renungan-pagination a.active {
+    background: #5f95c7;
+    color: #fff;
+    border-color: transparent;
+}
+.renungan-pagination a:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 18px rgba(18,45,73,0.06);
 }
 
 /* =========================

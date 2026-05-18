@@ -1,9 +1,18 @@
 function initWhatsNewSlider() {
+  try {
   const slider = document.getElementById('whatsNewSlider');
   const track = document.getElementById('whatsNewTrack');
   const prevBtn = document.getElementById('whatsNewPrev');
   const nextBtn = document.getElementById('whatsNewNext');
   const dotsWrap = document.getElementById('whatsNewDots');
+  const modal = document.getElementById('comingSoonModal');
+  const modalImage = document.getElementById('comingSoonModalImage');
+  const modalTitle = document.getElementById('comingSoonModalTitle');
+  const modalDatetime = document.getElementById('comingSoonModalDatetime');
+  const modalLocation = document.getElementById('comingSoonModalLocation');
+  const modalRegistration = document.getElementById('comingSoonModalRegistration');
+  const modalDescription = document.getElementById('comingSoonModalDescription');
+  const debug = /(?:\?|&)debug_whatsnew=1/.test(window.location.search || '');
   if (!slider || !track) return;
 
   const AUTOPLAY_DELAY = 2800;
@@ -27,6 +36,45 @@ function initWhatsNewSlider() {
 
   function clamp(value, min, max) {
     return Math.min(Math.max(value, min), max);
+  }
+
+  function getModalText(value) {
+    const text = (value || '').trim();
+    return text === '' ? 'Belum diisi' : text;
+  }
+
+  function openModalFromCard(card) {
+    if (!modal || !modalImage || !modalTitle || !modalDatetime || !modalLocation || !modalRegistration || !modalDescription) {
+      if (debug) console.warn('WhatsNew: modal elements missing', { modal, modalImage, modalTitle, modalDatetime, modalLocation, modalRegistration, modalDescription });
+      return;
+    }
+
+    const imageSrc = card.getAttribute('data-event-image') || '';
+    const title = getModalText(card.getAttribute('data-event-title'));
+    const datetime = getModalText(card.getAttribute('data-event-datetime'));
+    const location = getModalText(card.getAttribute('data-event-location'));
+    const registration = getModalText(card.getAttribute('data-event-registration'));
+    const description = getModalText(card.getAttribute('data-event-description'));
+
+    modalImage.src = imageSrc;
+    modalImage.alt = title;
+    modalTitle.textContent = title;
+    modalDatetime.textContent = datetime;
+    modalLocation.textContent = location;
+    modalRegistration.textContent = registration;
+    modalDescription.textContent = description;
+    modal.classList.add('is-open');
+    modal.setAttribute('aria-hidden', 'false');
+    document.body.classList.add('coming-soon-modal-open');
+    if (debug) console.log('WhatsNew: opened modal for', { title, datetime, location, registration, description, imageSrc });
+  }
+
+  function closeModal() {
+    if (!modal) return;
+
+    modal.classList.remove('is-open');
+    modal.setAttribute('aria-hidden', 'true');
+    document.body.classList.remove('coming-soon-modal-open');
   }
 
   function calculateSizing() {
@@ -256,10 +304,90 @@ function initWhatsNewSlider() {
     }
   });
 
+  track.addEventListener('click', function (event) {
+    const card = event.target.closest('.whats-new-card');
+    if (!card || !track.contains(card)) return;
+    openModalFromCard(card);
+  });
+
+  track.addEventListener('keydown', function (event) {
+    if (event.key !== 'Enter' && event.key !== ' ') return;
+    const card = event.target.closest('.whats-new-card');
+    if (!card || !track.contains(card)) return;
+    event.preventDefault();
+    openModalFromCard(card);
+  });
+
+  // Fallback: attach per-card handlers in case event delegation is blocked on hosting (overlay/z-index issues)
+  function attachPerCardHandlers() {
+    try {
+      getAllItemsInTrack().forEach(function (card) {
+        if (card._wn_hasHandler) return;
+        card._wn_hasHandler = true;
+        card.addEventListener('click', function (e) {
+          if (debug) console.log('WhatsNew: card click (direct)', card);
+          openModalFromCard(card);
+        });
+        card.addEventListener('keydown', function (ev) {
+          if (ev.key === 'Enter' || ev.key === ' ') {
+            ev.preventDefault();
+            openModalFromCard(card);
+          }
+        });
+      });
+    } catch (err) {
+      if (debug) console.error('WhatsNew: attachPerCardHandlers failed', err);
+    }
+  }
+
+  // call once after setup, and again after resize (when cards may be recreated)
+  requestAnimationFrame(function () {
+    attachPerCardHandlers();
+  });
+  window.addEventListener('resize', function () { attachPerCardHandlers(); });
+
+  // Extra global fallback: detect clicks inside the slider using elementFromPoint.
+  // This helps on hosted setups where an invisible overlay or stacking context prevents normal events.
+  document.addEventListener('click', function (e) {
+    try {
+      if (!slider) return;
+      const rect = slider.getBoundingClientRect();
+      if (e.clientX < rect.left || e.clientX > rect.right || e.clientY < rect.top || e.clientY > rect.bottom) return;
+      const topEl = document.elementFromPoint(e.clientX, e.clientY);
+      const card = topEl && topEl.closest ? topEl.closest('.whats-new-card') : null;
+      if (card && track && track.contains(card)) {
+        if (debug) console.log('WhatsNew: document click fallback found card', card);
+        openModalFromCard(card);
+      }
+    } catch (err) {
+      if (debug) console.error('WhatsNew: document fallback error', err);
+    }
+  }, true);
+
+  if (modal) {
+    modal.addEventListener('click', function (event) {
+      if (event.target.closest('[data-modal-close]')) {
+        closeModal();
+      }
+    });
+
+    document.addEventListener('keydown', function (event) {
+      if (event.key === 'Escape' && modal.classList.contains('is-open')) {
+        closeModal();
+      }
+    });
+  }
+
   requestAnimationFrame(function () {
     setup();
     startAutoplay();
   });
+  } catch (err) {
+    try { console.error('WhatsNew:init error', err); } catch (e) { /* ignore console errors */ }
+    if (typeof debug !== 'undefined' && debug) {
+      try { console.trace(err); } catch (e) { /* ignore */ }
+    }
+  }
 }
 
 document.addEventListener('DOMContentLoaded', initWhatsNewSlider);

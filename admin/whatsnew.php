@@ -41,6 +41,11 @@ function ensureComingSoonTable($conn) {
             "CREATE TABLE IF NOT EXISTS coming_soon (
                 id INT AUTO_INCREMENT PRIMARY KEY,
                 image VARCHAR(255) NOT NULL,
+                event_title VARCHAR(255) NOT NULL DEFAULT '',
+                event_datetime VARCHAR(255) NOT NULL DEFAULT '',
+                event_location VARCHAR(255) NOT NULL DEFAULT '',
+                event_registration VARCHAR(255) NOT NULL DEFAULT '',
+                event_description TEXT NULL,
                 urutan INT NOT NULL DEFAULT 1,
                 is_active TINYINT(1) NOT NULL DEFAULT 1,
                 created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
@@ -78,6 +83,25 @@ function ensureComingSoonZoomColumn($conn) {
 }
 
 ensureComingSoonZoomColumn($conn);
+
+function ensureComingSoonDetailColumns($conn) {
+    $columns = [
+        'event_title' => "VARCHAR(255) NOT NULL DEFAULT '' AFTER image",
+        'event_datetime' => "VARCHAR(255) NOT NULL DEFAULT '' AFTER event_title",
+        'event_location' => "VARCHAR(255) NOT NULL DEFAULT '' AFTER event_datetime",
+        'event_registration' => "VARCHAR(255) NOT NULL DEFAULT '' AFTER event_location",
+        'event_description' => "TEXT NULL AFTER event_registration",
+    ];
+
+    foreach ($columns as $column => $definition) {
+        $check = $conn->query("SHOW COLUMNS FROM " . COMING_SOON_TABLE . " LIKE '" . $conn->real_escape_string($column) . "'");
+        if ($check && $check->num_rows === 0) {
+            $conn->query("ALTER TABLE " . COMING_SOON_TABLE . " ADD COLUMN " . $column . " " . $definition);
+        }
+    }
+}
+
+ensureComingSoonDetailColumns($conn);
 
 $wnServerLimit = getServerUploadLimit();
 $wnEffectiveMaxSize = WN_MAX_SIZE;
@@ -140,6 +164,11 @@ if (isset($_GET['action'], $_GET['id']) && $_GET['action'] === 'delete') {
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'upload') {
     $isActive = isset($_POST['is_active']) ? 1 : 0;
     $imageZoom = (int) ($_POST['image_zoom'] ?? 100);
+    $eventTitle = trim((string) ($_POST['event_title'] ?? ''));
+    $eventDatetime = trim((string) ($_POST['event_datetime'] ?? ''));
+    $eventLocation = trim((string) ($_POST['event_location'] ?? ''));
+    $eventRegistration = trim((string) ($_POST['event_registration'] ?? ''));
+    $eventDescription = trim((string) ($_POST['event_description'] ?? ''));
     if ($imageZoom < 50) {
         $imageZoom = 50;
     } elseif ($imageZoom > 150) {
@@ -169,8 +198,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'uploa
                 $error = $processed['error'];
             } else {
                 $urutan = getNextUrutan($conn);
-                $stmt = $conn->prepare('INSERT INTO ' . COMING_SOON_TABLE . ' (image, image_zoom, urutan, is_active) VALUES (?, ?, ?, ?)');
-                $stmt->bind_param('siii', $filename, $imageZoom, $urutan, $isActive);
+                $stmt = $conn->prepare('INSERT INTO ' . COMING_SOON_TABLE . ' (image, event_title, event_datetime, event_location, event_registration, event_description, image_zoom, urutan, is_active) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)');
+                $stmt->bind_param('ssssssiii', $filename, $eventTitle, $eventDatetime, $eventLocation, $eventRegistration, $eventDescription, $imageZoom, $urutan, $isActive);
                 if ($stmt->execute()) {
                     header('Location: whatsnew.php');
                     exit;
@@ -189,6 +218,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'updat
     $editId = (int) ($_POST['edit_id'] ?? 0);
     $isActive = isset($_POST['is_active']) ? 1 : 0;
     $imageZoom = (int) ($_POST['image_zoom'] ?? 100);
+    $eventTitle = trim((string) ($_POST['event_title'] ?? ''));
+    $eventDatetime = trim((string) ($_POST['event_datetime'] ?? ''));
+    $eventLocation = trim((string) ($_POST['event_location'] ?? ''));
+    $eventRegistration = trim((string) ($_POST['event_registration'] ?? ''));
+    $eventDescription = trim((string) ($_POST['event_description'] ?? ''));
     if ($imageZoom < 50) {
         $imageZoom = 50;
     } elseif ($imageZoom > 150) {
@@ -207,8 +241,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'updat
         if (!$current) {
             $error = 'Data yang akan diedit tidak ditemukan';
         } elseif (!isset($_FILES['image']) || $_FILES['image']['error'] !== UPLOAD_ERR_OK) {
-            $stmt = $conn->prepare('UPDATE ' . COMING_SOON_TABLE . ' SET image_zoom = ?, is_active = ? WHERE id = ?');
-            $stmt->bind_param('iii', $imageZoom, $isActive, $editId);
+            $stmt = $conn->prepare('UPDATE ' . COMING_SOON_TABLE . ' SET event_title = ?, event_datetime = ?, event_location = ?, event_registration = ?, event_description = ?, image_zoom = ?, is_active = ? WHERE id = ?');
+            $stmt->bind_param('sssssiii', $eventTitle, $eventDatetime, $eventLocation, $eventRegistration, $eventDescription, $imageZoom, $isActive, $editId);
             if ($stmt->execute()) {
                 header('Location: whatsnew.php');
                 exit;
@@ -236,8 +270,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'updat
                 if (!$processed['success']) {
                     $error = $processed['error'];
                 } else {
-                    $stmt = $conn->prepare('UPDATE ' . COMING_SOON_TABLE . ' SET image = ?, image_zoom = ?, is_active = ? WHERE id = ?');
-                    $stmt->bind_param('siii', $filename, $imageZoom, $isActive, $editId);
+                    $stmt = $conn->prepare('UPDATE ' . COMING_SOON_TABLE . ' SET image = ?, event_title = ?, event_datetime = ?, event_location = ?, event_registration = ?, event_description = ?, image_zoom = ?, is_active = ? WHERE id = ?');
+                    $stmt->bind_param('ssssssiii', $filename, $eventTitle, $eventDatetime, $eventLocation, $eventRegistration, $eventDescription, $imageZoom, $isActive, $editId);
 
                     if ($stmt->execute()) {
                         $oldPath = WN_UPLOAD_DIR . $current['image'];
@@ -297,6 +331,11 @@ if ($selectedItem && !empty($selectedItem['image']) && is_file(WN_UPLOAD_DIR . $
 }
 $panelStatusActive = $selectedItem ? ((int) $selectedItem['is_active'] === 1) : true;
 $panelZoom = $selectedItem ? (int) ($selectedItem['image_zoom'] ?? 100) : 100;
+$panelEventTitle = $selectedItem ? (string) ($selectedItem['event_title'] ?? '') : '';
+$panelEventDatetime = $selectedItem ? (string) ($selectedItem['event_datetime'] ?? '') : '';
+$panelEventLocation = $selectedItem ? (string) ($selectedItem['event_location'] ?? '') : '';
+$panelEventRegistration = $selectedItem ? (string) ($selectedItem['event_registration'] ?? '') : '';
+$panelEventDescription = $selectedItem ? (string) ($selectedItem['event_description'] ?? '') : '';
 if ($panelZoom < 50) {
     $panelZoom = 50;
 } elseif ($panelZoom > 150) {
@@ -324,6 +363,19 @@ if ($panelZoom < 50) {
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: 'Inter','Segoe UI',Tahoma,Geneva,Verdana,sans-serif; background:#F3F9FB; color:#102C57; line-height:1.6; overflow-x:hidden; }
+        .form-group textarea,
+        .form-group input[type='text'] {
+            width:100%;
+            padding:10px 12px;
+            border:1px solid rgba(16,44,87,.2);
+            border-radius:12px;
+            font-size:13px;
+            background:#fff;
+            resize:vertical;
+            min-height:42px;
+        }
+        .form-group textarea:focus,
+        .form-group input[type='text']:focus { outline:none; border-color:rgba(63,182,168,.56); box-shadow:0 0 0 .2rem rgba(63,182,168,.14); }
         .container { max-width:none; margin:0; width:100%; min-width:0; }
 
         .alert { padding:13px 16px; margin-bottom:16px; border-radius:12px; font-weight:600; }
@@ -629,6 +681,31 @@ if ($panelZoom < 50) {
                                 </div>
                                 <input type="range" id="image_zoom" name="image_zoom" min="50" max="150" value="<?php echo (int) $panelZoom; ?>">
                                 <p class="info-text">Atur skala foto untuk tampilan Coming Soon di website jemaat.</p>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="event_title">Judul Event</label>
+                                <input type="text" id="event_title" name="event_title" value="<?php echo htmlspecialchars($panelEventTitle); ?>" placeholder="Contoh: College Bible Study (Upperroom)">
+                            </div>
+
+                            <div class="form-group">
+                                <label for="event_datetime">Hari/Tanggal</label>
+                                <input type="text" id="event_datetime" name="event_datetime" value="<?php echo htmlspecialchars($panelEventDatetime); ?>" placeholder="Contoh: 24 Mei 2026 14.30 - 16.00 WIB">
+                            </div>
+
+                                                <div class="form-group">
+                                                    <label for="event_location">Lokasi</label>
+                                                    <textarea id="event_location" name="event_location" rows="2" placeholder="Contoh: Upperroom / Annex 1"><?php echo htmlspecialchars($panelEventLocation); ?></textarea>
+                                                </div>
+
+                                                <div class="form-group">
+                                                    <label for="event_registration">Registrasi</label>
+                                                    <textarea id="event_registration" name="event_registration" rows="2" placeholder="Contoh: Dibuka 12 Mei 2026 via MyJPCC App"><?php echo htmlspecialchars($panelEventRegistration); ?></textarea>
+                                                </div>
+
+                            <div class="form-group">
+                                <label for="event_description">Deskripsi</label>
+                                <textarea id="event_description" name="event_description" rows="6" placeholder="Tulis deskripsi singkat event coming soon di sini."><?php echo htmlspecialchars($panelEventDescription); ?></textarea>
                             </div>
 
                             <div class="checkbox-group">

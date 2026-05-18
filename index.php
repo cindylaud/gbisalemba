@@ -241,8 +241,18 @@ $cta_photo = gbi_find_first_image([
 
             <?php
             $coming_has_zoom = gbi_table_has_column($conn, 'coming_soon', 'image_zoom');
+            $coming_has_title = gbi_table_has_column($conn, 'coming_soon', 'event_title');
+            $coming_has_datetime = gbi_table_has_column($conn, 'coming_soon', 'event_datetime');
+            $coming_has_location = gbi_table_has_column($conn, 'coming_soon', 'event_location');
+            $coming_has_registration = gbi_table_has_column($conn, 'coming_soon', 'event_registration');
+            $coming_has_description = gbi_table_has_column($conn, 'coming_soon', 'event_description');
             $coming_zoom_select = $coming_has_zoom ? 'COALESCE(image_zoom, 100) AS image_zoom' : '100 AS image_zoom';
-            $q_wn = "SELECT image, {$coming_zoom_select} FROM coming_soon WHERE is_active = 1 ORDER BY urutan ASC LIMIT 5";
+            $coming_title_select = $coming_has_title ? "COALESCE(event_title, '') AS event_title" : "'' AS event_title";
+            $coming_datetime_select = $coming_has_datetime ? "COALESCE(event_datetime, '') AS event_datetime" : "'' AS event_datetime";
+            $coming_location_select = $coming_has_location ? "COALESCE(event_location, '') AS event_location" : "'' AS event_location";
+            $coming_registration_select = $coming_has_registration ? "COALESCE(event_registration, '') AS event_registration" : "'' AS event_registration";
+            $coming_description_select = $coming_has_description ? "COALESCE(event_description, '') AS event_description" : "'' AS event_description";
+            $q_wn = "SELECT image, {$coming_zoom_select}, {$coming_title_select}, {$coming_datetime_select}, {$coming_location_select}, {$coming_registration_select}, {$coming_description_select} FROM coming_soon WHERE is_active = 1 ORDER BY urutan ASC LIMIT 5";
             $r_wn = $conn->query($q_wn);
 
             $wn_images = [];
@@ -257,6 +267,11 @@ $cta_photo = gbi_find_first_image([
 
                             $wn_images[] = [
                                 'image' => (string) $row_wn['image'],
+                                'title' => (string) ($row_wn['event_title'] ?? ''),
+                                'datetime' => (string) ($row_wn['event_datetime'] ?? ''),
+                                'location' => (string) ($row_wn['event_location'] ?? ''),
+                                'registration' => (string) ($row_wn['event_registration'] ?? ''),
+                                'description' => (string) ($row_wn['event_description'] ?? ''),
                                 'zoom' => $zoom,
                             ];
                     }
@@ -266,7 +281,13 @@ $cta_photo = gbi_find_first_image([
                 <div class="whats-new-track" id="whatsNewTrack">
                     <?php foreach ($wn_images as $i => $item): ?>
                         <?php $imgScale = number_format(((int) $item['zoom']) / 100, 2, '.', ''); ?>
-                        <div class="whats-new-card">
+                        <div class="whats-new-card" role="button" tabindex="0"
+                            data-event-image="uploads/whatsnew/<?php echo htmlspecialchars($item['image'], ENT_QUOTES); ?>"
+                            data-event-title="<?php echo htmlspecialchars($item['title'] !== '' ? $item['title'] : 'Coming Soon Event', ENT_QUOTES); ?>"
+                            data-event-datetime="<?php echo htmlspecialchars($item['datetime'], ENT_QUOTES); ?>"
+                            data-event-location="<?php echo htmlspecialchars($item['location'], ENT_QUOTES); ?>"
+                            data-event-registration="<?php echo htmlspecialchars($item['registration'], ENT_QUOTES); ?>"
+                            data-event-description="<?php echo htmlspecialchars($item['description'], ENT_QUOTES); ?>">
                             <img src="uploads/whatsnew/<?php echo htmlspecialchars($item['image']); ?>" alt="Coming Soon <?php echo $i + 1; ?>" style="--coming-zoom-scale:<?php echo htmlspecialchars($imgScale); ?>;">
                         </div>
                     <?php endforeach; ?>
@@ -284,6 +305,38 @@ $cta_photo = gbi_find_first_image([
         </div>
     </div>
 </section>
+
+<div class="whats-new-modal" id="comingSoonModal" aria-hidden="true">
+    <div class="whats-new-modal-backdrop" data-modal-close></div>
+    <div class="whats-new-modal-dialog" role="dialog" aria-modal="true" aria-labelledby="comingSoonModalTitle">
+        <button type="button" class="whats-new-modal-close" data-modal-close aria-label="Tutup detail coming soon">&times;</button>
+        <div class="whats-new-modal-media">
+            <img id="comingSoonModalImage" src="" alt="Detail Coming Soon">
+        </div>
+        <div class="whats-new-modal-body">
+            <p class="whats-new-modal-kicker">Coming Soon Event</p>
+            <h3 id="comingSoonModalTitle">Coming Soon Event</h3>
+            <div class="whats-new-modal-grid">
+                <section class="whats-new-modal-card">
+                    <span class="whats-new-modal-label">Hari/Tanggal</span>
+                    <p id="comingSoonModalDatetime">Belum diisi</p>
+                </section>
+                <section class="whats-new-modal-card">
+                    <span class="whats-new-modal-label">Lokasi</span>
+                    <p id="comingSoonModalLocation">Belum diisi</p>
+                </section>
+                <section class="whats-new-modal-card">
+                    <span class="whats-new-modal-label">Registrasi</span>
+                    <p id="comingSoonModalRegistration">Belum diisi</p>
+                </section>
+                <section class="whats-new-modal-card whats-new-modal-card-wide">
+                    <span class="whats-new-modal-label">Deskripsi</span>
+                    <p id="comingSoonModalDescription">Belum diisi</p>
+                </section>
+            </div>
+        </div>
+    </div>
+</div>
 
 <!-- 3. IBADAH MINGGU SECTION -->
 <section class="ibadah-minggu-section reveal-on-scroll" data-reveal="section" data-delay="0">

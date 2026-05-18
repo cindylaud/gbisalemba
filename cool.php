@@ -8,6 +8,7 @@ $cool_images = [
     'visi1' => $cool_base . 'cool-visi-1.JPG',
     'visi2' => $cool_base . 'cool-visi-2.JPG',
     'visi3' => $cool_base . 'cool-visi-3.JPG',
+    'why' => $cool_base . 'cool-why-background.JPG',
     'community' => $cool_base . 'cool-community.JPG',
 ];
 
@@ -807,7 +808,7 @@ foreach ($cool_images as $key => $img) {
         border-radius: 36px;
         background:
             linear-gradient(180deg, rgba(11, 31, 55, 0.52), rgba(11, 31, 55, 0.8)),
-            url('uploads/whatsnew/img_2780b3.webp') center/cover no-repeat;
+            url('<?= htmlspecialchars($cool_images['why']) ?>') center/cover no-repeat;
         box-shadow: var(--cool-shadow);
     }
 
