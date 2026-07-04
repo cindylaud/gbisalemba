@@ -309,7 +309,9 @@ $cta_photo = gbi_find_first_image([
 <div class="whats-new-modal" id="comingSoonModal" aria-hidden="true">
     <div class="whats-new-modal-backdrop" data-modal-close></div>
     <div class="whats-new-modal-dialog" role="dialog" aria-modal="true" aria-labelledby="comingSoonModalTitle">
-        <button type="button" class="whats-new-modal-close" data-modal-close aria-label="Tutup detail coming soon">&times;</button>
+        <button type="button" class="whats-new-modal-close" data-modal-close aria-label="Tutup detail coming soon dan kembali ke Coming Soon">
+            <span aria-hidden="true">✕</span>
+        </button>
         <div class="whats-new-modal-media">
             <img id="comingSoonModalImage" src="" alt="Detail Coming Soon">
         </div>

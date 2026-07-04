@@ -18,9 +18,9 @@ $about_images = [
 
 // FOTO GEMBALA
 $about_photo = [
-    $gembala_base . 'wakilgembala1.jpg',
-    $gembala_base . 'gembala.jpg',
-    $gembala_base . 'wakilgembala2.jpg'
+    $gembala_base . 'wakilgembala1.jpeg',
+    $gembala_base . 'gembala.jpeg',
+    $gembala_base . 'wakilgembala2.jpeg'
 ];
 
 // Fallback kalau file hilang
@@ -101,44 +101,158 @@ if (!file_exists(__DIR__ . '/' . $about_hero_image)) {
             </article>
         </section>
 
+        <!-- LEADERS SECTION — zigzag layout dengan hiasan rohani -->
         <section class="about-gbi-leaders">
-            <h3 class="about-gbi-script-title">Penggembalaan</h3>
-            <div class="about-gbi-leaders-grid">
-                <article class="about-gbi-leader-card">
-                    <div class="about-gbi-leader-photo-wrap">
-                        <img src="<?php echo htmlspecialchars($about_photo[0]); ?>" alt="Wakil Gembala GBI Salemba" class="about-gbi-leader-photo">
-                    </div>
-                    <div class="about-gbi-leader-meta">
-                        <h4 class="about-gbi-leader-position">Wakil Gembala</h4>
-                        <h5 class="about-gbi-leader-name">Ps. David Natanael &amp; Ps. Rita Emia Nata</h5>
-                    </div>
-                </article>
 
-                <article class="about-gbi-leader-card about-gbi-leader-main">
-                    <div class="about-gbi-leader-photo-wrap">
-                        <img src="<?php echo htmlspecialchars($about_photo[1]); ?>" alt="Wakil Gembala GBI Salemba" class="about-gbi-leader-photo">
-                    </div>
-                    <div class="about-gbi-leader-meta">
-                        <h4 class="about-gbi-leader-position">Gembala</h4>
-                        <h5 class="about-gbi-leader-name">Ps. David Natanael &amp; Ps. Rita Emia Nata</h5>
-                    </div>
-                </article>
+            <!-- Judul dengan hiasan salib -->
+            <div class="ldr-title-wrap">
+                <!-- Salib kiri -->
+                <svg class="ldr-cross-deco ldr-cross-left" viewBox="0 0 40 40" aria-hidden="true">
+                    <rect x="17" y="2" width="6" height="36" rx="3" fill="#102c57" opacity="0.18"/>
+                    <rect x="2" y="14" width="36" height="6" rx="3" fill="#102c57" opacity="0.18"/>
+                </svg>
+                <h3 class="about-gbi-script-title">Penggembalaan</h3>
+                <!-- Salib kanan -->
+                <svg class="ldr-cross-deco ldr-cross-right" viewBox="0 0 40 40" aria-hidden="true">
+                    <rect x="17" y="2" width="6" height="36" rx="3" fill="#102c57" opacity="0.18"/>
+                    <rect x="2" y="14" width="36" height="6" rx="3" fill="#102c57" opacity="0.18"/>
+                </svg>
+            </div>
 
-                <article class="about-gbi-leader-card">
-                    <div class="about-gbi-leader-photo-wrap">
-                        <img src="<?php echo htmlspecialchars($about_photo[2]); ?>" alt="Wakil Gembala GBI Salemba" class="about-gbi-leader-photo">
+            <div class="ldr-zigzag-wrap">
+
+                <!-- Garis timeline tengah -->
+                <div class="ldr-timeline-line" aria-hidden="true"></div>
+
+                <!-- ROW 1: Gembala — foto KIRI, teks KANAN -->
+                <div class="ldr-row ldr-row-left ldr-row-gembala">
+                    <!-- Hiasan daun zaitun pojok foto -->
+                    <svg class="ldr-olive ldr-olive-tl" viewBox="0 0 50 60" aria-hidden="true">
+                        <path d="M25 55 C25 55, 8 40, 10 22 C12 8, 25 5, 25 5 C25 5, 38 8, 40 22 C42 40, 25 55, 25 55Z" fill="none" stroke="#102c57" stroke-width="1.2" opacity="0.18"/>
+                        <line x1="25" y1="55" x2="25" y2="5" stroke="#102c57" stroke-width="1" opacity="0.14" stroke-dasharray="3,3"/>
+                        <ellipse cx="17" cy="25" rx="5" ry="8" fill="#102c57" opacity="0.10" transform="rotate(-20 17 25)"/>
+                        <ellipse cx="33" cy="30" rx="5" ry="8" fill="#102c57" opacity="0.10" transform="rotate(20 33 30)"/>
+                    </svg>
+
+                    <div class="ldr-photo-col">
+                        <div class="ldr-photo-frame">
+                            <img src="<?php echo htmlspecialchars($about_photo[1]); ?>" alt="Gembala GBI Salemba" class="ldr-photo">
+                            <!-- Ornamen sudut foto -->
+                            <span class="ldr-corner ldr-corner-tl" aria-hidden="true"></span>
+                            <span class="ldr-corner ldr-corner-br" aria-hidden="true"></span>
+                        </div>
                     </div>
-                    <div class="about-gbi-leader-meta">
-                        <h4 class="about-gbi-leader-position">Wakil Gembala</h4>
-                        <h5 class="about-gbi-leader-name">Ps. David Natanael &amp; Ps. Rita Emia Nata</h5>
+
+                    <div class="ldr-connector-wrap" aria-hidden="true">
+                        <div class="ldr-connector-line"></div>
+                        <!-- Bintang Kejora / Bintang Daud kecil di titik tengah -->
+                        <svg class="ldr-star-node" viewBox="0 0 24 24">
+                            <polygon points="12,2 14.9,9.3 22.5,9.3 16.3,14 18.7,21.5 12,17 5.3,21.5 7.7,14 1.5,9.3 9.1,9.3" fill="#102c57" opacity="0.30"/>
+                        </svg>
                     </div>
-                </article>
+
+                    <div class="ldr-info-col">
+                        <div class="ldr-card">
+                            <span class="ldr-badge">Gembala</span>
+                            <h4 class="ldr-name">Ps. David Natanael &amp; Ps. Rita Emianata</h4>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Hiasan salib kecil di antara baris -->
+                <div class="ldr-divider-deco" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" width="20" height="20">
+                        <rect x="10" y="2" width="4" height="20" rx="2" fill="#102c57" opacity="0.20"/>
+                        <rect x="2" y="8" width="20" height="4" rx="2" fill="#102c57" opacity="0.20"/>
+                    </svg>
+                </div>
+
+                <!-- ROW 2: Wakil 1 — foto KANAN, teks KIRI -->
+                <div class="ldr-row ldr-row-right ldr-row-wakil1">
+                    <!-- Hiasan daun zaitun pojok kanan -->
+                    <svg class="ldr-olive ldr-olive-tr" viewBox="0 0 50 60" aria-hidden="true">
+                        <path d="M25 55 C25 55, 8 40, 10 22 C12 8, 25 5, 25 5 C25 5, 38 8, 40 22 C42 40, 25 55, 25 55Z" fill="none" stroke="#102c57" stroke-width="1.2" opacity="0.18"/>
+                        <line x1="25" y1="55" x2="25" y2="5" stroke="#102c57" stroke-width="1" opacity="0.14" stroke-dasharray="3,3"/>
+                        <ellipse cx="17" cy="25" rx="5" ry="8" fill="#102c57" opacity="0.10" transform="rotate(-20 17 25)"/>
+                        <ellipse cx="33" cy="30" rx="5" ry="8" fill="#102c57" opacity="0.10" transform="rotate(20 33 30)"/>
+                    </svg>
+
+                    <div class="ldr-info-col">
+                        <div class="ldr-card ldr-card-right">
+                            <span class="ldr-badge">Wakil Gembala</span>
+                            <h4 class="ldr-name ldr-name-split">
+                                <span class="ldr-name-line">Ps. Cahyadi &amp;</span>
+                                <span class="ldr-name-line">Herna JT</span>
+                            </h4>
+                        </div>
+                    </div>
+
+                    <div class="ldr-connector-wrap" aria-hidden="true">
+                        <div class="ldr-connector-line"></div>
+                        <svg class="ldr-star-node" viewBox="0 0 24 24">
+                            <polygon points="12,2 14.9,9.3 22.5,9.3 16.3,14 18.7,21.5 12,17 5.3,21.5 7.7,14 1.5,9.3 9.1,9.3" fill="#102c57" opacity="0.30"/>
+                        </svg>
+                    </div>
+
+                    <div class="ldr-photo-col">
+                        <div class="ldr-photo-frame">
+                            <img src="<?php echo htmlspecialchars($about_photo[0]); ?>" alt="Wakil Gembala GBI Salemba" class="ldr-photo">
+                            <span class="ldr-corner ldr-corner-tl" aria-hidden="true"></span>
+                            <span class="ldr-corner ldr-corner-br" aria-hidden="true"></span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Hiasan salib kecil di antara baris -->
+                <div class="ldr-divider-deco" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" width="20" height="20">
+                        <rect x="10" y="2" width="4" height="20" rx="2" fill="#102c57" opacity="0.20"/>
+                        <rect x="2" y="8" width="20" height="4" rx="2" fill="#102c57" opacity="0.20"/>
+                    </svg>
+                </div>
+
+                <!-- ROW 3: Wakil 2 — foto KIRI, teks KANAN -->
+                <div class="ldr-row ldr-row-left ldr-row-wakil2">
+                    <svg class="ldr-olive ldr-olive-bl" viewBox="0 0 50 60" aria-hidden="true">
+                        <path d="M25 55 C25 55, 8 40, 10 22 C12 8, 25 5, 25 5 C25 5, 38 8, 40 22 C42 40, 25 55, 25 55Z" fill="none" stroke="#102c57" stroke-width="1.2" opacity="0.18"/>
+                        <line x1="25" y1="55" x2="25" y2="5" stroke="#102c57" stroke-width="1" opacity="0.14" stroke-dasharray="3,3"/>
+                        <ellipse cx="17" cy="25" rx="5" ry="8" fill="#102c57" opacity="0.10" transform="rotate(-20 17 25)"/>
+                        <ellipse cx="33" cy="30" rx="5" ry="8" fill="#102c57" opacity="0.10" transform="rotate(20 33 30)"/>
+                    </svg>
+
+                    <div class="ldr-photo-col">
+                        <div class="ldr-photo-frame">
+                            <img src="<?php echo htmlspecialchars($about_photo[2]); ?>" alt="Wakil Gembala GBI Salemba" class="ldr-photo">
+                            <span class="ldr-corner ldr-corner-tl" aria-hidden="true"></span>
+                            <span class="ldr-corner ldr-corner-br" aria-hidden="true"></span>
+                        </div>
+                    </div>
+
+                    <div class="ldr-connector-wrap" aria-hidden="true">
+                        <div class="ldr-connector-line"></div>
+                        <svg class="ldr-star-node" viewBox="0 0 24 24">
+                            <polygon points="12,2 14.9,9.3 22.5,9.3 16.3,14 18.7,21.5 12,17 5.3,21.5 7.7,14 1.5,9.3 9.1,9.3" fill="#102c57" opacity="0.30"/>
+                        </svg>
+                    </div>
+
+                    <div class="ldr-info-col">
+                        <div class="ldr-card">
+                            <span class="ldr-badge">Wakil Gembala</span>
+                            <h4 class="ldr-name">Ps. Rajendra Aling &amp; Anggi Elvira Natalia</h4>
+                        </div>
+                    </div>
+                </div>
+
             </div>
         </section>
     </section>
 </main>
 
 <style>
+/* =============================================
+   ABOUT GBI — STYLESHEET
+   ============================================= */
+
 .about-gbi-wrap {
     --gbi-navy: #102c57;
     --gbi-green: #1a3a63;
@@ -157,9 +271,7 @@ if (!file_exists(__DIR__ . '/' . $about_hero_image)) {
 }
 
 .about-gbi-wrap::before,
-.about-gbi-wrap::after {
-    display: none;
-}
+.about-gbi-wrap::after { display: none; }
 
 .about-gbi-shell {
     width: 100%;
@@ -174,10 +286,11 @@ if (!file_exists(__DIR__ . '/' . $about_hero_image)) {
     z-index: 1;
 }
 
+/* ── HERO ── */
 .about-gbi-hero {
     position: relative;
     padding: 18px 36px 86px;
-    background-image: linear-gradient(120deg, rgba(16, 44, 87, 0.82) 0%, rgba(16, 44, 87, 0.75) 44%, rgba(16, 44, 87, 0.78) 100%), var(--about-bg);
+    background-image: linear-gradient(120deg, rgba(16,44,87,0.82) 0%, rgba(16,44,87,0.75) 44%, rgba(16,44,87,0.78) 100%), var(--about-bg);
     background-size: cover;
     background-position: center;
     overflow: hidden;
@@ -219,27 +332,13 @@ if (!file_exists(__DIR__ . '/' . $about_hero_image)) {
     border-left: 6px solid var(--gbi-green);
 }
 
-.about-gbi-hero-card::after {
-    content: '';
-    position: absolute;
-    bottom: -1px;
-    right: 0;
-    width: 120px;
-    height: 120px;
-    background: radial-gradient(circle, rgba(16, 44, 87, 0.15) 0%, transparent 70%);
-    border-radius: 50%;
-    pointer-events: none;
-}
-
 .about-gbi-hero-card h1 {
     margin: 0 0 10px;
     font-size: clamp(30px, 4vw, 48px);
     line-height: 0.96;
     letter-spacing: -0.02em;
     color: var(--gbi-navy);
-    font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     font-weight: 800;
-    position: relative;
 }
 
 .about-gbi-hero-card h1::after {
@@ -265,33 +364,23 @@ if (!file_exists(__DIR__ . '/' . $about_hero_image)) {
     content: '"';
     position: absolute;
     font-size: 48px;
-    font-family: inherit;
     color: var(--gbi-green);
     opacity: 0.6;
     line-height: 0.8;
 }
-
-.about-gbi-hero-card p::before {
-    left: 0;
-    top: -8px;
-}
-
-.about-gbi-hero-card p::after {
-    right: 0;
-    bottom: -16px;
-}
+.about-gbi-hero-card p::before { left: 0; top: -8px; }
+.about-gbi-hero-card p::after  { right: 0; bottom: -16px; }
 
 .about-gbi-wave {
     position: absolute;
-    left: 0;
-    right: 0;
-    bottom: -1px;
+    left: 0; right: 0; bottom: -1px;
     height: 76px;
     background: var(--gbi-intro-bg);
     border-top-left-radius: 50% 80px;
     border-top-right-radius: 50% 80px;
 }
 
+/* ── INTRO ── */
 .about-gbi-intro {
     padding: 26px 52px 34px;
     text-align: center;
@@ -304,11 +393,8 @@ if (!file_exists(__DIR__ . '/' . $about_hero_image)) {
     font-size: clamp(30px, 4vw, 54px);
     line-height: 1.06;
     letter-spacing: -0.025em;
-    font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     font-weight: 800;
     color: var(--gbi-navy);
-    position: relative;
-    display: inline-block;
 }
 
 .about-gbi-intro .about-gbi-identity {
@@ -317,21 +403,17 @@ if (!file_exists(__DIR__ . '/' . $about_hero_image)) {
     font-size: clamp(14px, 1.3vw, 16px);
     line-height: 1.7;
     color: #1b446e;
-    background: rgba(16, 44, 87, 0.08);
+    background: rgba(16,44,87,0.08);
     border-left: 4px solid var(--gbi-navy);
     border-right: 4px solid var(--gbi-navy);
     border-radius: 12px;
     padding: 10px 14px;
 }
 
-.about-nowrap {
-    white-space: nowrap;
-}
+.about-nowrap { white-space: nowrap; }
 
-.about-gbi-gallery {
-    padding: 30px 40px 26px;
-    position: relative;
-}
+/* ── GALLERY ── */
+.about-gbi-gallery { padding: 30px 40px 26px; }
 
 .about-gbi-gallery-grid {
     display: grid;
@@ -343,41 +425,24 @@ if (!file_exists(__DIR__ . '/' . $about_hero_image)) {
     margin: 0;
     border-radius: 14px;
     overflow: hidden;
-    box-shadow: 0 12px 24px rgba(11, 31, 53, 0.15);
+    box-shadow: 0 12px 24px rgba(11,31,53,0.15);
     aspect-ratio: 5 / 4;
     border: 2px solid transparent;
-    transition: transform 0.35s cubic-bezier(0.2, 0.9, 0.3, 1), box-shadow 0.35s ease, border-color 0.35s ease;
+    transition: transform 0.35s cubic-bezier(0.2,0.9,0.3,1), box-shadow 0.35s ease, border-color 0.35s ease;
     position: relative;
-    background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(0,0,0,0.02));
-}
-
-.about-gbi-gallery-card::after {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background: linear-gradient(180deg, rgba(16,44,87,0) 0%, rgba(16,44,87,0.06) 100%);
-    opacity: 0;
-    transition: opacity 0.35s ease;
-    pointer-events: none;
 }
 
 .about-gbi-gallery-card:hover {
     border-color: var(--gbi-green);
-    box-shadow: 0 20px 48px rgba(16, 44, 87, 0.28);
+    box-shadow: 0 20px 48px rgba(16,44,87,0.28);
     transform: translateY(-6px) scale(1.03);
 }
 
-.about-gbi-gallery-card:hover::after {
-    opacity: 1;
-}
-
 .about-gbi-gallery-card img {
-    width: 100%;
-    height: 100%;
+    width: 100%; height: 100%;
     object-fit: cover;
     display: block;
-    transition: transform 0.6s cubic-bezier(0.2, 0.9, 0.3, 1), filter 0.35s ease;
-    transform-origin: center center;
+    transition: transform 0.6s cubic-bezier(0.2,0.9,0.3,1), filter 0.35s ease;
 }
 
 .about-gbi-gallery-card:hover img {
@@ -385,38 +450,22 @@ if (!file_exists(__DIR__ . '/' . $about_hero_image)) {
     filter: brightness(1.03);
 }
 
-/* Accessibility: respect reduced motion */
 @media (prefers-reduced-motion: reduce) {
     .about-gbi-gallery-card,
-    .about-gbi-gallery-card img {
-        transition: none !important;
-        transform: none !important;
-    }
+    .about-gbi-gallery-card img { transition: none !important; transform: none !important; }
 }
 
-/* Keyboard focus styles for accessibility */
-.about-gbi-gallery-card:focus-visible {
-    outline: 3px solid rgba(63,182,168,0.18);
-    outline-offset: 4px;
-    transform: translateY(-4px) scale(1.02);
-    box-shadow: 0 18px 40px rgba(16,44,87,0.22);
-}
-
-
-.about-gbi-story {
-    padding: 44px 40px 30px;
-}
+/* ── STORY ── */
+.about-gbi-story { padding: 44px 40px 30px; }
 
 .about-gbi-story h3,
 .about-gbi-leaders h3 {
-    margin: 0 0 16px;
+    margin: 0 0 20px;
     text-align: center;
     font-size: clamp(30px, 4.8vw, 52px);
     line-height: 1.04;
     letter-spacing: -0.02em;
-    font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     color: var(--gbi-navy);
-    position: relative;
 }
 
 .about-gbi-story h3::after,
@@ -430,34 +479,20 @@ if (!file_exists(__DIR__ . '/' . $about_hero_image)) {
 }
 
 .about-gbi-script-title {
-    font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif !important;
     font-size: clamp(28px, 3.5vw, 40px) !important;
     font-weight: 800 !important;
     letter-spacing: -0.02em !important;
     line-height: 1.05 !important;
-    text-transform: none !important;
 }
 
 .about-gbi-story-card {
     background: linear-gradient(180deg, #fbfdff 0%, #eef4fb 100%);
-    border: 1px solid rgba(16, 44, 87, 0.13);
+    border: 1px solid rgba(16,44,87,0.13);
     border-radius: 18px;
     padding: clamp(22px, 3vw, 42px);
-    box-shadow: 0 16px 32px rgba(11, 31, 53, 0.11);
+    box-shadow: 0 16px 32px rgba(11,31,53,0.11);
     border-left: 5px solid var(--gbi-navy);
     position: relative;
-}
-
-.about-gbi-story-card::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    right: 0;
-    width: 80px;
-    height: 80px;
-    background: radial-gradient(circle, rgba(16, 44, 87, 0.08) 0%, transparent 70%);
-    border-radius: 50%;
-    transform: translate(20px, -20px);
 }
 
 .about-gbi-story-card p {
@@ -471,10 +506,9 @@ if (!file_exists(__DIR__ . '/' . $about_hero_image)) {
     margin: 0 0 18px;
     padding: 14px 18px;
     border-left: 5px solid var(--gbi-navy);
-    background: rgba(16, 44, 87, 0.06);
+    background: rgba(16,44,87,0.06);
     border-radius: 0 12px 12px 0;
     color: var(--gbi-navy);
-    font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     font-size: 20px;
     line-height: 1.55;
     font-weight: 700;
@@ -486,347 +520,563 @@ if (!file_exists(__DIR__ . '/' . $about_hero_image)) {
     color: #12365f;
 }
 
+/* ── LEADERS — ZIGZAG LAYOUT ── */
 .about-gbi-leaders {
-    padding: 52px 40px 54px;
+    padding: 52px 40px 64px;
+    position: relative;
 }
 
-.about-gbi-leaders-grid {
-    display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 18px;
-    align-items: start;
+.ldr-title-wrap {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+    margin-bottom: 10px;
 }
 
-.about-gbi-leader-card {
-    border-radius: 20px;
-    border: 2px solid rgba(16, 44, 87, 0.2);
-    background: linear-gradient(180deg, #ffffff 0%, #f3f8ff 100%);
-    box-shadow: 0 8px 20px rgba(11, 31, 53, 0.08);
-    overflow: hidden;
+.ldr-cross-deco {
+    width: 32px;
+    height: 32px;
+    flex-shrink: 0;
+}
+
+.ldr-verse {
     text-align: center;
-    transition: all 0.3s ease;
+    font-size: 13px;
+    font-style: italic;
+    color: rgba(16,44,87,0.55);
+    margin: 0 0 40px;
+    letter-spacing: 0.01em;
 }
 
-.about-gbi-leader-card:hover {
-    border-color: var(--gbi-green);
-    box-shadow: 0 12px 32px rgba(16, 44, 87, 0.2);
+.ldr-zigzag-wrap {
+    position: relative;
+    max-width: 760px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+}
+
+/* Garis timeline vertikal di tengah */
+.ldr-timeline-line {
+    position: absolute;
+    left: 50%;
+    top: 40px;
+    bottom: 40px;
+    width: 1px;
+    background: rgba(16,44,87,0.12);
+    transform: translateX(-50%);
+    pointer-events: none;
+}
+
+/* Merpati hiasan atas & bawah */
+.ldr-dove-top {
+    width: 60px;
+    height: 40px;
+    display: block;
+    margin: 0 auto 8px;
+    position: relative;
+    z-index: 1;
+}
+.ldr-dove-bottom {
+    width: 60px;
+    height: 40px;
+    display: block;
+    margin: 8px auto 0;
+    position: relative;
+    z-index: 1;
+}
+
+/* Setiap baris zigzag */
+.ldr-row {
+    display: flex;
+    align-items: center;
+    gap: 0;
+    position: relative;
+    padding: 12px 0;
+}
+
+.ldr-photo-col {
+    flex: 0 0 220px;
+    position: relative;
+    z-index: 2;
+}
+
+.ldr-photo-frame {
+    position: relative;
+    border-radius: 18px;
+    overflow: hidden;
+    aspect-ratio: 3 / 4;
+    box-shadow: 0 12px 36px rgba(16,44,87,0.20);
+    border: 3px solid rgba(16,44,87,0.14);
+    transition: box-shadow 0.35s ease, transform 0.35s ease;
+}
+
+.ldr-row:hover .ldr-photo-frame {
+    box-shadow: 0 20px 48px rgba(16,44,87,0.30);
     transform: translateY(-4px);
 }
 
-.about-gbi-leader-main {
-    transform: none;
-}
-
-.about-gbi-leader-photo-wrap {
-    width: 100%;
-    aspect-ratio: 1 / 1.25;
-    overflow: hidden;
-    background: #d4dce8;
-    border-radius: 16px 16px 0 0;
-}
-
-.about-gbi-leader-photo {
-    width: 100%;
-    height: 100%;
+.ldr-photo {
+    width: 100%; height: 100%;
     object-fit: cover;
-    object-position: center 25%;
+    object-position: center 12%;
+    display: block;
+    transition: transform 0.5s ease;
+}
+
+.ldr-row:hover .ldr-photo { transform: scale(1.04); }
+
+/* Ornamen sudut foto — L-shape */
+.ldr-corner {
+    position: absolute;
+    width: 20px; height: 20px;
+    border-color: rgba(16,44,87,0.35);
+    border-style: solid;
+    pointer-events: none;
+}
+.ldr-corner-tl { top: 8px; left: 8px; border-width: 2px 0 0 2px; border-radius: 3px 0 0 0; }
+.ldr-corner-br { bottom: 8px; right: 8px; border-width: 0 2px 2px 0; border-radius: 0 0 3px 0; }
+
+/* Connector horisontal */
+.ldr-connector-wrap {
+    flex: 0 0 60px;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1;
+}
+
+.ldr-connector-line {
+    position: absolute;
+    left: 0; right: 0;
+    height: 2px;
+    background: rgba(16,44,87,0.20);
+}
+
+.ldr-star-node {
+    width: 18px; height: 18px;
+    position: relative;
+    z-index: 2;
+    flex-shrink: 0;
+}
+
+/* Info card */
+.ldr-info-col {
+    flex: 1;
+    position: relative;
+    z-index: 2;
+}
+
+.ldr-card {
+    background: linear-gradient(145deg, #ffffff 0%, #f0f6ff 100%);
+    border: 1.5px solid rgba(16,44,87,0.15);
+    border-left: 5px solid var(--gbi-navy);
+    border-radius: 0 16px 16px 0;
+    padding: 22px 24px;
+    box-shadow: 0 6px 24px rgba(16,44,87,0.10);
+    transition: box-shadow 0.3s ease, transform 0.3s ease;
+}
+
+.ldr-card-right {
+    border-left: 1.5px solid rgba(16,44,87,0.15);
+    border-right: 5px solid var(--gbi-navy);
+    border-radius: 16px 0 0 16px;
+    text-align: right;
+}
+
+.ldr-row:hover .ldr-card {
+    box-shadow: 0 12px 36px rgba(16,44,87,0.16);
+    transform: translateX(4px);
+}
+
+.ldr-row:hover .ldr-card-right {
+    transform: translateX(-4px);
+}
+
+.ldr-badge {
+    display: inline-block;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--gbi-navy);
+    background: rgba(16,44,87,0.09);
+    border-radius: 20px;
+    padding: 3px 12px;
+    margin-bottom: 10px;
+}
+
+.ldr-name {
+    margin: 0 0 8px;
+    font-size: clamp(15px, 1.6vw, 18px);
+    font-weight: 700;
+    color: var(--gbi-navy);
+    line-height: 1.35;
+}
+
+.ldr-name-split {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    min-height: 3.1em;
+    justify-content: center;
+}
+
+.ldr-name-line {
     display: block;
 }
 
-.about-gbi-leader-meta {
-    background: linear-gradient(180deg, rgba(255, 255, 255, 0.95) 0%, rgba(236, 244, 254, 0.9) 100%);
-    padding: 18px 14px 16px;
-}
-
-.about-gbi-leader-position {
+.ldr-desc {
     margin: 0;
-    text-align: center;
-    font-size: 12px;
-    font-weight: 700;
-    letter-spacing: 0.1em;
-    color: var(--gbi-green);
-    text-transform: uppercase;
-    display: inline-block;
-    background: rgba(16, 44, 87, 0.08);
-    padding: 4px 12px;
-    border-radius: 20px;
-    width: fit-content;
-    margin-left: auto;
-    margin-right: auto;
+    font-size: 14px;
+    line-height: 1.75;
+    color: #2a4e7a;
 }
 
-.about-gbi-leader-name {
-    margin: 8px 0 0;
-    text-align: center;
-    font-size: clamp(16px, 2vw, 20px);
-    line-height: 1.3;
-    font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    color: var(--gbi-navy);
-    font-weight: 700;
+/* Hiasan daun zaitun di samping */
+.ldr-olive {
+    position: absolute;
+    width: 46px;
+    height: 56px;
+    pointer-events: none;
+    z-index: 0;
 }
+.ldr-olive-tl { top: -10px; left: -14px; }
+.ldr-olive-tr { top: -10px; right: -14px; transform: scaleX(-1); }
+.ldr-olive-bl { bottom: -10px; left: -14px; transform: scaleY(-1); }
+
+/* Divider salib antarbaris */
+.ldr-divider-deco {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 28px;
+    position: relative;
+    z-index: 2;
+}
+
+/* ── DESKTOP: 3 kolom sejajar ── */
+@media (min-width: 900px) {
+
+    /* Sembunyikan elemen zigzag */
+    .ldr-timeline-line,
+    .ldr-divider-deco,
+    .ldr-dove-top,
+    .ldr-dove-bottom,
+    .ldr-connector-wrap {
+        display: none;
+    }
+
+    /* Grid 3 kolom */
+    .ldr-zigzag-wrap {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        grid-template-areas: "wakil1 gembala wakil2";
+        gap: 24px;
+        align-items: stretch;
+        max-width: 1000px;
+    }
+
+    /* Urutan kolom: Wakil1(kiri) | Gembala(tengah) | Wakil2(kanan) */
+    .ldr-row-wakil1 { grid-area: wakil1; }
+    .ldr-row-gembala { grid-area: gembala; }
+    .ldr-row-wakil2 { grid-area: wakil2; }
+
+    /* Tiap row jadi kartu vertikal */
+    .ldr-row,
+    .ldr-row.ldr-row-right,
+    .ldr-row.ldr-row-left {
+        flex-direction: column;
+        align-items: stretch;
+        padding: 0;
+        min-width: 0;
+    }
+
+    .ldr-row-wakil1 .ldr-photo-col {
+        order: 1;
+    }
+
+    .ldr-row-wakil1 .ldr-info-col {
+        order: 2;
+    }
+
+    .ldr-photo-col {
+        flex: unset;
+        width: 100%;
+    }
+
+    .ldr-photo-frame {
+        border-radius: 18px 18px 0 0;
+        aspect-ratio: 3 / 4;
+        height: auto;
+        box-shadow: 0 8px 28px rgba(16,44,87,0.15);
+        border: 2px solid rgba(16,44,87,0.12);
+        transition: box-shadow 0.35s ease, transform 0.35s ease;
+    }
+
+    .ldr-row:hover .ldr-photo-frame {
+        box-shadow: 0 16px 40px rgba(16,44,87,0.24);
+        transform: translateY(-4px);
+    }
+
+    .ldr-info-col {
+        flex: unset;
+        width: 100%;
+    }
+
+    /* Kartu info — border atas navy, sudut bawah rounded */
+    .ldr-card,
+    .ldr-card-right {
+        border-radius: 0 0 18px 18px;
+        border-top: 4px solid var(--gbi-navy);
+        border-left: 1px solid rgba(16,44,87,0.12);
+        border-right: 1px solid rgba(16,44,87,0.12);
+        border-bottom: 1px solid rgba(16,44,87,0.12);
+        text-align: center;
+        padding: 20px 20px 24px;
+        height: 100%;
+        box-sizing: border-box;
+    }
+
+    .ldr-row:hover .ldr-card,
+    .ldr-row:hover .ldr-card-right {
+        transform: none;
+        box-shadow: 0 8px 28px rgba(16,44,87,0.14);
+    }
+
+    /* Gembala (tengah) sedikit lebih menonjol */
+    .ldr-row-gembala .ldr-photo-frame {
+        border-color: rgba(16,44,87,0.25);
+        box-shadow: 0 12px 36px rgba(16,44,87,0.22);
+    }
+    .ldr-row-gembala .ldr-card {
+        border-top-width: 5px;
+    }
+
+    .ldr-name { font-size: 16px; }
+
+    /* Daun zaitun di desktop */
+    .ldr-olive { display: block; }
+    .ldr-olive-tl { top: -8px; left: -10px; }
+    .ldr-olive-tr { top: -8px; right: -10px; }
+    .ldr-olive-bl { bottom: 60px; left: -10px; }
+
+    .ldr-corner { width: 18px; height: 18px; }
+    .ldr-corner-tl { top: 7px; left: 7px; }
+    .ldr-corner-br { bottom: 7px; right: 7px; }
+}
+
+/* ── TABLET: ikuti susunan desktop agar tetap 3 kolom ── */
+@media (min-width: 641px) and (max-width: 899px) {
+    .ldr-timeline-line,
+    .ldr-divider-deco,
+    .ldr-dove-top,
+    .ldr-dove-bottom,
+    .ldr-olive,
+    .ldr-connector-wrap {
+        display: none !important;
+    }
+
+    .ldr-zigzag-wrap {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        grid-template-areas: "wakil1 gembala wakil2";
+        gap: 16px;
+        align-items: stretch;
+        max-width: 960px;
+    }
+
+    .ldr-row,
+    .ldr-row.ldr-row-right,
+    .ldr-row.ldr-row-left {
+        flex-direction: column;
+        align-items: stretch;
+        padding: 0;
+        min-width: 0;
+    }
+
+    .ldr-row-wakil1 .ldr-photo-col {
+        order: 1;
+    }
+
+    .ldr-row-wakil1 .ldr-info-col {
+        order: 2;
+    }
+
+    .ldr-row-wakil1 { grid-area: wakil1; }
+    .ldr-row-gembala { grid-area: gembala; }
+    .ldr-row-wakil2 { grid-area: wakil2; }
+
+    .ldr-photo-col,
+    .ldr-info-col {
+        flex: unset;
+        width: 100%;
+    }
+
+    .ldr-photo-frame {
+        border-radius: 18px 18px 0 0;
+        aspect-ratio: 3 / 4;
+    }
+
+    .ldr-card,
+    .ldr-card-right {
+        border-radius: 0 0 18px 18px;
+        border-top: 4px solid var(--gbi-navy);
+        border-left: none;
+        border-right: none;
+        text-align: center;
+        padding: 18px 16px 20px;
+    }
+
+    .ldr-row:hover .ldr-card,
+    .ldr-row:hover .ldr-card-right {
+        transform: none;
+    }
+}
+
+@media (max-width: 640px) {
+    .about-gbi-leaders { padding: 32px 14px 40px; }
+
+    .ldr-timeline-line { display: none; }
+    .ldr-olive { display: none; }
+
+    /* Semua row tetap flex horizontal, tapi lebih compact */
+    .ldr-row {
+        align-items: stretch;
+        gap: 0;
+        padding: 8px 0;
+    }
+
+    .ldr-photo-col {
+        flex: 0 0 42%;
+        max-width: 160px;
+    }
+
+    .ldr-photo-frame {
+        border-radius: 14px;
+        aspect-ratio: 3 / 4;
+        height: 100%;
+        box-shadow: 0 6px 18px rgba(16,44,87,0.18);
+    }
+
+    .ldr-photo {
+        object-position: center 10%;
+    }
+
+    .ldr-connector-wrap {
+        flex: 0 0 24px;
+        min-height: 60px;
+    }
+
+    .ldr-connector-line {
+        left: 0; right: 0;
+        height: 2px;
+        top: 50%;
+        transform: translateY(-50%);
+    }
+
+    .ldr-star-node {
+        width: 14px; height: 14px;
+    }
+
+    .ldr-info-col {
+        flex: 1;
+        display: flex;
+        align-items: center;
+    }
+
+    /* Row kiri: foto kiri, teks kanan — border kiri */
+    .ldr-row-left .ldr-card {
+        border-radius: 0 12px 12px 0;
+        border-left: 4px solid var(--gbi-navy);
+        border-right: 1px solid rgba(16,44,87,0.12);
+        text-align: left;
+        padding: 14px 12px;
+        width: 100%;
+    }
+
+    /* Row kanan: teks kiri, foto kanan — border kanan */
+    .ldr-row-right .ldr-card-right {
+        border-radius: 12px 0 0 12px;
+        border-right: 4px solid var(--gbi-navy);
+        border-left: 1px solid rgba(16,44,87,0.12);
+        text-align: left;
+        padding: 14px 12px;
+        width: 100%;
+    }
+
+    .ldr-row:hover .ldr-card,
+    .ldr-row:hover .ldr-card-right {
+        transform: none;
+    }
+
+    .ldr-badge {
+        font-size: 9px;
+        padding: 2px 8px;
+        margin-bottom: 6px;
+    }
+
+    .ldr-name {
+        font-size: clamp(12px, 3.4vw, 15px);
+        margin-bottom: 5px;
+    }
+
+    .ldr-desc {
+        font-size: 11px;
+        line-height: 1.6;
+    }
+
+    /* Sudut ornamen lebih kecil di mobile */
+    .ldr-corner { width: 14px; height: 14px; }
+    .ldr-corner-tl { top: 5px; left: 5px; }
+    .ldr-corner-br { bottom: 5px; right: 5px; }
+
+    .ldr-verse { font-size: 11.5px; margin-bottom: 24px; }
+    .ldr-cross-deco { width: 20px; height: 20px; }
+    .ldr-dove-top, .ldr-dove-bottom { width: 44px; height: 30px; }
+    .ldr-divider-deco { height: 20px; }
+}
+
+/* ── RESPONSIVE (non-leaders) ── */
 
 @media (max-width: 1080px) {
-    .about-gbi-hero {
-        padding: 20px 20px 76px;
-    }
-
-    .about-gbi-hero-inner {
-        grid-template-columns: 1fr;
-    }
-
-    .about-gbi-hero-media {
-        border-radius: 18px 18px 0 0;
-        min-height: 300px;
-    }
-
+    .about-gbi-hero { padding: 20px 20px 76px; }
+    .about-gbi-hero-inner { grid-template-columns: 1fr; }
+    .about-gbi-hero-media { border-radius: 18px 18px 0 0; min-height: 300px; }
     .about-gbi-hero-card {
         border-radius: 0 0 18px 18px;
         padding: 24px 22px;
         border-left: none;
         border-top: 5px solid var(--gbi-green);
     }
-
-    .about-gbi-intro {
-        padding: 24px 34px 30px;
-    }
-
-    .about-gbi-intro h2 {
-        display: block;
-        max-width: 760px;
-    }
-
-    .about-gbi-intro .about-gbi-identity {
-        max-width: 900px;
-    }
-
+    .about-gbi-intro { padding: 24px 34px 30px; }
     .about-gbi-gallery,
     .about-gbi-story,
-    .about-gbi-leaders {
-        padding-left: 26px;
-        padding-right: 26px;
-    }
-
-    .about-gbi-gallery-grid {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-    }
-
-    .about-gbi-leaders-grid {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-    }
-}
-
-@media (max-width: 900px) {
-    .about-gbi-hero {
-        padding: 16px 18px 68px;
-    }
-
-    .about-gbi-hero-inner {
-        max-width: 760px;
-    }
-
-    .about-gbi-hero-media {
-        min-height: 280px;
-    }
-
-    .about-gbi-hero-card h1 {
-        font-size: clamp(28px, 6vw, 42px);
-    }
-
-    .about-gbi-hero-card p {
-        font-size: 15px;
-        line-height: 1.66;
-    }
-
-    .about-gbi-wave {
-        height: 68px;
-        border-top-left-radius: 50% 72px;
-        border-top-right-radius: 50% 72px;
-    }
-
-    .about-gbi-intro {
-        padding: 22px 24px 28px;
-    }
-
-    .about-gbi-intro h2 {
-        font-size: clamp(32px, 6.1vw, 44px);
-        line-height: 1.08;
-    }
-
-    .about-gbi-intro .about-gbi-identity {
-        font-size: 15px;
-        line-height: 1.68;
-        padding: 11px 14px;
-    }
-
-    .about-gbi-story-card {
-        padding: 24px;
-    }
-
-    .about-gbi-story-card p {
-        font-size: 16px;
-        line-height: 1.8;
-    }
-
-    .about-gbi-story-card blockquote {
-        font-size: 20px;
-        line-height: 1.48;
-    }
+    .about-gbi-leaders { padding-left: 26px; padding-right: 26px; }
+    .about-gbi-gallery-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
 
 @media (max-width: 700px) {
-    .about-gbi-wrap {
-        padding: 0 0 30px;
-    }
-
-    .about-gbi-shell {
-        width: 100%;
-        margin: 0;
-        border-radius: 0;
-        overflow: hidden;
-    }
-
-    .about-gbi-wave {
-        height: 54px;
-        border-top-left-radius: 50% 56px;
-        border-top-right-radius: 50% 56px;
-    }
-
-    .about-gbi-hero,
-    .about-gbi-intro,
-    .about-gbi-gallery,
-    .about-gbi-story,
-    .about-gbi-leaders {
-        padding-left: 14px;
-        padding-right: 14px;
-    }
-
-    .about-gbi-hero {
-        padding-top: 14px;
-        padding-bottom: 42px;
-    }
-
-    .about-gbi-hero-media {
-        min-height: 240px;
-    }
-
-    .about-gbi-hero-card {
-        padding: 18px 16px 20px;
-    }
-
-    .about-gbi-hero-card h1 {
-        font-size: clamp(26px, 9vw, 36px);
-    }
-
-    .about-gbi-hero-card p {
-        font-size: 14px;
-        line-height: 1.62;
-        padding: 0 16px;
-    }
-
+    .about-gbi-hero { padding: 14px 16px 52px; }
+    .about-gbi-hero-media { min-height: 220px; }
+    .about-gbi-hero-card { padding: 18px 16px 22px; }
+    .about-gbi-hero-card h1 { font-size: clamp(26px, 9vw, 34px); }
+    .about-gbi-hero-card p { font-size: 14px; line-height: 1.62; padding: 0 16px; }
     .about-gbi-hero-card p::before,
-    .about-gbi-hero-card p::after {
-        font-size: 36px;
-    }
-
-    .about-gbi-intro {
-        padding-top: 18px;
-        padding-bottom: 22px;
-        margin-top: 14px;
-    }
-
-    .about-gbi-intro h2,
-    .about-gbi-story h3,
-    .about-gbi-leaders h3 {
-        line-height: 1.08;
-    }
-
-    .about-gbi-intro h2 {
-        font-size: clamp(30px, 9vw, 40px);
-        margin-bottom: 10px;
-    }
-
-    .about-gbi-intro .about-gbi-identity {
-        font-size: 14px;
-        line-height: 1.65;
-        border-left-width: 3px;
-        border-right-width: 3px;
-        padding: 10px 12px;
-    }
-
-    .about-gbi-story-card p {
-        font-size: 15px;
-    }
-
-    .about-gbi-story-card blockquote {
-        font-size: 19px;
-    }
-
-    .about-gbi-gallery-grid {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-        column-gap: 10px;
-        row-gap: 6px;
-    }
-
-    .about-gbi-leaders-grid {
-        grid-template-columns: repeat(3, minmax(0, 1fr));
-        gap: 8px;
-    }
-
-    .about-gbi-leaders {
-        padding-top: 34px;
-        padding-bottom: 28px;
-    }
-
-    .about-gbi-leader-photo-wrap {
-        aspect-ratio: 1 / 1.14;
-    }
-
-    .about-gbi-leader-meta {
-        padding: 10px 8px 11px;
-    }
-
-    .about-gbi-leader-position {
-        font-size: 9px;
-        letter-spacing: 0.07em;
-        padding: 3px 8px;
-    }
-
-    .about-gbi-leader-name {
-        margin-top: 6px;
-        font-size: clamp(11px, 2.8vw, 14px);
-        line-height: 1.25;
-    }
-}
-
-@media (max-width: 480px) {
-    .about-gbi-wave {
-        height: 46px;
-        border-top-left-radius: 50% 42px;
-        border-top-right-radius: 50% 42px;
-    }
-
-    .about-gbi-intro h2 {
-        font-size: clamp(28px, 10.6vw, 34px);
-    }
-
-    .about-gbi-intro .about-gbi-identity {
-        font-size: 13px;
-        line-height: 1.62;
-    }
-
-    .about-gbi-story-card {
-        padding: 18px;
-    }
-
-    .about-gbi-story-card p {
-        font-size: 14px;
-        line-height: 1.74;
-    }
-
-    .about-gbi-story-card blockquote {
-        font-size: 17px;
-        padding: 12px 14px;
-    }
+    .about-gbi-hero-card p::after { font-size: 36px; }
+    .about-gbi-wave { height: 48px; border-top-left-radius: 50% 50px; border-top-right-radius: 50% 50px; }
+    .about-gbi-intro { padding: 18px 16px 22px; }
+    .about-gbi-intro h2 { font-size: clamp(24px, 8vw, 34px); }
+    .about-gbi-intro .about-gbi-identity { font-size: 13.5px; border-left-width: 3px; border-right-width: 3px; }
+    .about-gbi-gallery { padding: 20px 16px 16px; }
+    .about-gbi-gallery-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+    .about-gbi-story { padding: 30px 16px 20px; }
+    .about-gbi-story-card { padding: 18px; }
+    .about-gbi-story-card p { font-size: 15px; line-height: 1.78; }
+    .about-gbi-story-card blockquote { font-size: 17px; padding: 12px 14px; }
 }
 </style>
 

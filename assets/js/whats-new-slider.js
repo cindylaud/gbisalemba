@@ -25,6 +25,7 @@ function initWhatsNewSlider() {
   let autoplayTimer = null;
   let isTransitioning = false;
   let dots = [];
+  let lastOpenedCard = null;
 
   function getOriginalItemsInTrack() {
     return Array.from(track.querySelectorAll('.whats-new-card:not([data-clone="true"])'));
@@ -63,6 +64,7 @@ function initWhatsNewSlider() {
     modalLocation.textContent = location;
     modalRegistration.textContent = registration;
     modalDescription.textContent = description;
+    lastOpenedCard = card;
     modal.classList.add('is-open');
     modal.setAttribute('aria-hidden', 'false');
     document.body.classList.add('coming-soon-modal-open');
@@ -75,6 +77,14 @@ function initWhatsNewSlider() {
     modal.classList.remove('is-open');
     modal.setAttribute('aria-hidden', 'true');
     document.body.classList.remove('coming-soon-modal-open');
+
+    if (lastOpenedCard && typeof lastOpenedCard.focus === 'function') {
+      try {
+        lastOpenedCard.focus({ preventScroll: true });
+      } catch (e) {
+        lastOpenedCard.focus();
+      }
+    }
   }
 
   function calculateSizing() {
