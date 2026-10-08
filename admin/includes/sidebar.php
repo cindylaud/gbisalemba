@@ -29,6 +29,7 @@ function isMenuActive($currentPath, $href) {
 
 $menuItems = [
 	['href' => $adminBaseUrl . '/index.php', 'icon' => 'fa-gauge', 'label' => 'Dashboard'],
+	['href' => $adminBaseUrl . '/profile.php', 'icon' => 'fa-user', 'label' => 'Profile'],
 	['href' => $adminBaseUrl . '/slider.php', 'icon' => 'fa-images', 'label' => 'Kelola Slider'],
 	['href' => $adminBaseUrl . '/whatsnew.php', 'icon' => 'fa-bullhorn', 'label' => 'Kelola Coming Soon'],
 	['href' => $adminBaseUrl . '/jadwal_ibadah/index.php', 'icon' => 'fa-calendar-days', 'label' => 'Kelola Jadwal'],
